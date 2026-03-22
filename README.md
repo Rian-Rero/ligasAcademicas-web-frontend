@@ -41,28 +41,20 @@ O desenvolvimento deste sistema é guiado pelas seguintes necessidades de seus d
 
 ### Gestão Global (Administrador)
 
-- **Como administrador do sistema**, eu quero cadastrar e gerenciar diferentes universidades na plataforma para que cada instituição tenha seu próprio ecossistema.
-- **Como administrador do sistema**, eu quero criar Ligas Acadêmicas e vinculá-las a uma universidade específica.
-- **Como administrador**, eu quero gerenciar os níveis de permissão de acesso (diretoria vs. aluno comum) para garantir a segurança e a integridade dos dados de cada liga.
+- **Como administrador do sistema**, eu quero cadastrar e gerenciar diferentes Ligas Acadêmicas na plataforma, vinculando-as a uma universidade específica, para que cada instituição tenha seu próprio ecossistema.
+- **Como administrador**, eu quero gerenciar os níveis de permissão de acesso (diretoria vs. aluno comum) para garantir a segurança e a integridade dos dados dos participantes de cada liga.
 
 ### Gestão da Liga (Diretoria e Presidência)
 
-- **Como presidente da liga**, eu quero criar e agendar eventos/aulas, definindo capacidade e local, para que os alunos possam visualizar e se inscrever.
-- **Como membro da diretoria**, eu quero cadastrar e aprovar novos alunos na liga para manter o controle de filiados sempre atualizado.
-- **Como membro da diretoria**, eu quero registrar e validar a lista de presença das reuniões/eventos para manter o histórico de participação de cada membro.
-- **Como membro da diretoria**, eu quero garantir que apenas usuários com cargo de diretoria tenham acesso aos dados sensíveis (contatos, documentos) dos participantes da liga.
+- **Como presidente da liga**, eu quero agendar eventos, definindo capacidade e local, para que os alunos possam se inscrever.
+- **Como membro da diretoria**, eu quero cadastrar e remover alunos da liga para manter o controle de filiados sempre atualizado.
+- **Como membro da diretoria**, eu quero registrar a lista de presença das reuniões/eventos para manter o histórico de participação de cada membro.
 - **Como membro da diretoria**, eu quero anexar o modelo de certificado assinado para que o sistema possa utilizá-lo como base na geração automática de documentos.
-- **Como membro da diretoria**, eu quero visualizar um painel (dashboard) com o número de inscritos e presentes por evento para medir o engajamento da liga. _(História Adicional)_
 
 ### Experiência do Aluno (Membro comum)
 
 - **Como aluno**, eu quero acessar um painel com a agenda de eventos e reuniões da minha liga para me programar e confirmar minha inscrição.
 - **Como aluno**, eu quero fazer o download dos meus certificados em formato PDF diretamente pelo portal para utilizá-los na comprovação de horas complementares na faculdade.
-- **Como aluno**, eu quero visualizar meu histórico de participação e status de membro ativo na liga. _(História Adicional)_
-
-### Automação (Sistema)
-
-- **Como sistema**, eu quero gerar certificados automaticamente baseados no cargo exercido (ex: ligante, palestrante, diretor), carga horária e datas, poupando o tempo da diretoria.
 
 ---
 
