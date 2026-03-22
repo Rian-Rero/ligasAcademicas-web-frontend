@@ -30,7 +30,7 @@ _(Observação: Preencher com os demais membros da equipe e seus respectivos foc
 
 - **Frontend:** React (JavaScript)
 - **Backend:** Node.js com Express
-- **Banco de Dados:** MongoDB
+- **Banco de Dados:** PostgreSQL
 - **Inteligência Artificial (Auxílio ao Desenvolvimento):** Gemini, Claude Code e ChatGPT
 
 ---
