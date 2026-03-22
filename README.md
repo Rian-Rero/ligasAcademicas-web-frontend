@@ -22,8 +22,6 @@ A plataforma automatiza processos burocráticos, permitindo o controle eficiente
 | **João Paulo Gonçalves da Silva** | Desenvolvedor Backend    |
 | **Yan Adriel Martins Silva**      | Desenvolvedor Fullstack  |
 
-_(Observação: Preencher com os demais membros da equipe e seus respectivos focos no desenvolvimento)._
-
 ---
 
 ## 🛠️ Tecnologias Utilizadas
