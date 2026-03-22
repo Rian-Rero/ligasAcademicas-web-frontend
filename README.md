@@ -19,8 +19,8 @@ A plataforma automatiza processos burocráticos, permitindo o controle eficiente
 | :-------------------------------- | :----------------------- |
 | **Rian Rero Lopes Jericó Vieira** | Desenvolvedor Fullstack  |
 | **Lara Strutz Carvalho**          | _[Papel do Membro 2]_    |
-| **João Paulo**                    | Desenvolvedor Baclend    |
-| **Yan**                           | _[Papel do Membro 4]_    |
+| **João Paulo Gonçalves da Silva** | Desenvolvedor Backend    |
+| **Yan Adriel Martins Silva**      | _[Papel do Membro 4]_    |
 
 _(Observação: Preencher com os demais membros da equipe e seus respectivos focos no desenvolvimento)._
 
