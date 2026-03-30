@@ -12,7 +12,7 @@ export default function AppLayout() {
   const [isLoadingScreen, setIsLoadingScreen] = useState(true);
   const { isLoadng } = useRefreshToken();
   const { pathname } = useLocation();
-  const timeToShowLoading = 2000; // milliseconds
+  const timeToShowLoading = 500; // milliseconds
 
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll page to top when it is opened
