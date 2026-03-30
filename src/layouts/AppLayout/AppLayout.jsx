@@ -5,10 +5,12 @@ import { Outlet, useLocation } from 'react-router-dom';
 
 import { Container } from './Styles';
 import { AddToast, Header } from '../../components/common';
+import { SystemLoading } from '../../components/features';
+import { useRefreshToken } from '../../hooks/query/sessions';
 
 export default function AppLayout() {
-  // eslint-disable-next-line no-unused-vars
   const [isLoadingScreen, setIsLoadingScreen] = useState(true);
+  const { isLoadng } = useRefreshToken();
   const { pathname } = useLocation();
   const timeToShowLoading = 2000; // milliseconds
 
@@ -25,7 +27,9 @@ export default function AppLayout() {
     return () => clearTimeout(loadingTimer);
   }, []);
 
-  return (
+  return isLoadng || isLoadingScreen ? (
+    <SystemLoading />
+  ) : (
     <Container>
       <Header />
       <Outlet />
