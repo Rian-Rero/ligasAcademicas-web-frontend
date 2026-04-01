@@ -54,7 +54,7 @@ export const Box = styled.div`
   justify-content: center;
 
   width: 100%;
-  min-height: 32rem;
+  min-height: 30rem;
   padding: clamp(1.4rem, 1.8vw, 2rem);
   border-radius: 2.2rem;
   border: 1px solid rgba(255, 255, 255, 0.26);
@@ -78,8 +78,9 @@ export const InputsBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: clamp(1.1rem, 1.8vw, 1.8rem);
+  justify-content: flex-start;
+  margin-top: clamp(2rem, 1.8vw, 2rem);
+  gap: clamp(1.4rem, 1.8vw, 2rem);
 
   width: 100%;
   height: 100%;

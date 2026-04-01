@@ -24,7 +24,7 @@ export default function Login() {
   return (
     <Container>
       <StyledForm onSubmit={(event) => event.preventDefault()}>
-        <Logo customHeight="50%" />
+        <Logo customHeight="60%" />
         <Box>
           <InputsBox>
             <FormInput
