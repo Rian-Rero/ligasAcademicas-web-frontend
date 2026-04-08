@@ -6,8 +6,8 @@ import { ERROR_CODES } from '../../utils/constants';
 export const loginValidationSchema = z.object({
   email: z
     .string()
-    .nonempty('Favor digitar o email')
     .trim()
+    .nonempty('Favor digitar o email')
     .pipe(z.email('Insira um email no formato email@email.com')),
   password: z
     .string()

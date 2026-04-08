@@ -26,6 +26,7 @@ export default function FormInput({
   icon: IconComponent,
 }) {
   const errorMessage = errors?.[name]?.message;
+  const errorMessageId = `${name}-error`;
 
   return (
     <Container>
@@ -42,6 +43,8 @@ export default function FormInput({
           $error={!!errorMessage}
           placeholder={placeholder}
           aria-label={ariaLabel ?? label ?? placeholder}
+          aria-invalid={!!errorMessage}
+          aria-describedby={errorMessage ? errorMessageId : undefined}
           {...register(name, rules)}
           $backgroundColor={backgroundColor}
           $borderString={borderString}
@@ -49,7 +52,9 @@ export default function FormInput({
           $customColor={customColor}
         />
       </InputWrapper>
-      {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+      {errorMessage && (
+        <ErrorMessage id={errorMessageId}>{errorMessage}</ErrorMessage>
+      )}
     </Container>
   );
 }
