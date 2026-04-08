@@ -12,10 +12,14 @@ import {
 export default function FormInput({
   name,
   label,
+  hideLabel,
+  ariaLabel,
   placeholder,
   errors,
   register,
-  backgroundcolor,
+  rules,
+  type,
+  backgroundColor,
   borderRadius,
   borderString,
   customColor,
@@ -25,18 +29,24 @@ export default function FormInput({
 
   return (
     <Container>
-      {label && <Label htmlFor={name}>{label}</Label>}
+      {label && (
+        <Label htmlFor={name} $visuallyHidden={hideLabel}>
+          {label}
+        </Label>
+      )}
       <InputWrapper>
         {IconComponent && <Icon as={IconComponent} />}
         <Input
           id={name}
-          error={!!errorMessage}
+          type={type}
+          $error={!!errorMessage}
           placeholder={placeholder}
-          {...register(name)}
-          backgroundcolor={backgroundcolor}
-          borderString={borderString}
-          borderradius={borderRadius}
-          customColor={customColor}
+          aria-label={ariaLabel ?? label ?? placeholder}
+          {...register(name, rules)}
+          $backgroundColor={backgroundColor}
+          $borderString={borderString}
+          $borderRadius={borderRadius}
+          $customColor={customColor}
         />
       </InputWrapper>
       {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
@@ -47,10 +57,14 @@ export default function FormInput({
 FormInput.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
+  hideLabel: PropTypes.bool,
+  ariaLabel: PropTypes.string,
   placeholder: PropTypes.string.isRequired,
   errors: PropTypes.object.isRequired,
   register: PropTypes.func.isRequired,
-  backgroundcolor: PropTypes.string,
+  rules: PropTypes.object,
+  type: PropTypes.string,
+  backgroundColor: PropTypes.string,
   borderRadius: PropTypes.string,
   borderString: PropTypes.string,
   customColor: PropTypes.string,
@@ -59,8 +73,12 @@ FormInput.propTypes = {
 
 FormInput.defaultProps = {
   label: null,
+  hideLabel: false,
+  ariaLabel: null,
   icon: null,
-  backgroundcolor: null,
+  rules: {},
+  type: 'text',
+  backgroundColor: null,
   borderRadius: null,
   borderString: null,
   customColor: null,

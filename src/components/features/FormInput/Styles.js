@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
@@ -14,6 +14,20 @@ export const Container = styled.div`
 export const Label = styled.label`
   color: #ffffff;
   font-size: 2.4rem;
+
+  ${({ $visuallyHidden }) =>
+    $visuallyHidden &&
+    css`
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    `}
 
   @media (max-width: 700px) {
     font-size: 2rem;
@@ -38,23 +52,21 @@ export const Icon = styled.div`
   pointer-events: none;
 `;
 
-export const Input = styled.input.withConfig({
-  shouldForwardProp: (prop) => prop !== 'error',
-})`
+export const Input = styled.input`
   height: clamp(4rem, 4.1vw, 4.6rem);
   font-size: 1.8rem;
   padding: 0.8rem 1.6rem;
   padding-left: 4rem;
-  border-radius: ${(props) => props.borderradius ?? '0.4rem'};
+  border-radius: ${(props) => props.$borderRadius ?? '0.4rem'};
   width: 100%;
-  color: ${(props) => props.customColor ?? '#ffffff'};
+  color: ${(props) => props.$customColor ?? '#ffffff'};
   border: ${(props) =>
-    props.error
+    props.$error
       ? '0.2rem red solid'
-      : (props.borderString ?? '1px solid rgba(255, 255, 255, 0.28)')};
+      : (props.$borderString ?? '1px solid rgba(255, 255, 255, 0.28)')};
   background-color: ${(props) =>
-    props.backgroundcolor
-      ? props.backgroundcolor
+    props.$backgroundColor
+      ? props.$backgroundColor
       : 'rgba(255, 255, 255, 0.06)'};
   transition:
     border-color 0.2s ease,

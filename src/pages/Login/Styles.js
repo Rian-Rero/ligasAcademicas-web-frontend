@@ -94,7 +94,6 @@ export const Button = styled.button`
 
   background: linear-gradient(120deg, #008cff, #2b66ff 58%, #0b9de8);
   color: ${({ theme }) => theme.colors.font.white};
-
   font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -121,12 +120,34 @@ export const Button = styled.button`
     transform: translateY(0);
   }
 
+  &:disabled {
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.9;
+    filter: saturate(0.9);
+    box-shadow:
+      0 0.6rem 1.6rem rgba(0, 140, 255, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  }
+
+  &:disabled:hover {
+    transform: none;
+    filter: saturate(0.9);
+  }
+
   &:focus-visible {
     outline: none;
     box-shadow:
       0 0 0 3px rgba(0, 140, 255, 0.35),
       0 1rem 2rem rgba(0, 140, 255, 0.35);
   }
+`;
+
+export const ButtonContent = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
 `;
 
 export const ForgotPassword = styled.button`
@@ -152,5 +173,11 @@ export const ForgotPassword = styled.button`
     outline: none;
     color: #ffffff;
     text-shadow: 0 0 1.2rem rgba(0, 140, 255, 0.45);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    text-shadow: none;
   }
 `;
