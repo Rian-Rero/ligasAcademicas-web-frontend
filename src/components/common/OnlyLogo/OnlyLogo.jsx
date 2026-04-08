@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 import { Logo as LogoDiv } from './Styles';
-import { onlyLogo as logoImg } from '../../../assets';
+import { OnlyLogo as logoImg } from '../../../assets';
 
 export default function OnlyLogo({ customHeight, customWidth }) {
   return (

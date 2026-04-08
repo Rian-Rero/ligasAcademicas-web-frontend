@@ -51,7 +51,7 @@ export const Container = styled.header`
   padding: clamp(1rem, 1.8vw, 1.6rem) clamp(1.2rem, 2.8vw, 3.2rem) 0;
 `;
 
-export const HeaderSurface = styled.nav`
+export const HeaderSurface = styled.div`
   width: min(120rem, 100%);
   border-radius: 2.4rem;
   border: 1px solid transparent;
@@ -150,7 +150,7 @@ export const BrandSubtitle = styled.span`
   letter-spacing: 0.02em;
 `;
 
-export const DesktopNav = styled.div`
+export const DesktopNav = styled.nav`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -319,7 +319,7 @@ export const MobileMenu = styled.div`
 
     width: min(120rem, 100%);
     margin-top: 0.8rem;
-    padding: ${({ $isOpen }) => ($isOpen ? '1.2rem' : '0 1.2rem')};
+    padding: 1.2rem;
     border-radius: 1.8rem;
     border: 1px solid rgba(255, 255, 255, 0.2);
 
@@ -334,17 +334,8 @@ export const MobileMenu = styled.div`
       inset 0 1px 0 rgba(255, 255, 255, 0.14);
 
     backdrop-filter: blur(10px);
-    max-height: ${({ $isOpen }) => ($isOpen ? '30rem' : '0')};
-    opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
-    transform: ${({ $isOpen }) =>
-      $isOpen ? 'translateY(0)' : 'translateY(-8px)'};
     overflow: hidden;
-
-    transition:
-      max-height 0.28s ease,
-      opacity 0.2s ease,
-      transform 0.2s ease,
-      padding 0.2s ease;
+    animation: ${slideDown} 0.2s ease;
   }
 `;
 

@@ -96,7 +96,7 @@ export default function Header() {
             <MenuButton
               type="button"
               aria-expanded={isMobileMenuOpen}
-              aria-controls="mobile-navigation"
+              aria-controls={isMobileMenuOpen ? 'mobile-navigation' : undefined}
               aria-label={
                 isMobileMenuOpen
                   ? 'Fechar menu de navegação'
@@ -110,32 +110,30 @@ export default function Header() {
         </ItensBox>
       </HeaderSurface>
 
-      <MobileMenu
-        id="mobile-navigation"
-        $isOpen={isMobileMenuOpen}
-        aria-hidden={!isMobileMenuOpen}
-      >
-        <MobileNav aria-label="Navegação mobile">
-          {navigationLinks.map(({ to, label, end }) => (
-            <MobileNavItem
-              key={to}
-              to={to}
-              end={end}
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {label}
-            </MobileNavItem>
-          ))}
-        </MobileNav>
+      {isMobileMenuOpen && (
+        <MobileMenu id="mobile-navigation">
+          <MobileNav aria-label="Navegação mobile">
+            {navigationLinks.map(({ to, label, end }) => (
+              <MobileNavItem
+                key={to}
+                to={to}
+                end={end}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {label}
+              </MobileNavItem>
+            ))}
+          </MobileNav>
 
-        <MobileCtaLink
-          to={ctaData.to}
-          onClick={() => setIsMobileMenuOpen(false)}
-        >
-          <IoLogIn />
-          {ctaData.label}
-        </MobileCtaLink>
-      </MobileMenu>
+          <MobileCtaLink
+            to={ctaData.to}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <IoLogIn />
+            {ctaData.label}
+          </MobileCtaLink>
+        </MobileMenu>
+      )}
     </Container>
   );
 }
