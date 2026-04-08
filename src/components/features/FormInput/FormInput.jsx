@@ -50,7 +50,6 @@ export default function FormInput({
           $borderString={borderString}
           $borderRadius={borderRadius}
           $customColor={customColor}
-          noValidate
         />
       </InputWrapper>
       {errorMessage && (
