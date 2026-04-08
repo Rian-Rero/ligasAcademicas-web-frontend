@@ -54,13 +54,6 @@ export default function Login() {
               icon={IoPerson}
               register={register}
               errors={errors}
-              rules={{
-                required: 'E-mail e obrigatorio',
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: 'Digite um e-mail valido',
-                },
-              }}
               borderRadius="4rem"
               customColor={theme.colors.font.white}
               borderString={`1px solid ${theme.colors.white}`}
@@ -74,13 +67,6 @@ export default function Login() {
               icon={RiLock2Fill}
               register={register}
               errors={errors}
-              rules={{
-                required: 'Senha e obrigatoria',
-                minLength: {
-                  value: 6,
-                  message: 'A senha deve ter pelo menos 6 caracteres',
-                },
-              }}
               borderRadius="4rem"
               customColor={theme.colors.font.white}
               borderString={`1px solid ${theme.colors.white}`}

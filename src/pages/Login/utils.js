@@ -27,6 +27,6 @@ const loginDefaultErrorMessage =
   'Erro ao realizar o login. Tente novamente mais tarde';
 
 export function buildLoginErrorMessage(err) {
-  const code = err?.response?.data?.httpCode;
+  const code = err?.response?.data?.httpCode ?? err?.response?.status;
   return loginErrorMessages[code] || loginDefaultErrorMessage;
 }

@@ -1,10 +1,10 @@
 import { toast } from 'react-toastify';
 
 const fallbackByType = {
-  success: 'Operacao realizada com sucesso',
-  error: 'Nao foi possivel concluir a operacao',
-  info: 'Confira as informacoes enviadas',
-  warning: 'Atencao aos dados informados',
+  success: 'Operação realizada com sucesso',
+  error: 'Não foi possível concluir a operação',
+  info: 'Confira as informações enviadas',
+  warning: 'Atenção aos dados informados',
 };
 
 const prefixByType = {
