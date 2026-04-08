@@ -10,7 +10,7 @@ export const forgotPasswordValidationSchema = z.object({
 });
 
 const forgotPasswordErrorMessages = {
-  [ERROR_CODES.BAD_REQUEST]: 'Dados invalidos',
+  [ERROR_CODES.BAD_REQUEST]: 'Dados inválidos',
   [ERROR_CODES.NOT_FOUND]: 'E-mail não encontrado ou não verificado',
 };
 

@@ -5,10 +5,9 @@ import { ERROR_CODES } from '../../utils/constants';
 // Form Validation
 export const loginValidationSchema = z.object({
   email: z
-    .string()
+    .email('Insira um email no formato email@email.com')
     .trim()
-    .nonempty('Favor digitar o email')
-    .pipe(z.email('Insira um email no formato email@email.com')),
+    .nonempty('Favor digitar o email'),
   password: z
     .string()
     .nonempty('Favor digitar uma senha')
