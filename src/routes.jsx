@@ -6,7 +6,7 @@ import {
 } from 'react-router-dom';
 
 import { AppLayout } from './layouts';
-import { Home, Login } from './pages';
+import { ForgotPassword, Home, Login } from './pages';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -14,6 +14,7 @@ const router = createBrowserRouter(
       <Route path="/" element={<AppLayout />}>
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
       </Route>
     </Route>,
   ),

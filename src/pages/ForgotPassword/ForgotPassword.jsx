@@ -1,79 +1,81 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { IoPerson } from 'react-icons/io5';
-import { RiLock2Fill } from 'react-icons/ri';
+import { IoArrowBack, IoMail } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
 import {
+  BackToLogin,
   Box,
   Button,
   ButtonContent,
   Container,
-  ForgotPassword as ForgotPasswordButton,
+  Description,
   InputsBox,
   StyledForm,
+  Title,
 } from './Styles';
-import { buildLoginErrorMessage, loginValidationSchema } from './utils';
+import {
+  buildForgotPasswordErrorMessage,
+  forgotPasswordValidationSchema,
+} from './utils';
 import { Logo } from '../../components/common';
 import { FormInput } from '../../components/features';
-import { useLogin } from '../../hooks/query/sessions';
+import { useForgotPassword } from '../../hooks/query/user';
 import { notifyError, notifySuccess } from '../../utils/toast';
 
-export default function Login() {
+export default function ForgotPassword() {
   const theme = useTheme();
   const navigate = useNavigate();
-
-  const { mutate: login, isPending: isLoading } = useLogin({
-    onSuccess: () => {
-      notifySuccess('Login realizado com sucesso!');
-    },
-    onError: (err) => {
-      notifyError(buildLoginErrorMessage(err));
-    },
-  });
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(loginValidationSchema) });
+  } = useForm({ resolver: zodResolver(forgotPasswordValidationSchema) });
 
-  const onSubmit = (data) => login(data);
+  const { mutate: requestForgotPassword, isPending: isLoading } =
+    useForgotPassword({
+      onSuccess: () => {
+        notifySuccess('E-mail de recuperação enviado!');
+        reset();
+      },
+      onError: (err) => {
+        notifyError(buildForgotPasswordErrorMessage(err));
+      },
+    });
+
+  const onSubmit = ({ email }) => requestForgotPassword(email);
+  const handleBackToLogin = () => navigate('/login');
 
   return (
     <Container>
       <StyledForm onSubmit={handleSubmit(onSubmit)}>
         <Logo customHeight="60%" />
+
         <Box>
           <InputsBox>
+            <Title>Recuperar senha</Title>
+            <Description>
+              Digite o e-mail da sua conta para receber um link de redefinição.
+            </Description>
+
             <FormInput
               name="email"
               label="E-mail"
               hideLabel
               type="email"
               placeholder="Digite aqui seu email"
-              icon={IoPerson}
+              icon={IoMail}
               register={register}
               errors={errors}
               borderRadius="4rem"
               customColor={theme.colors.font.white}
               borderString={`1px solid ${theme.colors.white}`}
             />
-            <FormInput
-              name="password"
-              label="Senha"
-              hideLabel
-              type="password"
-              placeholder="Digite aqui sua senha"
-              icon={RiLock2Fill}
-              register={register}
-              errors={errors}
-              borderRadius="4rem"
-              customColor={theme.colors.font.white}
-              borderString={`1px solid ${theme.colors.white}`}
-            />
+
             <Button type="submit" disabled={isLoading} aria-busy={isLoading}>
               {isLoading ? (
                 <ButtonContent>
@@ -82,19 +84,21 @@ export default function Login() {
                     color={theme.colors.white}
                     speedMultiplier={0.9}
                   />
-                  Entrando...
+                  Enviando...
                 </ButtonContent>
               ) : (
-                'Entrar'
+                'Enviar link'
               )}
             </Button>
-            <ForgotPasswordButton
+
+            <BackToLogin
               type="button"
               disabled={isLoading}
-              onClick={() => navigate('/forgot-password')}
+              onClick={handleBackToLogin}
             >
-              Esqueci minha senha
-            </ForgotPasswordButton>
+              <IoArrowBack />
+              Voltar para login
+            </BackToLogin>
           </InputsBox>
         </Box>
       </StyledForm>

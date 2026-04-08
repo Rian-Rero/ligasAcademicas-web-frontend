@@ -1,5 +1,5 @@
 import { Container, Logo, Text } from './Styles';
-import logoSGLA from '../../../assets/logoSGLA.svg';
+import logoSGLA from '../../../assets/logoSGLA.png';
 
 export default function SystemLoading() {
   return (
