@@ -16,9 +16,48 @@ html {
 body {
   font-family: ${(props) => props.theme.fonts.openSans}, sans-serif;
   font-size: 1.4rem;
-  background: white;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
+
+  background: #06090f;
+  position: relative;
+  color: #fff;
+
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: -20%;
+  left: -20%;
+  width: 70%;
+  height: 70%;
+
+  background: radial-gradient(
+    circle,
+    rgba(0, 140, 255, 0.25),
+    transparent 70%
+  );
+
+  filter: blur(120px);
+  z-index: -1;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  bottom: -20%;
+  right: -20%;
+  width: 70%;
+  height: 70%;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 140, 0, 0.25),
+    transparent 70%
+  );
+
+  filter: blur(120px);
+  z-index: -1;
 }
 
 html,
@@ -29,8 +68,11 @@ body,
 
 html {
   scroll-behavior: smooth;
-  @media (prefers-reduced-motion: reduce) {
-	  scroll-behavior:auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 `;

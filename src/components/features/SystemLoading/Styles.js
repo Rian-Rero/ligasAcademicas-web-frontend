@@ -30,9 +30,11 @@ export const Container = styled.div`
 `;
 
 export const Logo = styled.img`
-  width: clamp(400px, 32vw, 500px);
+  width: 60%;
   height: auto;
   animation: ${pulse} 1.3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(0, 140, 255, 0.25))
+    drop-shadow(0 0 40px rgba(255, 140, 0, 0.15));
 `;
 
 export const Text = styled.p`

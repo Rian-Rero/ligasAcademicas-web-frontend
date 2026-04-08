@@ -10,9 +10,9 @@ import { useRefreshToken } from '../../hooks/query/sessions';
 
 export default function AppLayout() {
   const [isLoadingScreen, setIsLoadingScreen] = useState(true);
-  const { isLoadng } = useRefreshToken();
+  const { isLoading } = useRefreshToken();
   const { pathname } = useLocation();
-  const timeToShowLoading = 2000; // milliseconds
+  const timeToShowLoading = 500; // milliseconds
 
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll page to top when it is opened
@@ -27,7 +27,7 @@ export default function AppLayout() {
     return () => clearTimeout(loadingTimer);
   }, []);
 
-  return isLoadng || isLoadingScreen ? (
+  return isLoading || isLoadingScreen ? (
     <SystemLoading />
   ) : (
     <Container>
