@@ -6,7 +6,7 @@ import {
 } from 'react-router-dom';
 
 import { AppLayout } from './layouts';
-import { ForgotPassword, Home, Login } from './pages';
+import { EmailConfirmation, ForgotPassword, Home, Login } from './pages';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -15,6 +15,10 @@ const router = createBrowserRouter(
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route
+          path="email-confirmation/:token"
+          element={<EmailConfirmation />}
+        />
       </Route>
     </Route>,
   ),
