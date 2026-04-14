@@ -59,12 +59,14 @@ export function useCreateUser({
 
 export function useVerifyUser({
   token,
+  enabled = true,
   onSuccess = () => {},
   onError = (err) => console.log(err),
 } = {}) {
   return useQuery({
-    queryKey: ['verifyEmail'],
+    queryKey: ['verifyEmail', token],
     queryFn: () => verifyEmail(token),
+    enabled: Boolean(token) && enabled,
     onSuccess,
     onError,
   });

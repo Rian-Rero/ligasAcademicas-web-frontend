@@ -1,4 +1,17 @@
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+
+const badgeGlow = keyframes`
+  0%,
+  100% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+  }
+`;
 
 export const Container = styled.div`
   display: flex;
@@ -110,6 +123,52 @@ export const Message = styled.p`
   font-weight: 400;
   line-height: 1.6;
   text-align: center;
+`;
+
+export const NameBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+
+  background: linear-gradient(120deg, #008cff, #2b66ff 58%, #0b9de8);
+  color: #ffffff;
+
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
+  box-shadow:
+    0 0.75rem 1.7rem rgba(0, 140, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+
+  animation: ${badgeGlow} 1.9s ease-in-out infinite;
+`;
+
+export const RedirectProgressBar = styled.div`
+  width: 100%;
+  max-width: 31rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(255, 255, 255, 0.12);
+`;
+
+export const RedirectProgressFill = styled.div`
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+
+  background: linear-gradient(90deg, #00c6ff, #008cff 42%, #2b66ff);
+  box-shadow: 0 0 14px rgba(0, 140, 255, 0.45);
+
+  transition: width 0.12s linear;
 `;
 
 export const Button = styled.button`
