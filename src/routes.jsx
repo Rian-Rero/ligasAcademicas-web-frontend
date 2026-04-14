@@ -15,7 +15,10 @@ const router = createBrowserRouter(
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
-        <Route path="email-confirmation" element={<EmailConfirmation />} />
+        <Route
+          path="email-confirmation/:token"
+          element={<EmailConfirmation />}
+        />
       </Route>
     </Route>,
   ),

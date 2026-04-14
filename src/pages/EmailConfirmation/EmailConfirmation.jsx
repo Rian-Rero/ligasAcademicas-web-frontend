@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   Box,
@@ -13,6 +13,7 @@ import {
   Title,
 } from './Styles';
 import { Logo } from '../../components/common';
+import { useVerifyUser } from '../../hooks/query/user';
 import { notifySuccess } from '../../utils/toast';
 
 export default function EmailConfirmation() {
@@ -27,6 +28,13 @@ export default function EmailConfirmation() {
 
     return () => clearTimeout(timer);
   }, [navigate]);
+
+  // Backend calls
+
+  const { token } = useParams();
+  const { data: userName, isPending: isLoading } = useVerifyUser({
+    token,
+  });
 
   return (
     <Container>
