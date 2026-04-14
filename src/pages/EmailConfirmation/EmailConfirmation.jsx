@@ -91,15 +91,6 @@ export default function EmailConfirmation() {
     };
   }, [isSuccess, navigate]);
 
-  if (!token) {
-    return (
-      <SystemLoading
-        title="Link de confirmação inválido"
-        message="Voltando para o login..."
-      />
-    );
-  }
-
   if (isLoading) {
     return (
       <SystemLoading

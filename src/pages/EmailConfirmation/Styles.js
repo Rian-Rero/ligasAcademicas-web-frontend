@@ -179,7 +179,7 @@ export const Button = styled.button`
   border: 1px solid rgba(255, 255, 255, 0.42);
 
   background: linear-gradient(120deg, #008cff, #2b66ff 58%, #0b9de8);
-  color: ${({ theme }) => theme?.colors?.font?.white || '#ffffff'};
+  color: ${({ theme }) => theme?.colors?.font?.white ?? '#ffffff'};
   font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: 0.02em;

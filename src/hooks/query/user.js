@@ -64,7 +64,7 @@ export function useVerifyUser({
   onError = (err) => console.log(err),
 } = {}) {
   return useQuery({
-    queryKey: ['verifyEmail', token],
+    queryKey: ['verifyEmail'],
     queryFn: () => verifyEmail(token),
     enabled: Boolean(token) && enabled,
     onSuccess,
