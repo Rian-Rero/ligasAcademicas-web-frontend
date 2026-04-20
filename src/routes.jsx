@@ -6,7 +6,13 @@ import {
 } from 'react-router-dom';
 
 import { AppLayout } from './layouts';
-import { ForgotPassword, Home, Login, Student } from './pages';
+import {
+  Student,
+  EmailConfirmation,
+  ForgotPassword,
+  Home,
+  Login,
+} from './pages';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -16,6 +22,10 @@ const router = createBrowserRouter(
         <Route path="login" element={<Login />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route path="student" element={<Student />} />
+        <Route
+          path="email-confirmation/:token"
+          element={<EmailConfirmation />}
+        />
       </Route>
     </Route>,
   ),
