@@ -7,6 +7,7 @@ import {
 
 import { AppLayout } from './layouts';
 import {
+  Manager,
   Student,
   EmailConfirmation,
   ForgotPassword,
@@ -26,6 +27,9 @@ const router = createBrowserRouter(
           path="email-confirmation/:token"
           element={<EmailConfirmation />}
         />
+      </Route>
+      <Route path="manager">
+        <Route path="dashboard" element={<Manager />} />
       </Route>
     </Route>,
   ),
