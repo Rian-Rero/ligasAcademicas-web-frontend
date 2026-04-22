@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import {
   Card as BaseCard,
   CardHeader as BaseCardHeader,
-  SideBarMenuItem as BaseSideBarMenuItem,
   SummaryCard as BaseSummaryCard,
   TopCards as BaseTopCards,
 } from '../Student/Styles';
@@ -32,6 +31,7 @@ export {
   SectionHeading,
   SideBar,
   SideBarMenu,
+  SideBarMenuItem,
   SummaryCard,
   SummaryItem,
   TeamAvatar,
@@ -189,20 +189,4 @@ export const ShortcutBox = styled.button`
     min-height: 3rem;
     margin-top: 0.1rem;
   }
-`;
-
-export const ManagerSideBarMenuItem = styled(BaseSideBarMenuItem)`
-  ${(props) =>
-    props.$active
-      ? `
-    background: rgba(246, 160, 79, 0.15);
-    color: #f6a04f;
-    border-right-color: #f6a04f;
-    
-    span:first-child {
-      background: rgba(246, 160, 79, 0);
-      color: #f6a04f;
-    }
-  `
-      : ''}
 `;

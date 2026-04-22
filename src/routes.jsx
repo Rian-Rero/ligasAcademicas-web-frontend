@@ -29,9 +29,9 @@ const router = createBrowserRouter(
         <Route path="student">
           <Route path="dashboard" element={<Student />} />
         </Route>
-      </Route>
-      <Route path="manager">
-        <Route path="dashboard" element={<Manager />} />
+        <Route path="manager">
+          <Route path="dashboard" element={<Manager />} />
+        </Route>
       </Route>
     </Route>,
   ),

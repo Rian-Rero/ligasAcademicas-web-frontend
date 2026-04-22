@@ -35,7 +35,7 @@ import {
   ShortcutBoxes,
   SideBar,
   SideBarMenu,
-  ManagerSideBarMenuItem,
+  SideBarMenuItem,
   TopCards,
 } from './Styles';
 
@@ -108,7 +108,7 @@ export default function Manager() {
 
         <SideBarMenu>
           {navigation.map(({ label, icon, path }) => (
-            <ManagerSideBarMenuItem
+            <SideBarMenuItem
               key={label}
               type="button"
               $active={location.pathname === path}
@@ -116,7 +116,7 @@ export default function Manager() {
             >
               <span>{icon}</span>
               {label}
-            </ManagerSideBarMenuItem>
+            </SideBarMenuItem>
           ))}
         </SideBarMenu>
       </SideBar>
