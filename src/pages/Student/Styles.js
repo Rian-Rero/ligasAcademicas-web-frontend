@@ -141,6 +141,44 @@ export const SideBarMenuItem = styled.button`
     background: rgba(246, 160, 79, 0);
     color: #f6a04f;
   }
+
+  ${(props) =>
+    props.$active
+      ? `
+    background: rgba(246, 160, 79, 0.15);
+    color: #f6a04f;
+    border-right-color: #f6a04f;
+    transition: none;
+    transform: none;
+
+    &:hover {
+      background: rgba(246, 160, 79, 0.15);
+      color: #f6a04f;
+      border-right-color: #f6a04f;
+    }
+
+    &::before {
+      transform: scaleX(0);
+      transition: none;
+    }
+
+    &:hover::before {
+      transform: scaleX(0);
+    }
+    
+    span:first-child {
+      background: rgba(246, 160, 79, 0);
+      color: #f6a04f;
+      transition: none;
+    }
+
+    &:hover span:first-child {
+      background: rgba(246, 160, 79, 0);
+      color: #f6a04f;
+      transition: none;
+    }
+  `
+      : ''}
 `;
 
 export const Content = styled.section`

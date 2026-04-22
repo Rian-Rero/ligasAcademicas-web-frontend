@@ -7,7 +7,8 @@ import {
   FiUsers,
   FiUser,
 } from 'react-icons/fi';
-import { TbCertificate } from 'react-icons/tb';
+import { TbCertificate, TbLayoutDashboard } from 'react-icons/tb';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import {
   AgendaAction,
@@ -46,10 +47,31 @@ import {
 } from './Styles';
 
 const navigation = [
-  { label: 'Meus Eventos', icon: <FiCalendar /> },
-  { label: 'Meus Certificados', icon: <TbCertificate /> },
-  { label: 'Minha Subequipe', icon: <FiUsers /> },
-  { label: 'Meu Perfil', icon: <FiUser /> },
+  {
+    label: 'Dashboard',
+    icon: <TbLayoutDashboard />,
+    path: '/student/dashboard',
+  },
+  {
+    label: 'Meus Eventos',
+    icon: <FiCalendar />,
+    path: '/student/events',
+  },
+  {
+    label: 'Meus Certificados',
+    icon: <TbCertificate />,
+    path: '/student/certificates',
+  },
+  {
+    label: 'Minha Subequipe',
+    icon: <FiUsers />,
+    path: '/student/team',
+  },
+  {
+    label: 'Meu Perfil',
+    icon: <FiUser />,
+    path: '/student/profile',
+  },
 ];
 
 const agenda = [
@@ -77,6 +99,9 @@ const certificates = [
 const team = ['Nome do Membro 1', 'Nome do Membro 2', 'Nome do Membro 3'];
 
 export default function Student() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   return (
     <Container>
       <SideBar>
@@ -89,8 +114,13 @@ export default function Student() {
         </ProfileCard>
 
         <SideBarMenu>
-          {navigation.map(({ label, icon }) => (
-            <SideBarMenuItem key={label} type="button">
+          {navigation.map(({ label, icon, path }) => (
+            <SideBarMenuItem
+              key={label}
+              type="button"
+              $active={location.pathname === path}
+              onClick={() => navigate(path)}
+            >
               <span>{icon}</span>
               {label}
             </SideBarMenuItem>

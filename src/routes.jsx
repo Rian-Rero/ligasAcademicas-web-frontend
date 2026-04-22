@@ -21,11 +21,13 @@ const router = createBrowserRouter(
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
-        <Route path="student" element={<Student />} />
         <Route
           path="email-confirmation/:token"
           element={<EmailConfirmation />}
         />
+        <Route path="student">
+          <Route path="dashboard" element={<Student />} />
+        </Route>
       </Route>
     </Route>,
   ),
