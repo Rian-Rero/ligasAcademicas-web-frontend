@@ -5,9 +5,9 @@ import {
   Route,
 } from 'react-router-dom';
 
-import { AppLayout } from './layouts';
+import { AppLayout, StudentSideBarLayout } from './layouts';
 import {
-  Student,
+  StudentDashboard,
   EmailConfirmation,
   ForgotPassword,
   Home,
@@ -25,8 +25,8 @@ const router = createBrowserRouter(
           path="email-confirmation/:token"
           element={<EmailConfirmation />}
         />
-        <Route path="student">
-          <Route path="dashboard" element={<Student />} />
+        <Route path="student" element={<StudentSideBarLayout />}>
+          <Route path="dashboard" element={<StudentDashboard />} />
         </Route>
       </Route>
     </Route>,
