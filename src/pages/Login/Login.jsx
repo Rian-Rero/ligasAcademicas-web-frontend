@@ -28,6 +28,7 @@ export default function Login() {
   const { mutate: login, isPending: isLoading } = useLogin({
     onSuccess: () => {
       notifySuccess('Login realizado com sucesso!');
+      navigate('/student/dashboard', { replace: true });
     },
     onError: (err) => {
       notifyError(buildLoginErrorMessage(err));

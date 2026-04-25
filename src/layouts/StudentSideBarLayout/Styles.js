@@ -61,7 +61,10 @@ export const Avatar = styled.div`
   width: 6rem;
   height: 6rem;
   border-radius: 50%;
-  background: radial-gradient(circle at top left, #57b8ff 10%, #0f2f6e 60%);
+  background: ${({ $imageUrl }) =>
+    $imageUrl
+      ? `url(${$imageUrl}) center / cover no-repeat`
+      : 'radial-gradient(circle at top left, #57b8ff 10%, #0f2f6e 60%)'};
   box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 `;

@@ -113,7 +113,6 @@ export const Box = styled.div`
 
 export const SectionHeading = styled.h3`
   font-size: 1.8rem;
-  margin-bottom: 1.5rem;
 
   strong {
     font-size: 1.8rem;
@@ -123,11 +122,18 @@ export const SectionHeading = styled.h3`
     color: rgba(255, 255, 255, 0.72);
     font-size: 1.5rem;
   }
+
+  .members-subtitle {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 0.35rem;
+  }
 `;
 
 export const AgendaList = styled.div`
   display: grid;
   gap: 1.5rem;
+  margin-top: 1rem;
 `;
 
 export const AgendaItem = styled.div`
@@ -285,6 +291,18 @@ export const TeamList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  max-height: 30rem;
+  overflow-y: auto;
+  padding-right: 0.4rem;
+
+  &::-webkit-scrollbar {
+    width: 0.6rem;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.24);
+    border-radius: 999px;
+  }
 `;
 
 export const TeamMember = styled.div`
@@ -301,7 +319,10 @@ export const TeamAvatar = styled.div`
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 50%;
-  background: radial-gradient(circle at top left, #57b8ff 10%, #0f2f6e 60%);
+  background: ${({ $imageUrl }) =>
+    $imageUrl
+      ? `url(${$imageUrl}) center / cover no-repeat`
+      : 'radial-gradient(circle at top left, #57b8ff 10%, #0f2f6e 60%)'};
   box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 `;
