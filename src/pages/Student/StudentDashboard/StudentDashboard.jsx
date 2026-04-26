@@ -135,20 +135,20 @@ export default function StudentDashboard() {
         squadMemberships
           .map((membership) => membership?.user)
           .filter(Boolean)
-          .map(String),
+          .map((userId) => String(userId)),
       ),
     ],
     [squadMemberships],
   );
 
-  const { data: allUsers = [] } = useQuery({
-    queryKey: ['users', 'student-dashboard-squad-members', squadMemberUserIds],
+  const { data: squadUsers = [] } = useQuery({
+    queryKey: ['users', 'squad-members', squadMemberUserIds],
     queryFn: async () => {
-      const usersById = await Promise.all(
+      const usersByMembership = await Promise.all(
         squadMemberUserIds.map((userId) => getUsers({ _id: userId })),
       );
 
-      return usersById.flat();
+      return usersByMembership.flat();
     },
     enabled: squadMemberUserIds.length > 0,
   });
@@ -168,7 +168,7 @@ export default function StudentDashboard() {
   });
 
   const team = useMemo(() => {
-    if (!squadMemberships.length || !allUsers.length) {
+    if (!squadMemberUserIds.length || !squadUsers.length) {
       return authUser?.name
         ? [
             {
@@ -180,11 +180,9 @@ export default function StudentDashboard() {
         : fallbackTeam;
     }
 
-    const userIds = new Set(
-      squadMemberships.map((member) => String(member.user)),
-    );
+    const userIds = new Set(squadMemberUserIds);
 
-    const names = allUsers
+    const names = squadUsers
       .filter((user) => userIds.has(String(user._id)))
       .filter((user) => Boolean(user.name))
       .map((user) => ({
@@ -207,11 +205,11 @@ export default function StudentDashboard() {
 
     return names;
   }, [
-    allUsers,
     authUser?._id,
     authUser?.name,
     authUser?.imageURL,
-    squadMemberships,
+    squadMemberUserIds,
+    squadUsers,
   ]);
 
   const agenda = useMemo(() => {
@@ -264,7 +262,7 @@ export default function StudentDashboard() {
             <TbCertificate />
           </CardIcon>
           <CardHeader>Certificados disponíveis:</CardHeader>
-          <CardValue>{certificates?.length || 0}</CardValue>
+          <CardValue>0</CardValue>
         </Card>
 
         <Card>
@@ -291,7 +289,7 @@ export default function StudentDashboard() {
                   <strong>{item.title}</strong>
                   <span>{item.location}</span>
                 </div>
-                <AgendaAction type="button" $variant={item.variant}>
+                <AgendaAction $variant={item.variant}>
                   {item.action}
                 </AgendaAction>
               </AgendaItem>
@@ -337,6 +335,7 @@ export default function StudentDashboard() {
               <TeamMember key={member.id}>
                 <TeamAvatar
                   $imageUrl={member?.imageURL}
+                  role="img"
                   aria-label={`Foto de ${member.name}`}
                 />
                 {member.name}

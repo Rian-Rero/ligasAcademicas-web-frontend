@@ -82,7 +82,13 @@ export default function StudentSideBarLayout() {
     <Container>
       <SideBar>
         <ProfileCard>
-          <Avatar $imageUrl={authUser?.imageURL} aria-label="Foto do aluno" />
+          <Avatar
+            $imageUrl={authUser?.imageURL}
+            role="img"
+            aria-label={
+              authUser?.name ? `Foto de ${authUser.name}` : 'Foto do aluno'
+            }
+          />
           <div>
             <strong>{authUser?.name}</strong>
             <span>{activeUniversity?.name}</span>

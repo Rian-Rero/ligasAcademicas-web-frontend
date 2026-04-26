@@ -31,7 +31,12 @@ const router = createBrowserRouter(
           element={<EmailConfirmation />}
         />
         <Route path="student" element={<StudentSideBarLayout />}>
+          <Route index element={<StudentDashboard />} />
           <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="events" element={<StudentDashboard />} />
+          <Route path="certificates" element={<StudentDashboard />} />
+          <Route path="team" element={<StudentDashboard />} />
+          <Route path="profile" element={<StudentDashboard />} />
           <Route path="*" element={<StudentDashboard />} />
         </Route>
         <Route path="manager" element={<ManagerSideBarLayout />}>
