@@ -56,7 +56,6 @@ export default function ManagerSideBarLayout() {
   const { data: memberships = [] } = useGetLeagueMemberships({
     filters: { user: authUser?._id, isActive: true },
     enabled: Boolean(authUser?._id),
-    queryKey: ['league-memberships', authUser?._id, 'manager-sidebar'],
   });
 
   const activeMembership = memberships[0];
@@ -64,11 +63,6 @@ export default function ManagerSideBarLayout() {
   const { data: leagues = [] } = useGetAcademicLeagues({
     filters: { _id: activeMembership?.academicLeague },
     enabled: Boolean(activeMembership?.academicLeague),
-    queryKey: [
-      'academic-leagues',
-      activeMembership?.academicLeague,
-      'manager-sidebar',
-    ],
   });
 
   const activeLeague = leagues[0];
@@ -76,7 +70,6 @@ export default function ManagerSideBarLayout() {
   const { data: universities = [] } = useGetUniversities({
     filters: { _id: activeLeague?.university },
     enabled: Boolean(activeLeague?.university),
-    queryKey: ['universities', activeLeague?.university, 'manager-sidebar'],
   });
 
   const activeUniversity = universities[0];

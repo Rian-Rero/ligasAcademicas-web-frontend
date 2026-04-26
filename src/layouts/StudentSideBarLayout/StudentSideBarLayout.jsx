@@ -52,7 +52,6 @@ export default function StudentSideBarLayout() {
   const { data: memberships = [] } = useGetLeagueMemberships({
     filters: { user: authUser?._id, isActive: true },
     enabled: Boolean(authUser?._id),
-    queryKey: ['league-memberships', authUser?._id],
   });
 
   const activeMembership = memberships[0];
@@ -60,7 +59,6 @@ export default function StudentSideBarLayout() {
   const { data: leagues = [] } = useGetAcademicLeagues({
     filters: { _id: activeMembership?.academicLeague },
     enabled: Boolean(activeMembership?.academicLeague),
-    queryKey: ['academic-leagues', activeMembership?.academicLeague],
   });
 
   const activeLeague = leagues[0];
@@ -68,7 +66,6 @@ export default function StudentSideBarLayout() {
   const { data: universities = [] } = useGetUniversities({
     filters: { _id: activeLeague?.university },
     enabled: Boolean(activeLeague?.university),
-    queryKey: ['universities', activeLeague?.university],
   });
 
   const activeUniversity = universities[0];

@@ -71,7 +71,6 @@ export default function ManagerDashboard() {
   const { data: memberships = [] } = useGetLeagueMemberships({
     filters: { user: authUser?._id, isActive: true },
     enabled: Boolean(authUser?._id),
-    queryKey: ['league-memberships', authUser?._id, 'manager-dashboard'],
   });
 
   const activeMembership = memberships[0];
@@ -79,11 +78,6 @@ export default function ManagerDashboard() {
   const { data: leagues = [] } = useGetAcademicLeagues({
     filters: { _id: activeMembership?.academicLeague },
     enabled: Boolean(activeMembership?.academicLeague),
-    queryKey: [
-      'academic-leagues',
-      activeMembership?.academicLeague,
-      'manager-dashboard',
-    ],
   });
 
   const activeLeague = leagues[0];
@@ -91,7 +85,6 @@ export default function ManagerDashboard() {
   const { data: universities = [] } = useGetUniversities({
     filters: { _id: activeLeague?.university },
     enabled: Boolean(activeLeague?.university),
-    queryKey: ['universities', activeLeague?.university, 'manager-dashboard'],
   });
 
   const activeUniversity = universities[0];
@@ -102,23 +95,16 @@ export default function ManagerDashboard() {
       isActive: true,
     },
     enabled: Boolean(activeMembership?.academicLeague),
-    queryKey: [
-      'league-memberships',
-      activeMembership?.academicLeague,
-      'all-members',
-    ],
   });
 
   const { data: squads = [] } = useGetSquads({
     filters: { academicLeague: activeMembership?.academicLeague },
     enabled: Boolean(activeMembership?.academicLeague),
-    queryKey: ['squads', activeMembership?.academicLeague, 'manager-dashboard'],
   });
 
   const { data: eventsFromApi = [] } = useGetEvents({
     filters: { academicLeague: activeMembership?.academicLeague },
     enabled: Boolean(activeMembership?.academicLeague),
-    queryKey: ['events', activeMembership?.academicLeague, 'manager-dashboard'],
     onError: () => {},
   });
 

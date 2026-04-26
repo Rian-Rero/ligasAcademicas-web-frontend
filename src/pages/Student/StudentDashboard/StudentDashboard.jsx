@@ -88,7 +88,6 @@ export default function StudentDashboard() {
   const { data: memberships = [] } = useGetLeagueMemberships({
     filters: { user: authUser?._id, isActive: true },
     enabled: Boolean(authUser?._id),
-    queryKey: ['league-memberships', authUser?._id],
   });
 
   const activeMembership = memberships[0];
@@ -96,7 +95,6 @@ export default function StudentDashboard() {
   const { data: leagues = [] } = useGetAcademicLeagues({
     filters: { _id: activeMembership?.academicLeague },
     enabled: Boolean(activeMembership?.academicLeague),
-    queryKey: ['academic-leagues', activeMembership?.academicLeague],
   });
 
   const activeLeague = leagues[0];
@@ -104,7 +102,6 @@ export default function StudentDashboard() {
   const { data: squads = [] } = useGetSquads({
     filters: { _id: activeMembership?.squad },
     enabled: Boolean(activeMembership?.squad),
-    queryKey: ['squads', activeMembership?.squad],
   });
 
   const activeSquad = squads[0];
@@ -112,7 +109,6 @@ export default function StudentDashboard() {
   const { data: universities = [] } = useGetUniversities({
     filters: { _id: activeLeague?.university },
     enabled: Boolean(activeLeague?.university),
-    queryKey: ['universities', activeLeague?.university],
   });
 
   const activeUniversity = universities[0];
@@ -120,7 +116,6 @@ export default function StudentDashboard() {
   const { data: squadMemberships = [] } = useGetLeagueMemberships({
     filters: { squad: activeMembership?.squad, isActive: true },
     enabled: Boolean(activeMembership?.squad),
-    queryKey: ['squad-memberships', activeMembership?.squad],
   });
 
   const squadMemberUserIds = useMemo(
@@ -138,13 +133,11 @@ export default function StudentDashboard() {
   const { data: squadUsers = [] } = useGetUsersByIds({
     userIds: squadMemberUserIds,
     enabled: squadMemberUserIds.length > 0,
-    queryKey: ['users', 'squad-members', squadMemberUserIds],
   });
 
   const { data: eventsFromApi = [] } = useGetEvents({
     filters: { academicLeague: activeMembership?.academicLeague },
     enabled: Boolean(activeMembership?.academicLeague),
-    queryKey: ['events', activeMembership?.academicLeague],
     onError: () => {},
   });
 
