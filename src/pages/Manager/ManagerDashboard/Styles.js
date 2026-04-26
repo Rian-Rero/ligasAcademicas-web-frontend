@@ -5,39 +5,33 @@ import {
   CardHeader as BaseCardHeader,
   SummaryCard as BaseSummaryCard,
   TopCards as BaseTopCards,
-} from '../Student/Styles';
+} from '../../Student/StudentDashboard/Styles';
 
 export {
   AgendaAction,
   AgendaInfo,
   AgendaItem,
   AgendaList,
-  Avatar,
   BottomCards,
   Box,
   CardDate,
   CardIcon,
   CardTitle,
   CardValue,
-  Container,
   Content,
   HeaderSection,
   HeaderTitle,
   MiddleSection,
   ProgressCircle,
   ProgressInfo,
-  ProfileCard,
   QuickLink,
   SectionHeading,
-  SideBar,
-  SideBarMenu,
-  SideBarMenuItem,
   SummaryCard,
   SummaryItem,
   TeamAvatar,
   TeamList,
   TeamMember,
-} from '../Student/Styles';
+} from '../../Student/StudentDashboard/Styles';
 
 export const TopCards = styled(BaseTopCards)`
   grid-template-columns: repeat(4, minmax(0, 1fr));

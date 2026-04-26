@@ -62,3 +62,38 @@ export const redefinePassword = async ({ token, password }) => {
 
   return data;
 };
+
+// League memberships
+export const getLeagueMemberships = async (filters = {}) => {
+  const { data } = await api.get('/league-memberships', { params: filters });
+
+  return data;
+};
+
+// Academic leagues
+export const getAcademicLeagues = async (filters = {}) => {
+  const { data } = await api.get('/academic-leagues', { params: filters });
+
+  return data;
+};
+
+// Squads
+export const getSquads = async (filters = {}) => {
+  const { data } = await api.get('/squads', { params: filters });
+
+  return data;
+};
+
+// Universities
+export const getUniversities = async (filters = {}) => {
+  const { data } = await api.get('/universities', { params: filters });
+
+  return data;
+};
+
+// Events
+export const getEvents = async (filters = {}) => {
+  const { data } = await api.get('/events', { params: filters });
+
+  return data;
+};

@@ -5,10 +5,14 @@ import {
   Route,
 } from 'react-router-dom';
 
-import { AppLayout } from './layouts';
 import {
-  Manager,
-  Student,
+  AppLayout,
+  StudentSideBarLayout,
+  ManagerSideBarLayout,
+} from './layouts';
+import {
+  ManagerDashboard,
+  StudentDashboard,
   EmailConfirmation,
   ForgotPassword,
   Home,
@@ -26,11 +30,11 @@ const router = createBrowserRouter(
           path="email-confirmation/:token"
           element={<EmailConfirmation />}
         />
-        <Route path="student">
-          <Route path="dashboard" element={<Student />} />
+        <Route path="student" element={<StudentSideBarLayout />}>
+          <Route path="dashboard" element={<StudentDashboard />} />
         </Route>
-        <Route path="manager">
-          <Route path="dashboard" element={<Manager />} />
+        <Route path="manager" element={<ManagerSideBarLayout />}>
+          <Route path="dashboard" element={<ManagerDashboard />} />
         </Route>
       </Route>
     </Route>,
