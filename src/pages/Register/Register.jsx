@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { IoArrowBack, IoMail, IoPerson } from 'react-icons/io5';
-import { RiLock2Fill } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
@@ -35,7 +34,7 @@ export default function Register() {
 
   const { mutate: createUser, isPending: isLoading } = useCreateUser({
     onSuccess: () => {
-      notifySuccess('Novo membro cadastrado com sucesso!');
+      notifySuccess('Membro cadastrado! A senha foi enviada por e-mail.');
       reset();
     },
     onError: (err) => {
@@ -43,9 +42,7 @@ export default function Register() {
     },
   });
 
-  const onSubmit = ({ confirmPassword, ...newUserData }) => {
-    createUser(newUserData);
-  };
+  const onSubmit = (newUserData) => createUser(newUserData);
 
   const handleBackToManagerDashboard = () => navigate('/manager/dashboard');
 
@@ -56,7 +53,8 @@ export default function Register() {
           <InputsBox>
             <Title>Cadastrar novo membro</Title>
             <Description>
-              Preencha os campos para adicionar uma nova pessoa ao sistema.
+              Preencha os campos para adicionar uma nova pessoa. A senha sera
+              gerada automaticamente e enviada por e-mail.
             </Description>
 
             <FormInput
@@ -86,34 +84,6 @@ export default function Register() {
               borderString={`1px solid ${theme.colors.white}`}
             />
 
-            <FormInput
-              name="password"
-              label="Senha"
-              hideLabel
-              type="password"
-              placeholder="Digite aqui sua senha"
-              icon={RiLock2Fill}
-              register={register}
-              errors={errors}
-              borderRadius="4rem"
-              customColor={theme.colors.font.white}
-              borderString={`1px solid ${theme.colors.white}`}
-            />
-
-            <FormInput
-              name="confirmPassword"
-              label="Confirmar senha"
-              hideLabel
-              type="password"
-              placeholder="Confirme sua senha"
-              icon={RiLock2Fill}
-              register={register}
-              errors={errors}
-              borderRadius="4rem"
-              customColor={theme.colors.font.white}
-              borderString={`1px solid ${theme.colors.white}`}
-            />
-
             <Button type="submit" disabled={isLoading} aria-busy={isLoading}>
               {isLoading ? (
                 <ButtonContent>
@@ -125,7 +95,7 @@ export default function Register() {
                   Cadastrando...
                 </ButtonContent>
               ) : (
-                'Criar conta'
+                'Cadastrar membro'
               )}
             </Button>
 

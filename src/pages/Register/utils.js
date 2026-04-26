@@ -14,21 +14,13 @@ export const registerValidationSchema = z
       .email('Insira um email no formato email@email.com')
       .trim()
       .nonempty('Favor digitar o email'),
-    password: z
-      .string()
-      .nonempty('Favor digitar uma senha')
-      .min(6, 'A senha não pode ter menos de 6 caracteres')
-      .max(16, 'A senha não pode ter mais de 16 caracteres'),
-    confirmPassword: z.string().nonempty('Favor confirmar sua senha'),
   })
-  .refine((formData) => formData.password === formData.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'As senhas não coincidem',
-  });
+  .strict();
 
 const registerErrorMessages = {
   [ERROR_CODES.BAD_REQUEST]: 'Dados inválidos',
-  [ERROR_CODES.FORBIDDEN]: 'Dados inválidos',
+  [ERROR_CODES.UNAUTHORIZED]: 'Sua sessão expirou. Faça login novamente',
+  [ERROR_CODES.FORBIDDEN]: 'Apenas gestores podem cadastrar novos membros',
   [ERROR_CODES.CONFLICT]: 'Já existe uma conta com este e-mail',
 };
 
