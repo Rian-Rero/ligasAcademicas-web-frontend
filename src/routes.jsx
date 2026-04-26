@@ -17,6 +17,7 @@ import {
   ForgotPassword,
   Home,
   Login,
+  Register,
 } from './pages';
 
 const router = createBrowserRouter(
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
       <Route path="/" element={<AppLayout />}>
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
         <Route
           path="email-confirmation/:token"
