@@ -129,10 +129,28 @@ export default function StudentDashboard() {
     enabled: Boolean(activeMembership?.squad),
   });
 
-  const { data: allUsers = [] } = useQuery({
-    queryKey: ['users', 'all-for-student-dashboard'],
-    queryFn: () => getUsers(),
-    enabled: squadMemberships.length > 0,
+  const squadMemberUserIds = useMemo(
+    () => [
+      ...new Set(
+        squadMemberships
+          .map((membership) => membership?.user)
+          .filter(Boolean)
+          .map((userId) => String(userId)),
+      ),
+    ],
+    [squadMemberships],
+  );
+
+  const { data: squadUsers = [] } = useQuery({
+    queryKey: ['users', 'squad-members', squadMemberUserIds],
+    queryFn: async () => {
+      const usersByMembership = await Promise.all(
+        squadMemberUserIds.map((userId) => getUsers({ _id: userId })),
+      );
+
+      return usersByMembership.flat();
+    },
+    enabled: squadMemberUserIds.length > 0,
   });
 
   const { data: eventsFromApi = [] } = useQuery({
@@ -150,7 +168,7 @@ export default function StudentDashboard() {
   });
 
   const team = useMemo(() => {
-    if (!squadMemberships.length || !allUsers.length) {
+    if (!squadMemberUserIds.length || !squadUsers.length) {
       return authUser?.name
         ? [
             {
@@ -162,11 +180,9 @@ export default function StudentDashboard() {
         : fallbackTeam;
     }
 
-    const userIds = new Set(
-      squadMemberships.map((member) => String(member.user)),
-    );
+    const userIds = new Set(squadMemberUserIds);
 
-    const names = allUsers
+    const names = squadUsers
       .filter((user) => userIds.has(String(user._id)))
       .filter((user) => Boolean(user.name))
       .map((user) => ({
@@ -189,11 +205,11 @@ export default function StudentDashboard() {
 
     return names;
   }, [
-    allUsers,
     authUser?._id,
     authUser?.name,
     authUser?.imageURL,
-    squadMemberships,
+    squadMemberUserIds,
+    squadUsers,
   ]);
 
   const agenda = useMemo(() => {
@@ -319,6 +335,7 @@ export default function StudentDashboard() {
               <TeamMember key={member.id}>
                 <TeamAvatar
                   $imageUrl={member?.imageURL}
+                  role="img"
                   aria-label={`Foto de ${member.name}`}
                 />
                 {member.name}
