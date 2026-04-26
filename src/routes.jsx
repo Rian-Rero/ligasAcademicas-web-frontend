@@ -5,8 +5,19 @@ import {
   Route,
 } from 'react-router-dom';
 
-import { AppLayout } from './layouts';
-import { EmailConfirmation, ForgotPassword, Home, Login } from './pages';
+import {
+  AppLayout,
+  StudentSideBarLayout,
+  ManagerSideBarLayout,
+} from './layouts';
+import {
+  ManagerDashboard,
+  StudentDashboard,
+  EmailConfirmation,
+  ForgotPassword,
+  Home,
+  Login,
+} from './pages';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -19,6 +30,14 @@ const router = createBrowserRouter(
           path="email-confirmation/:token"
           element={<EmailConfirmation />}
         />
+        <Route path="student" element={<StudentSideBarLayout />}>
+          <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="*" element={<StudentDashboard />} />
+        </Route>
+        <Route path="manager" element={<ManagerSideBarLayout />}>
+          <Route path="dashboard" element={<ManagerDashboard />} />
+          <Route path="*" element={<ManagerDashboard />} />
+        </Route>
       </Route>
     </Route>,
   ),
