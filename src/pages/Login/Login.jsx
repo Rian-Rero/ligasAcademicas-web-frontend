@@ -18,8 +18,8 @@ import {
 import { buildLoginErrorMessage, loginValidationSchema } from './utils';
 import { Logo } from '../../components/common';
 import { FormInput } from '../../components/features';
+import { useGetLeagueMembershipsOnDemand } from '../../hooks/query/leagueMembership';
 import { useLogin } from '../../hooks/query/sessions';
-import { getLeagueMemberships } from '../../services/api/endpoints';
 import useAuthStore from '../../stores/auth';
 import { notifyError, notifySuccess } from '../../utils/toast';
 
@@ -41,14 +41,14 @@ function hasManagerRole(role) {
   );
 }
 
-async function resolvePostLoginRoute() {
+async function resolvePostLoginRoute(getActiveMemberships) {
   const authUser = useAuthStore.getState().auth?.user;
   if (!authUser?._id) return '/student/dashboard';
 
   if (hasManagerRole(authUser?.globalRole)) return '/manager/dashboard';
 
   try {
-    const activeMemberships = await getLeagueMemberships({
+    const activeMemberships = await getActiveMemberships({
       user: authUser._id,
       isActive: true,
     });
@@ -68,12 +68,14 @@ async function resolvePostLoginRoute() {
 export default function Login() {
   const theme = useTheme();
   const navigate = useNavigate();
+  const { mutateAsync: getActiveMemberships } =
+    useGetLeagueMembershipsOnDemand();
 
   const { mutate: login, isPending: isLoading } = useLogin({
     onSuccess: async () => {
       notifySuccess('Login realizado com sucesso!');
 
-      const nextRoute = await resolvePostLoginRoute();
+      const nextRoute = await resolvePostLoginRoute(getActiveMemberships);
       navigate(nextRoute, { replace: true });
     },
     onError: (err) => {

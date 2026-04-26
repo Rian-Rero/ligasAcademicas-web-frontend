@@ -2,23 +2,64 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import {
-  getUsers,
   createUser,
   deleteUser,
+  forgotPassword,
+  getUserById,
+  getUsers,
+  redefinePassword,
   updateUser,
   verifyEmail,
-  forgotPassword,
-  redefinePassword,
 } from '../../services/api/endpoints';
 
 export function useGetUsers({
   filters,
+  enabled = true,
+  queryKey = ['users', filters],
   onSuccess = () => {},
   onError = (err) => console.log(err),
 } = {}) {
   return useQuery({
-    queryKey: ['users', filters],
+    queryKey,
     queryFn: () => getUsers(filters),
+    enabled,
+    onSuccess,
+    onError,
+  });
+}
+
+export function useGetUserById({
+  _id,
+  enabled = true,
+  queryKey = ['user', _id],
+  onSuccess = () => {},
+  onError = (err) => console.log(err),
+} = {}) {
+  return useQuery({
+    queryKey,
+    queryFn: () => getUserById(_id),
+    enabled: Boolean(_id) && enabled,
+    onSuccess,
+    onError,
+  });
+}
+
+export function useGetUsersByIds({
+  userIds = [],
+  enabled = true,
+  queryKey = ['users-by-ids', userIds],
+  onSuccess = () => {},
+  onError = (err) => console.log(err),
+} = {}) {
+  return useQuery({
+    queryKey,
+    queryFn: async () => {
+      const usersById = await Promise.all(
+        userIds.map((userId) => getUserById(userId)),
+      );
+      return usersById.filter(Boolean);
+    },
+    enabled: userIds.length > 0 && enabled,
     onSuccess,
     onError,
   });
@@ -60,11 +101,12 @@ export function useCreateUser({
 export function useVerifyUser({
   token,
   enabled = true,
+  queryKey = ['verifyEmail', token],
   onSuccess = () => {},
   onError = (err) => console.log(err),
 } = {}) {
   return useQuery({
-    queryKey: ['verifyEmail'],
+    queryKey,
     queryFn: () => verifyEmail(token),
     enabled: Boolean(token) && enabled,
     onSuccess,

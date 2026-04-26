@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
 import {
   FiArrowRight,
   FiCalendar,
@@ -39,14 +38,12 @@ import {
   TeamMember,
   TopCards,
 } from './Styles';
-import {
-  getAcademicLeagues,
-  getEvents,
-  getLeagueMemberships,
-  getSquads,
-  getUniversities,
-  getUsers,
-} from '../../../services/api/endpoints';
+import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
+import { useGetEvents } from '../../../hooks/query/event';
+import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
+import { useGetSquads } from '../../../hooks/query/squad';
+import { useGetUniversities } from '../../../hooks/query/university';
+import { useGetUsersByIds } from '../../../hooks/query/user';
 import useAuthStore from '../../../stores/auth';
 
 const fallbackAgenda = [
@@ -88,45 +85,42 @@ function formatDate(dateString) {
 export default function StudentDashboard() {
   const authUser = useAuthStore((state) => state.auth?.user);
 
-  const { data: memberships = [] } = useQuery({
-    queryKey: ['league-memberships', authUser?._id],
-    queryFn: () =>
-      getLeagueMemberships({ user: authUser?._id, isActive: true }),
+  const { data: memberships = [] } = useGetLeagueMemberships({
+    filters: { user: authUser?._id, isActive: true },
     enabled: Boolean(authUser?._id),
+    queryKey: ['league-memberships', authUser?._id],
   });
 
   const activeMembership = memberships[0];
 
-  const { data: leagues = [] } = useQuery({
-    queryKey: ['academic-leagues', activeMembership?.academicLeague],
-    queryFn: () =>
-      getAcademicLeagues({ _id: activeMembership?.academicLeague }),
+  const { data: leagues = [] } = useGetAcademicLeagues({
+    filters: { _id: activeMembership?.academicLeague },
     enabled: Boolean(activeMembership?.academicLeague),
+    queryKey: ['academic-leagues', activeMembership?.academicLeague],
   });
 
   const activeLeague = leagues[0];
 
-  const { data: squads = [] } = useQuery({
-    queryKey: ['squads', activeMembership?.squad],
-    queryFn: () => getSquads({ _id: activeMembership?.squad }),
+  const { data: squads = [] } = useGetSquads({
+    filters: { _id: activeMembership?.squad },
     enabled: Boolean(activeMembership?.squad),
+    queryKey: ['squads', activeMembership?.squad],
   });
 
   const activeSquad = squads[0];
 
-  const { data: universities = [] } = useQuery({
-    queryKey: ['universities', activeLeague?.university],
-    queryFn: () => getUniversities({ _id: activeLeague?.university }),
+  const { data: universities = [] } = useGetUniversities({
+    filters: { _id: activeLeague?.university },
     enabled: Boolean(activeLeague?.university),
+    queryKey: ['universities', activeLeague?.university],
   });
 
   const activeUniversity = universities[0];
 
-  const { data: squadMemberships = [] } = useQuery({
-    queryKey: ['squad-memberships', activeMembership?.squad],
-    queryFn: () =>
-      getLeagueMemberships({ squad: activeMembership?.squad, isActive: true }),
+  const { data: squadMemberships = [] } = useGetLeagueMemberships({
+    filters: { squad: activeMembership?.squad, isActive: true },
     enabled: Boolean(activeMembership?.squad),
+    queryKey: ['squad-memberships', activeMembership?.squad],
   });
 
   const squadMemberUserIds = useMemo(
@@ -141,30 +135,17 @@ export default function StudentDashboard() {
     [squadMemberships],
   );
 
-  const { data: squadUsers = [] } = useQuery({
-    queryKey: ['users', 'squad-members', squadMemberUserIds],
-    queryFn: async () => {
-      const usersByMembership = await Promise.all(
-        squadMemberUserIds.map((userId) => getUsers({ _id: userId })),
-      );
-
-      return usersByMembership.flat();
-    },
+  const { data: squadUsers = [] } = useGetUsersByIds({
+    userIds: squadMemberUserIds,
     enabled: squadMemberUserIds.length > 0,
+    queryKey: ['users', 'squad-members', squadMemberUserIds],
   });
 
-  const { data: eventsFromApi = [] } = useQuery({
-    queryKey: ['events', activeMembership?.academicLeague],
-    queryFn: async () => {
-      try {
-        return await getEvents({
-          academicLeague: activeMembership?.academicLeague,
-        });
-      } catch {
-        return [];
-      }
-    },
+  const { data: eventsFromApi = [] } = useGetEvents({
+    filters: { academicLeague: activeMembership?.academicLeague },
     enabled: Boolean(activeMembership?.academicLeague),
+    queryKey: ['events', activeMembership?.academicLeague],
+    onError: () => {},
   });
 
   const team = useMemo(() => {

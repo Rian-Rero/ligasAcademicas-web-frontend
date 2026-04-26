@@ -1,13 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
 import { FiCalendar, FiUsers, FiUser } from 'react-icons/fi';
 import { TbCertificate, TbLayoutDashboard, TbUsersGroup } from 'react-icons/tb';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import {
-  getAcademicLeagues,
-  getLeagueMemberships,
-  getUniversities,
-} from '../../services/api/endpoints';
+import { useGetAcademicLeagues } from '../../hooks/query/academicLeague';
+import { useGetLeagueMemberships } from '../../hooks/query/leagueMembership';
+import { useGetUniversities } from '../../hooks/query/university';
 import useAuthStore from '../../stores/auth';
 import {
   Avatar,
@@ -56,32 +53,30 @@ export default function ManagerSideBarLayout() {
   const location = useLocation();
   const authUser = useAuthStore((state) => state.auth?.user);
 
-  const { data: memberships = [] } = useQuery({
-    queryKey: ['league-memberships', authUser?._id, 'manager-sidebar'],
-    queryFn: () =>
-      getLeagueMemberships({ user: authUser?._id, isActive: true }),
+  const { data: memberships = [] } = useGetLeagueMemberships({
+    filters: { user: authUser?._id, isActive: true },
     enabled: Boolean(authUser?._id),
+    queryKey: ['league-memberships', authUser?._id, 'manager-sidebar'],
   });
 
   const activeMembership = memberships[0];
 
-  const { data: leagues = [] } = useQuery({
+  const { data: leagues = [] } = useGetAcademicLeagues({
+    filters: { _id: activeMembership?.academicLeague },
+    enabled: Boolean(activeMembership?.academicLeague),
     queryKey: [
       'academic-leagues',
       activeMembership?.academicLeague,
       'manager-sidebar',
     ],
-    queryFn: () =>
-      getAcademicLeagues({ _id: activeMembership?.academicLeague }),
-    enabled: Boolean(activeMembership?.academicLeague),
   });
 
   const activeLeague = leagues[0];
 
-  const { data: universities = [] } = useQuery({
-    queryKey: ['universities', activeLeague?.university, 'manager-sidebar'],
-    queryFn: () => getUniversities({ _id: activeLeague?.university }),
+  const { data: universities = [] } = useGetUniversities({
+    filters: { _id: activeLeague?.university },
     enabled: Boolean(activeLeague?.university),
+    queryKey: ['universities', activeLeague?.university, 'manager-sidebar'],
   });
 
   const activeUniversity = universities[0];

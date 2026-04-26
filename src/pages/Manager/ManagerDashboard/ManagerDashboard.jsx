@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { useQuery } from '@tanstack/react-query';
 import { CgFileDocument } from 'react-icons/cg';
 import { FiCalendar, FiUsers } from 'react-icons/fi';
 import { GrAddCircle } from 'react-icons/gr';
@@ -34,13 +33,11 @@ import {
   ShortcutBoxes,
   TopCards,
 } from './Styles';
-import {
-  getAcademicLeagues,
-  getEvents,
-  getLeagueMemberships,
-  getSquads,
-  getUniversities,
-} from '../../../services/api/endpoints';
+import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
+import { useGetEvents } from '../../../hooks/query/event';
+import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
+import { useGetSquads } from '../../../hooks/query/squad';
+import { useGetUniversities } from '../../../hooks/query/university';
 import useAuthStore from '../../../stores/auth';
 
 const fallbackAgenda = [
@@ -71,69 +68,58 @@ function formatDate(dateString) {
 export default function ManagerDashboard() {
   const authUser = useAuthStore((state) => state.auth?.user);
 
-  const { data: memberships = [] } = useQuery({
-    queryKey: ['league-memberships', authUser?._id, 'manager-dashboard'],
-    queryFn: () =>
-      getLeagueMemberships({ user: authUser?._id, isActive: true }),
+  const { data: memberships = [] } = useGetLeagueMemberships({
+    filters: { user: authUser?._id, isActive: true },
     enabled: Boolean(authUser?._id),
+    queryKey: ['league-memberships', authUser?._id, 'manager-dashboard'],
   });
 
   const activeMembership = memberships[0];
 
-  const { data: leagues = [] } = useQuery({
+  const { data: leagues = [] } = useGetAcademicLeagues({
+    filters: { _id: activeMembership?.academicLeague },
+    enabled: Boolean(activeMembership?.academicLeague),
     queryKey: [
       'academic-leagues',
       activeMembership?.academicLeague,
       'manager-dashboard',
     ],
-    queryFn: () =>
-      getAcademicLeagues({ _id: activeMembership?.academicLeague }),
-    enabled: Boolean(activeMembership?.academicLeague),
   });
 
   const activeLeague = leagues[0];
 
-  const { data: universities = [] } = useQuery({
-    queryKey: ['universities', activeLeague?.university, 'manager-dashboard'],
-    queryFn: () => getUniversities({ _id: activeLeague?.university }),
+  const { data: universities = [] } = useGetUniversities({
+    filters: { _id: activeLeague?.university },
     enabled: Boolean(activeLeague?.university),
+    queryKey: ['universities', activeLeague?.university, 'manager-dashboard'],
   });
 
   const activeUniversity = universities[0];
 
-  const { data: leagueMemberships = [] } = useQuery({
+  const { data: leagueMemberships = [] } = useGetLeagueMemberships({
+    filters: {
+      academicLeague: activeMembership?.academicLeague,
+      isActive: true,
+    },
+    enabled: Boolean(activeMembership?.academicLeague),
     queryKey: [
       'league-memberships',
       activeMembership?.academicLeague,
       'all-members',
     ],
-    queryFn: () =>
-      getLeagueMemberships({
-        academicLeague: activeMembership?.academicLeague,
-        isActive: true,
-      }),
-    enabled: Boolean(activeMembership?.academicLeague),
   });
 
-  const { data: squads = [] } = useQuery({
+  const { data: squads = [] } = useGetSquads({
+    filters: { academicLeague: activeMembership?.academicLeague },
+    enabled: Boolean(activeMembership?.academicLeague),
     queryKey: ['squads', activeMembership?.academicLeague, 'manager-dashboard'],
-    queryFn: () =>
-      getSquads({ academicLeague: activeMembership?.academicLeague }),
-    enabled: Boolean(activeMembership?.academicLeague),
   });
 
-  const { data: eventsFromApi = [] } = useQuery({
-    queryKey: ['events', activeMembership?.academicLeague, 'manager-dashboard'],
-    queryFn: async () => {
-      try {
-        return await getEvents({
-          academicLeague: activeMembership?.academicLeague,
-        });
-      } catch {
-        return [];
-      }
-    },
+  const { data: eventsFromApi = [] } = useGetEvents({
+    filters: { academicLeague: activeMembership?.academicLeague },
     enabled: Boolean(activeMembership?.academicLeague),
+    queryKey: ['events', activeMembership?.academicLeague, 'manager-dashboard'],
+    onError: () => {},
   });
 
   const agenda = useMemo(() => {
