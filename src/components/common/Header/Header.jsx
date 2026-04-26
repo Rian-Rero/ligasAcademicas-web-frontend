@@ -28,17 +28,12 @@ import OnlyLogo from '../OnlyLogo/OnlyLogo';
 const navigationLinks = [
   { to: '/', label: 'Início', end: true },
   { to: '/login', label: 'Entrar', end: false },
-  { to: '/register', label: 'Cadastrar', end: false },
   { to: '/forgot-password', label: 'Recuperar senha', end: false },
 ];
 
 function getCtaData(pathname) {
   if (pathname === '/login') {
-    return { to: '/register', label: 'Criar conta' };
-  }
-
-  if (pathname === '/register') {
-    return { to: '/login', label: 'Entrar' };
+    return { to: '/forgot-password', label: 'Recuperar senha' };
   }
 
   if (pathname === '/forgot-password') {

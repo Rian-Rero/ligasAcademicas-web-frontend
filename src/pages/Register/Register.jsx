@@ -18,7 +18,6 @@ import {
   Title,
 } from './Styles';
 import { buildRegisterErrorMessage, registerValidationSchema } from './utils';
-import { Logo } from '../../components/common';
 import { FormInput } from '../../components/features';
 import { useCreateUser } from '../../hooks/query/user';
 import { notifyError, notifySuccess } from '../../utils/toast';
@@ -36,9 +35,8 @@ export default function Register() {
 
   const { mutate: createUser, isPending: isLoading } = useCreateUser({
     onSuccess: () => {
-      notifySuccess('Cadastro realizado com sucesso! Verifique seu e-mail.');
+      notifySuccess('Novo membro cadastrado com sucesso!');
       reset();
-      navigate('/login');
     },
     onError: (err) => {
       notifyError(buildRegisterErrorMessage(err));
@@ -49,18 +47,16 @@ export default function Register() {
     createUser(newUserData);
   };
 
-  const handleBackToLogin = () => navigate('/login');
+  const handleBackToManagerDashboard = () => navigate('/manager/dashboard');
 
   return (
     <Container>
       <StyledForm onSubmit={handleSubmit(onSubmit)}>
-        <Logo customHeight="60%" />
-
         <Box>
           <InputsBox>
-            <Title>Criar conta</Title>
+            <Title>Cadastrar novo membro</Title>
             <Description>
-              Preencha os campos para criar sua conta e acessar o sistema.
+              Preencha os campos para adicionar uma nova pessoa ao sistema.
             </Description>
 
             <FormInput
@@ -136,10 +132,10 @@ export default function Register() {
             <BackToLogin
               type="button"
               disabled={isLoading}
-              onClick={handleBackToLogin}
+              onClick={handleBackToManagerDashboard}
             >
               <IoArrowBack />
-              Já tenho conta
+              Voltar ao dashboard
             </BackToLogin>
           </InputsBox>
         </Box>

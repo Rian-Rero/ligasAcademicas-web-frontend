@@ -5,6 +5,7 @@ import { FiCalendar, FiUsers } from 'react-icons/fi';
 import { GrAddCircle } from 'react-icons/gr';
 import { RiUserAddLine } from 'react-icons/ri';
 import { TbCertificate, TbUsersGroup } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 
 import {
   AgendaAction,
@@ -66,6 +67,7 @@ function formatDate(dateString) {
 }
 
 export default function ManagerDashboard() {
+  const navigate = useNavigate();
   const authUser = useAuthStore((state) => state.auth?.user);
 
   const { data: memberships = [] } = useGetLeagueMemberships({
@@ -282,7 +284,10 @@ export default function ManagerDashboard() {
             Criar Novo Evento
           </ShortcutBox>
 
-          <ShortcutBox type="button">
+          <ShortcutBox
+            type="button"
+            onClick={() => navigate('/manager/cadastrar-membro')}
+          >
             <CardIcon>
               <RiUserAddLine />
             </CardIcon>

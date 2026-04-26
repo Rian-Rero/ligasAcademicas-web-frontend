@@ -144,13 +144,6 @@ export default function Login() {
             >
               Esqueci minha senha
             </ForgotPasswordButton>
-            <ForgotPasswordButton
-              type="button"
-              disabled={isLoading}
-              onClick={() => navigate('/register')}
-            >
-              Criar conta
-            </ForgotPasswordButton>
           </InputsBox>
         </Box>
       </StyledForm>
