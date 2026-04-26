@@ -129,10 +129,28 @@ export default function StudentDashboard() {
     enabled: Boolean(activeMembership?.squad),
   });
 
+  const squadMemberUserIds = useMemo(
+    () => [
+      ...new Set(
+        squadMemberships
+          .map((membership) => membership?.user)
+          .filter(Boolean)
+          .map(String),
+      ),
+    ],
+    [squadMemberships],
+  );
+
   const { data: allUsers = [] } = useQuery({
-    queryKey: ['users', 'all-for-student-dashboard'],
-    queryFn: () => getUsers(),
-    enabled: squadMemberships.length > 0,
+    queryKey: ['users', 'student-dashboard-squad-members', squadMemberUserIds],
+    queryFn: async () => {
+      const usersById = await Promise.all(
+        squadMemberUserIds.map((userId) => getUsers({ _id: userId })),
+      );
+
+      return usersById.flat();
+    },
+    enabled: squadMemberUserIds.length > 0,
   });
 
   const { data: eventsFromApi = [] } = useQuery({
@@ -246,7 +264,7 @@ export default function StudentDashboard() {
             <TbCertificate />
           </CardIcon>
           <CardHeader>Certificados disponíveis:</CardHeader>
-          <CardValue>0</CardValue>
+          <CardValue>{certificates?.length || 0}</CardValue>
         </Card>
 
         <Card>
@@ -273,7 +291,7 @@ export default function StudentDashboard() {
                   <strong>{item.title}</strong>
                   <span>{item.location}</span>
                 </div>
-                <AgendaAction $variant={item.variant}>
+                <AgendaAction type="button" $variant={item.variant}>
                   {item.action}
                 </AgendaAction>
               </AgendaItem>

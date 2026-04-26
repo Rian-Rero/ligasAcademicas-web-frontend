@@ -184,8 +184,8 @@ export default function ManagerDashboard() {
       <HeaderSection>
         <HeaderTitle>
           {activeLeague?.name
-            ? `PAINEL DE GESTAO - ${activeLeague.name.toLocaleUpperCase('pt-BR')}`
-            : 'PAINEL DE GESTAO DA LIGA'}
+            ? `PAINEL DE GESTÃO - ${activeLeague.name.toLocaleUpperCase('pt-BR')}`
+            : 'PAINEL DE GESTÃO DA LIGA'}
         </HeaderTitle>
       </HeaderSection>
 

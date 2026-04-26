@@ -90,11 +90,15 @@ export default function ManagerSideBarLayout() {
     <Container>
       <SideBar>
         <ProfileCard>
-          <Avatar $imageUrl={authUser?.imageURL} />
+          <Avatar
+            $imageUrl={authUser?.imageURL}
+            role="img"
+            aria-label="Foto do gestor"
+          />
           <div>
             <strong>{authUser?.name || 'Nome do Gestor'}</strong>
             <span>
-              {activeUniversity?.name || activeLeague?.name || 'Instituicao'}
+              {activeUniversity?.name || activeLeague?.name || 'Instituição'}
             </span>
           </div>
         </ProfileCard>

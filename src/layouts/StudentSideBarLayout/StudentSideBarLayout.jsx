@@ -46,7 +46,7 @@ const navigation = [
   },
 ];
 
-export default function StudentSideBar() {
+export default function StudentSideBarLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
