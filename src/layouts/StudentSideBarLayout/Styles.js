@@ -125,7 +125,7 @@ export const SideBarMenuItem = styled.button`
       color 180ms ease;
   }
 
-  > {
+  > * {
     position: relative;
     z-index: 1;
   }

@@ -19,16 +19,62 @@ import { buildLoginErrorMessage, loginValidationSchema } from './utils';
 import { Logo } from '../../components/common';
 import { FormInput } from '../../components/features';
 import { useLogin } from '../../hooks/query/sessions';
+import { getLeagueMemberships } from '../../services/api/endpoints';
+import useAuthStore from '../../stores/auth';
 import { notifyError, notifySuccess } from '../../utils/toast';
+
+const MANAGER_ROLE_KEYWORDS = [
+  'admin',
+  'manager',
+  'gest',
+  'diret',
+  'presid',
+  'coorden',
+];
+
+function hasManagerRole(role) {
+  if (!role) return false;
+
+  const normalizedRole = String(role).trim().toLocaleLowerCase('pt-BR');
+  return MANAGER_ROLE_KEYWORDS.some((keyword) =>
+    normalizedRole.includes(keyword),
+  );
+}
+
+async function resolvePostLoginRoute() {
+  const authUser = useAuthStore.getState().auth?.user;
+  if (!authUser?._id) return '/student/dashboard';
+
+  if (hasManagerRole(authUser?.globalRole)) return '/manager/dashboard';
+
+  try {
+    const activeMemberships = await getLeagueMemberships({
+      user: authUser._id,
+      isActive: true,
+    });
+
+    const hasManagementMembership = activeMemberships.some((membership) =>
+      hasManagerRole(membership?.role),
+    );
+
+    return hasManagementMembership
+      ? '/manager/dashboard'
+      : '/student/dashboard';
+  } catch {
+    return '/student/dashboard';
+  }
+}
 
 export default function Login() {
   const theme = useTheme();
   const navigate = useNavigate();
 
   const { mutate: login, isPending: isLoading } = useLogin({
-    onSuccess: () => {
+    onSuccess: async () => {
       notifySuccess('Login realizado com sucesso!');
-      navigate('/student/dashboard', { replace: true });
+
+      const nextRoute = await resolvePostLoginRoute();
+      navigate(nextRoute, { replace: true });
     },
     onError: (err) => {
       notifyError(buildLoginErrorMessage(err));
