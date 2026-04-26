@@ -32,6 +32,10 @@ const MANAGER_ROLE_KEYWORDS = [
   'coorden',
 ];
 
+const AUTH_INPUT_BACKGROUND =
+  'linear-gradient(165deg, rgba(9, 26, 52, 0.82), rgba(10, 28, 56, 0.72))';
+const AUTH_INPUT_BORDER = '1px solid rgba(170, 212, 255, 0.4)';
+
 function hasManagerRole(role) {
   if (!role) return false;
 
@@ -107,8 +111,9 @@ export default function Login() {
               register={register}
               errors={errors}
               borderRadius="4rem"
+              backgroundColor={AUTH_INPUT_BACKGROUND}
               customColor={theme.colors.font.white}
-              borderString={`1px solid ${theme.colors.white}`}
+              borderString={AUTH_INPUT_BORDER}
             />
             <FormInput
               name="password"
@@ -120,8 +125,9 @@ export default function Login() {
               register={register}
               errors={errors}
               borderRadius="4rem"
+              backgroundColor={AUTH_INPUT_BACKGROUND}
               customColor={theme.colors.font.white}
-              borderString={`1px solid ${theme.colors.white}`}
+              borderString={AUTH_INPUT_BORDER}
             />
             <Button type="submit" disabled={isLoading} aria-busy={isLoading}>
               {isLoading ? (

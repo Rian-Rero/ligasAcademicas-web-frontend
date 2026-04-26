@@ -47,7 +47,7 @@ export const Icon = styled.div`
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(226, 240, 255, 0.8);
   font-size: 2rem;
   pointer-events: none;
 `;
@@ -63,25 +63,34 @@ export const Input = styled.input`
   border: ${(props) =>
     props.$error
       ? '0.2rem red solid'
-      : (props.$borderString ?? '1px solid rgba(255, 255, 255, 0.28)')};
-  background-color: ${(props) =>
+      : (props.$borderString ?? '1px solid rgba(167, 206, 255, 0.38)')};
+  background: ${(props) =>
     props.$backgroundColor
       ? props.$backgroundColor
-      : 'rgba(255, 255, 255, 0.06)'};
+      : 'linear-gradient(165deg, rgba(8, 22, 44, 0.78), rgba(11, 29, 54, 0.68))'};
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 10px 24px rgba(0, 0, 0, 0.24);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
-    background-color 0.2s ease;
+    background 0.2s ease;
 
   &::placeholder {
-    color: rgba(255, 255, 255, 0.72);
+    color: rgba(225, 239, 255, 0.82);
   }
 
   &:focus {
     outline: none;
     border-color: rgba(0, 140, 255, 0.75);
-    background-color: rgba(255, 255, 255, 0.09);
-    box-shadow: 0 0 0 3px rgba(0, 140, 255, 0.22);
+    background: linear-gradient(
+      165deg,
+      rgba(10, 27, 54, 0.9),
+      rgba(12, 34, 66, 0.82)
+    );
+    box-shadow:
+      0 0 0 3px rgba(0, 140, 255, 0.22),
+      0 12px 28px rgba(0, 0, 0, 0.28);
   }
 
   @media (max-width: 700px) {
