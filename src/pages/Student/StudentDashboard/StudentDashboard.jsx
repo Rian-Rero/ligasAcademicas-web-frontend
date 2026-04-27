@@ -8,6 +8,7 @@ import {
   FiUsers,
 } from 'react-icons/fi';
 import { TbCertificate } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 
 import {
   AgendaAction,
@@ -30,6 +31,7 @@ import {
   ProgressInfo,
   QuickLink,
   SectionHeading,
+  SeeTeamLink,
   StatusBadge,
   SummaryCard,
   SummaryItem,
@@ -84,6 +86,7 @@ function formatDate(dateString) {
 
 export default function StudentDashboard() {
   const authUser = useAuthStore((state) => state.auth?.user);
+  const navigate = useNavigate();
 
   const { data: memberships = [] } = useGetLeagueMemberships({
     filters: { user: authUser?._id, isActive: true },
@@ -200,10 +203,8 @@ export default function StudentDashboard() {
   }, [eventsFromApi]);
 
   const nextEvent = agenda[0];
-  const visibleTeam = useMemo(() => team.slice(0, 3), [team]);
-  const displayedMembersCount = visibleTeam.length;
   const totalMembersCount = team.length;
-  const memberLabel = displayedMembersCount === 1 ? 'membro' : 'membros';
+  const memberLabel = totalMembersCount === 1 ? 'membro' : 'membros';
   const uppercaseStudentName = authUser?.name?.toLocaleUpperCase('pt-BR');
 
   return (
@@ -299,13 +300,12 @@ export default function StudentDashboard() {
             </span>
             <div>
               <span className="members-subtitle">
-                {displayedMembersCount} {memberLabel}
-                {totalMembersCount > 3 ? ` de ${totalMembersCount}` : ''}
+                {totalMembersCount} {memberLabel}
               </span>
             </div>
           </SectionHeading>
           <TeamList>
-            {visibleTeam.map((member) => (
+            {team.map((member) => (
               <TeamMember key={member.id}>
                 <TeamAvatar
                   $imageUrl={member?.imageURL}
@@ -316,6 +316,9 @@ export default function StudentDashboard() {
               </TeamMember>
             ))}
           </TeamList>
+          <SeeTeamLink type="button" onClick={() => navigate('/student/team')}>
+            Ver mais
+          </SeeTeamLink>
         </SummaryCard>
 
         <SummaryCard>

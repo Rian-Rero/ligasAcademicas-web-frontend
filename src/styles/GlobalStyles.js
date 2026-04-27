@@ -24,6 +24,32 @@ body {
   overflow-x: hidden;
 }
 
+html,
+body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(142, 97, 53, 0.59) rgba(255, 255, 255, 0.06);
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0.55rem;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+      rgba(139, 76, 34, 0.6),
+      rgba(224, 137, 51, 0.59)
+    )
+    padding-box;
+  border-radius: 999px;
+}
+
 body::before {
   content: "";
   position: fixed;

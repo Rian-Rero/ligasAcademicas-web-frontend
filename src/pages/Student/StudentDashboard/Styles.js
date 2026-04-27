@@ -291,17 +291,39 @@ export const TeamList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  max-height: 30rem;
+  max-height: 13rem;
   overflow-y: auto;
   padding-right: 0.4rem;
 
   &::-webkit-scrollbar {
-    width: 0.6rem;
+    width: 0.55rem;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.24);
+    background: linear-gradient(
+        rgba(139, 76, 34, 0.6),
+        rgba(224, 137, 51, 0.59)
+      )
+      padding-box;
     border-radius: 999px;
+  }
+`;
+
+export const SeeTeamLink = styled.button`
+  display: flex-end;
+  margin-top: 1rem;
+  padding: 0.8rem 1.6rem;
+  background: transparent;
+  color: #f6a04f;
+  border: none;
+  font-size: 1.35rem;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border: none;
+    filter: brightness(1.2);
   }
 `;
 
