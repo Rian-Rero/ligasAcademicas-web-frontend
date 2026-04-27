@@ -239,3 +239,46 @@ export const CardIcon = styled.div`
     height: 3.5rem;
   }
 `;
+
+export const LogoutButton = styled.button`
+  margin-top: auto;
+  padding: 1rem 1.2rem;
+  border-radius: 1.4rem;
+  background: rgba(246, 160, 79, 0);
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.35rem;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    background 180ms ease;
+
+  span {
+    display: flex;
+    gap: 0.75rem;
+    grid-auto-flow: column;
+    justify-content: center;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.9);
+    transition:
+      color 180ms ease,
+      background 180ms ease;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  &:hover {
+    background: rgba(255, 0, 0, 0.15);
+    color: #ff4f4f;
+    border-right-color: #ff4f4f;
+  }
+
+  &:hover span {
+    background: rgba(255, 0, 0, 0);
+    color: #ff4f4f;
+  }
+`;

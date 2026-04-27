@@ -11,9 +11,12 @@ export const login = async (credentials) => {
 };
 export const logout = async () => {
   const { clearAuth } = useAuthStore.getState();
-  await api.post('/logout');
 
-  clearAuth();
+  try {
+    await api.post('/logout');
+  } finally {
+    clearAuth();
+  }
 };
 export async function refresh() {
   const { setAuth } = useAuthStore.getState();

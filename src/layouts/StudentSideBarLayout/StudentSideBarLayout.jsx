@@ -1,10 +1,11 @@
 import { FiCalendar, FiUsers, FiUser } from 'react-icons/fi';
-import { TbCertificate, TbLayoutDashboard } from 'react-icons/tb';
+import { TbCertificate, TbLayoutDashboard, TbLogout2 } from 'react-icons/tb';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import {
   Avatar,
   Container,
+  LogoutButton,
   ProfileCard,
   SideBar,
   SideBarMenu,
@@ -12,6 +13,7 @@ import {
 } from './Styles';
 import { useGetAcademicLeagues } from '../../hooks/query/academicLeague';
 import { useGetLeagueMemberships } from '../../hooks/query/leagueMembership';
+import { useLogout } from '../../hooks/query/sessions';
 import { useGetUniversities } from '../../hooks/query/university';
 import useAuthStore from '../../stores/auth';
 
@@ -46,6 +48,9 @@ const navigation = [
 export default function StudentSideBarLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { mutate: logout } = useLogout({
+    onSettled: () => navigate('/login', { replace: true }),
+  });
 
   const authUser = useAuthStore((state) => state.auth?.user);
 
@@ -100,6 +105,12 @@ export default function StudentSideBarLayout() {
             </SideBarMenuItem>
           ))}
         </SideBarMenu>
+
+        <LogoutButton type="button" onClick={() => logout()}>
+          <span>
+            <TbLogout2 /> Sair
+          </span>
+        </LogoutButton>
       </SideBar>
 
       <Outlet />
