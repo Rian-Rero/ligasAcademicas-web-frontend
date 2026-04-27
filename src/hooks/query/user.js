@@ -8,7 +8,9 @@ import {
   getUserById,
   getUsers,
   redefinePassword,
+  resetUserPasswordByManagement,
   updateUser,
+  updateUserByManagement,
   verifyEmail,
 } from '../../services/api/endpoints';
 
@@ -120,6 +122,28 @@ export function useUpdateUser({
 } = {}) {
   return useMutation({
     mutationFn: updateUser,
+    onSuccess,
+    onError,
+  });
+}
+
+export function useUpdateUserByManagement({
+  onSuccess = () => {},
+  onError = (err) => console.log(err),
+} = {}) {
+  return useMutation({
+    mutationFn: updateUserByManagement,
+    onSuccess,
+    onError,
+  });
+}
+
+export function useResetUserPasswordByManagement({
+  onSuccess = () => {},
+  onError = (err) => console.log(err),
+} = {}) {
+  return useMutation({
+    mutationFn: resetUserPasswordByManagement,
     onSuccess,
     onError,
   });
