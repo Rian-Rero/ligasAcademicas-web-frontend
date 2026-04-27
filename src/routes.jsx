@@ -16,6 +16,7 @@ import {
 } from './layouts';
 import {
   ManagerDashboard,
+  ManagerEvents,
   ManagerMembers,
   StudentDashboard,
   EmailConfirmation,
@@ -103,6 +104,7 @@ const router = createBrowserRouter(
           <Route element={<ManagerPrivateRoutes />}>
             <Route path="manager" element={<ManagerSideBarLayout />}>
               <Route path="dashboard" element={<ManagerDashboard />} />
+              <Route path="eventos" element={<ManagerEvents />} />
               <Route path="membros" element={<ManagerMembers />} />
               <Route path="cadastrar-membro" element={<Register />} />
               <Route path="perfil" element={<Profile />} />
