@@ -135,6 +135,12 @@ export const MemberItem = styled.button`
     transform: translateY(-1px);
     border-color: rgba(0, 163, 255, 0.6);
   }
+
+  &:focus-visible {
+    outline: 2px solid rgba(0, 163, 255, 0.9);
+    outline-offset: 2px;
+    border-color: rgba(0, 163, 255, 0.78);
+  }
 `;
 
 export const MemberTitle = styled.div`
@@ -307,6 +313,11 @@ export const ActionButton = styled.button`
     cursor: not-allowed;
     transform: none;
     filter: saturate(0.9);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(0, 163, 255, 0.9);
+    outline-offset: 2px;
   }
 `;
 

@@ -154,10 +154,12 @@ export default function ManagerMembers() {
   });
 
   const { data: leagues = [] } = useGetAcademicLeagues({
+    filters: { _id: managerLeagueId },
     enabled: Boolean(managerLeagueId),
   });
 
   const { data: squads = [] } = useGetSquads({
+    filters: { academicLeague: managerLeagueId },
     enabled: Boolean(managerLeagueId),
   });
 
@@ -312,8 +314,17 @@ export default function ManagerMembers() {
   };
 
   const handleRefresh = async () => {
-    await Promise.all([refetchMemberships(), refetchUsers()]);
-    notifySuccess('Lista de membros atualizada');
+    try {
+      await Promise.all([refetchMemberships(), refetchUsers()]);
+      notifySuccess('Lista de membros atualizada');
+    } catch (err) {
+      notifyError(
+        buildRequestErrorMessage(
+          err,
+          'Nao foi possivel atualizar a lista de membros',
+        ),
+      );
+    }
   };
 
   const handleSaveMember = async () => {
@@ -334,13 +345,8 @@ export default function ManagerMembers() {
       return;
     }
 
-    if (!formState.squad) {
-      notifyWarning('Selecione uma subequipe para o membro');
-      return;
-    }
-
-    try {
-      await Promise.all([
+    const [userUpdateResult, membershipUpdateResult] = await Promise.allSettled(
+      [
         updateUserByManagement({
           _id: selectedMember.user._id,
           newUserData: {
@@ -354,20 +360,50 @@ export default function ManagerMembers() {
           _id: selectedMember.membership._id,
           inputData: {
             academicLeague: formState.academicLeague,
-            squad: formState.squad,
+            squad: formState.squad || null,
             role: normalizedLeagueRole || 'league-member',
             isActive: formState.isActive,
           },
         }),
-      ]);
+      ],
+    );
 
+    try {
       await Promise.all([refetchMemberships(), refetchUsers()]);
-      notifySuccess('Membro atualizado com sucesso');
     } catch (err) {
       notifyError(
-        buildRequestErrorMessage(err, 'Não foi possível salvar as alterações'),
+        buildRequestErrorMessage(
+          err,
+          'As alteracoes foram processadas, mas nao foi possivel atualizar os dados na tela',
+        ),
       );
+      return;
     }
+
+    const userUpdateSucceeded = userUpdateResult.status === 'fulfilled';
+    const membershipUpdateSucceeded =
+      membershipUpdateResult.status === 'fulfilled';
+
+    if (userUpdateSucceeded && membershipUpdateSucceeded) {
+      notifySuccess('Membro atualizado com sucesso');
+      return;
+    }
+
+    if (userUpdateSucceeded || membershipUpdateSucceeded) {
+      notifyWarning(
+        'As alteracoes foram aplicadas apenas parcialmente. Revise os dados atualizados e tente novamente para concluir a operacao',
+      );
+      return;
+    }
+
+    const error =
+      userUpdateResult.status === 'rejected'
+        ? userUpdateResult.reason
+        : membershipUpdateResult.reason;
+
+    notifyError(
+      buildRequestErrorMessage(error, 'Nao foi possivel salvar as alteracoes'),
+    );
   };
 
   const handleResetPassword = async () => {
