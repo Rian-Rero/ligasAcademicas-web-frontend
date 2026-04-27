@@ -5,4 +5,5 @@ export { default as Profile } from './Profile/Profile';
 export { default as Register } from './Register/Register';
 export { default as EmailConfirmation } from './EmailConfirmation/EmailConfirmation';
 export { default as ManagerDashboard } from './Manager/ManagerDashboard/ManagerDashboard';
+export { default as ManagerMembers } from './Manager/ManagerMembers/ManagerMembers';
 export { default as StudentDashboard } from './Student/StudentDashboard/StudentDashboard';

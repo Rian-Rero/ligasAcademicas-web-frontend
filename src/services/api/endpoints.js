@@ -50,6 +50,16 @@ export const updateUser = async ({ _id, newUserData }) => {
 
   return data;
 };
+export const updateUserByManagement = async ({ _id, newUserData }) => {
+  const { data } = await api.put(`/users/management/${_id}`, newUserData);
+
+  return data;
+};
+export const resetUserPasswordByManagement = async (_id) => {
+  const { data } = await api.post(`/users/management/${_id}/reset-password`);
+
+  return data;
+};
 export const deleteUser = async (_id) => {
   const { data } = await api.delete(`/users/${_id}`);
 
