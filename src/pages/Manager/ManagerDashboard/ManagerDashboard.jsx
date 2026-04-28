@@ -277,7 +277,10 @@ export default function ManagerDashboard() {
       <BottomCard>
         <SectionHeading>Atalhos Rápidos</SectionHeading>
         <ShortcutBoxes>
-          <ShortcutBox type="button">
+          <ShortcutBox
+            type="button"
+            onClick={() => navigate('/manager/criar-evento')}
+          >
             <CardIcon>
               <GrAddCircle />
             </CardIcon>
