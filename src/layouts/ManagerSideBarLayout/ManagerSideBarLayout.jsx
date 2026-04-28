@@ -1,4 +1,5 @@
 import { FiCalendar, FiUsers, FiUser } from 'react-icons/fi';
+import { GrAddCircle } from 'react-icons/gr';
 import {
   TbCertificate,
   TbLayoutDashboard,
@@ -37,6 +38,11 @@ const navigation = [
     label: 'Eventos',
     icon: <FiCalendar />,
     path: '/manager/eventos',
+  },
+  {
+    label: 'Criar Evento',
+    icon: <GrAddCircle />,
+    path: '/manager/criar-evento',
   },
   {
     label: 'Subequipes',
