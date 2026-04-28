@@ -222,6 +222,10 @@ export const HelperText = styled.span`
   font-size: 1.15rem;
 `;
 
+export const FullRow = styled.div`
+  grid-column: 1 / -1;
+`;
+
 export const ActionsRow = styled.div`
   grid-column: 1 / -1;
   display: flex;

@@ -30,6 +30,7 @@ import {
   EventTitle,
   EventsCard,
   Field,
+  FullRow,
   FormGrid,
   HeaderActions,
   HeaderSection,
@@ -43,6 +44,7 @@ import {
   TextArea,
   TextInput,
 } from './Styles';
+import { ConfirmDialog } from '../../../components/common';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
 import {
   useDeleteEvent,
@@ -169,6 +171,7 @@ export default function ManagerEventsList() {
   );
 
   const [selectedEventId, setSelectedEventId] = useState('');
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (!events.length) {
@@ -184,6 +187,10 @@ export default function ManagerEventsList() {
       setSelectedEventId(normalizeId(events[0]._id));
     }
   }, [events, selectedEventId]);
+
+  useEffect(() => {
+    setIsDeleteConfirmOpen(false);
+  }, [selectedEventId]);
 
   const selectedEvent = useMemo(
     () => events.find((event) => normalizeId(event._id) === selectedEventId),
@@ -233,22 +240,31 @@ export default function ManagerEventsList() {
   const canEdit = Boolean(selectedEvent?._id);
   const isLoadingLeague = isLoadingMemberships || isLoadingLeagues;
 
-  const handleDeleteEvent = async () => {
+  const handleRequestDelete = () => {
     if (!selectedEvent?._id) {
       notifyWarning('Selecione um evento para remover');
       return;
     }
 
-    const confirmed = window.confirm(
-      `Deseja excluir o evento ${selectedEvent.title || ''}?`,
-    );
+    setIsDeleteConfirmOpen(true);
+  };
 
-    if (!confirmed) return;
+  const handleCancelDelete = () => {
+    setIsDeleteConfirmOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedEvent?._id) {
+      notifyWarning('Selecione um evento para remover');
+      setIsDeleteConfirmOpen(false);
+      return;
+    }
 
     try {
       await deleteEvent(selectedEvent._id);
       notifySuccess('Evento removido com sucesso');
       await refetchEvents();
+      setIsDeleteConfirmOpen(false);
     } catch (err) {
       notifyError(
         buildRequestErrorMessage(
@@ -464,15 +480,44 @@ export default function ManagerEventsList() {
               )}
             </Field>
 
+            {isDeleteConfirmOpen && (
+              <FullRow>
+                <HelperText>
+                  Tem certeza que deseja excluir o evento{' '}
+                  {selectedEvent?.title || ''}?
+                </HelperText>
+              </FullRow>
+            )}
+
             <ActionsRow>
-              <ActionButton
-                type="button"
-                $variant="warning"
-                onClick={handleDeleteEvent}
-                disabled={!canEdit || isSaving}
-              >
-                <FiTrash2 /> Excluir evento
-              </ActionButton>
+              {isDeleteConfirmOpen ? (
+                <>
+                  <ActionButton
+                    type="button"
+                    onClick={handleCancelDelete}
+                    disabled={isSaving}
+                  >
+                    Cancelar
+                  </ActionButton>
+                  <ActionButton
+                    type="button"
+                    $variant="warning"
+                    onClick={handleConfirmDelete}
+                    disabled={isSaving}
+                  >
+                    <FiTrash2 /> Confirmar exclusao
+                  </ActionButton>
+                </>
+              ) : (
+                <ActionButton
+                  type="button"
+                  $variant="warning"
+                  onClick={handleRequestDelete}
+                  disabled={!canEdit || isSaving}
+                >
+                  <FiTrash2 /> Excluir evento
+                </ActionButton>
+              )}
 
               <ActionButton type="submit" disabled={!canEdit || isSaving}>
                 {isSaving ? (
@@ -494,6 +539,17 @@ export default function ManagerEventsList() {
           </FormGrid>
         </EditorCard>
       </PanelGrid>
+
+      <ConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        title="Confirmar exclusao"
+        description={`Deseja excluir o evento ${selectedEvent?.title || ''}?`}
+        confirmLabel="Excluir evento"
+        cancelLabel="Manter evento"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isLoading={isSaving}
+      />
     </Content>
   );
 }
