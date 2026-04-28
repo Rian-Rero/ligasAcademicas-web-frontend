@@ -136,7 +136,10 @@ export default function StudentDashboard() {
   });
 
   const { data: eventsFromApi = [] } = useGetEvents({
-    filters: { academicLeague: activeMembership?.academicLeague },
+    filters: {
+      academicLeague: activeMembership?.academicLeague,
+      ...(activeMembership?.squad && { squad: activeMembership.squad }),
+    },
     enabled: Boolean(activeMembership?.academicLeague),
     onError: () => {},
   });
