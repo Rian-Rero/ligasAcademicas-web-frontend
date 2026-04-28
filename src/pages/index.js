@@ -7,3 +7,4 @@ export { default as EmailConfirmation } from './EmailConfirmation/EmailConfirmat
 export { default as ManagerDashboard } from './Manager/ManagerDashboard/ManagerDashboard';
 export { default as ManagerMembers } from './Manager/ManagerMembers/ManagerMembers';
 export { default as StudentDashboard } from './Student/StudentDashboard/StudentDashboard';
+export { default as StudentTeam } from './Student/StudentTeam/StudentTeam';

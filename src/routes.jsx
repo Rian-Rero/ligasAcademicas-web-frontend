@@ -18,6 +18,7 @@ import {
   ManagerDashboard,
   ManagerMembers,
   StudentDashboard,
+  StudentTeam,
   EmailConfirmation,
   ForgotPassword,
   Home,
@@ -95,7 +96,7 @@ const router = createBrowserRouter(
             <Route path="dashboard" element={<StudentDashboard />} />
             <Route path="events" element={<StudentDashboard />} />
             <Route path="certificates" element={<StudentDashboard />} />
-            <Route path="team" element={<StudentDashboard />} />
+            <Route path="team" element={<StudentTeam />} />
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<StudentDashboard />} />
           </Route>
