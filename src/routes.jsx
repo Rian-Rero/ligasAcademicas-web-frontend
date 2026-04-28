@@ -17,7 +17,9 @@ import {
 import {
   ManagerDashboard,
   ManagerEvents,
+  ManagerEventsList,
   ManagerMembers,
+  StudentEvents,
   StudentDashboard,
   EmailConfirmation,
   ForgotPassword,
@@ -94,7 +96,7 @@ const router = createBrowserRouter(
           <Route path="student" element={<StudentSideBarLayout />}>
             <Route index element={<StudentDashboard />} />
             <Route path="dashboard" element={<StudentDashboard />} />
-            <Route path="events" element={<StudentDashboard />} />
+            <Route path="events" element={<StudentEvents />} />
             <Route path="certificates" element={<StudentDashboard />} />
             <Route path="team" element={<StudentDashboard />} />
             <Route path="profile" element={<Profile />} />
@@ -104,7 +106,8 @@ const router = createBrowserRouter(
           <Route element={<ManagerPrivateRoutes />}>
             <Route path="manager" element={<ManagerSideBarLayout />}>
               <Route path="dashboard" element={<ManagerDashboard />} />
-              <Route path="eventos" element={<ManagerEvents />} />
+              <Route path="eventos" element={<ManagerEventsList />} />
+              <Route path="criar-evento" element={<ManagerEvents />} />
               <Route path="membros" element={<ManagerMembers />} />
               <Route path="cadastrar-membro" element={<Register />} />
               <Route path="perfil" element={<Profile />} />

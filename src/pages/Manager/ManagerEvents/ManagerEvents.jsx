@@ -277,10 +277,10 @@ export default function ManagerEvents() {
               <ActionButton
                 type="button"
                 $variant="warning"
-                onClick={() => navigate('/manager/dashboard')}
+                onClick={() => navigate('/manager/eventos')}
                 disabled={isSaving}
               >
-                Voltar ao dashboard
+                Voltar aos eventos
               </ActionButton>
 
               <ActionButton type="submit" disabled={isSaving || !canSubmit}>

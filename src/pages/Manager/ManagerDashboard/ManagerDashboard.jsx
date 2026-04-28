@@ -279,7 +279,7 @@ export default function ManagerDashboard() {
         <ShortcutBoxes>
           <ShortcutBox
             type="button"
-            onClick={() => navigate('/manager/eventos')}
+            onClick={() => navigate('/manager/criar-evento')}
           >
             <CardIcon>
               <GrAddCircle />
