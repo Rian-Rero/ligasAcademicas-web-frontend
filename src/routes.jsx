@@ -24,6 +24,7 @@ import {
   StudentTeam,
   EmailConfirmation,
   ForgotPassword,
+  ChangePassword,
   Home,
   Login,
   Profile,
@@ -94,6 +95,7 @@ const router = createBrowserRouter(
           element={<EmailConfirmation />}
         />
         <Route element={<PrivateRoutes />}>
+          <Route path="change-password" element={<ChangePassword />} />
           <Route path="student" element={<StudentSideBarLayout />}>
             <Route index element={<StudentDashboard />} />
             <Route path="dashboard" element={<StudentDashboard />} />

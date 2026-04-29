@@ -11,3 +11,4 @@ export { default as ManagerMembers } from './Manager/ManagerMembers/ManagerMembe
 export { default as StudentEvents } from './Student/StudentEvents/StudentEvents';
 export { default as StudentDashboard } from './Student/StudentDashboard/StudentDashboard';
 export { default as StudentTeam } from './Student/StudentTeam/StudentTeam';
+export { default as ChangePassword } from './ChangePassword/ChangePassword';

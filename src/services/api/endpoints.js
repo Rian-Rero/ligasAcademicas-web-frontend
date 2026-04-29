@@ -81,6 +81,14 @@ export const redefinePassword = async ({ token, password }) => {
   return data;
 };
 
+export const changeUserPassword = async ({ _id, password }) => {
+  const { data } = await api.put(`/users/${_id}/change-password`, {
+    newPassword: password,
+  });
+
+  return data;
+};
+
 // Academic leagues
 export const getAcademicLeagues = async (filters = {}) => {
   const { data } = await api.get('/academic-leagues', { params: filters });
