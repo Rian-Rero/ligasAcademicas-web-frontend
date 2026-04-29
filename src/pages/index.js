@@ -1,5 +1,6 @@
 export { default as Home } from './Home/Home';
 export { default as ForgotPassword } from './ForgotPassword/ForgotPassword';
+export { default as RedefinePassword } from './RedefinePassword/RedefinePassword';
 export { default as Login } from './Login/Login';
 export { default as Profile } from './Profile/Profile';
 export { default as Register } from './Register/Register';
@@ -11,3 +12,4 @@ export { default as ManagerMembers } from './Manager/ManagerMembers/ManagerMembe
 export { default as StudentEvents } from './Student/StudentEvents/StudentEvents';
 export { default as StudentDashboard } from './Student/StudentDashboard/StudentDashboard';
 export { default as StudentTeam } from './Student/StudentTeam/StudentTeam';
+export { default as ChangePassword } from './ChangePassword/ChangePassword';

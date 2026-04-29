@@ -39,7 +39,7 @@ export default function ForgotPassword() {
   const { mutate: requestForgotPassword, isPending: isLoading } =
     useForgotPassword({
       onSuccess: () => {
-        notifySuccess('E-mail de recuperação enviado!');
+        notifySuccess('Link de redefinição enviado para seu e-mail!');
         reset();
       },
       onError: (err) => {
@@ -87,7 +87,7 @@ export default function ForgotPassword() {
                   Enviando...
                 </ButtonContent>
               ) : (
-                'Enviar link'
+                'Enviar link de redefinição'
               )}
             </Button>
 
