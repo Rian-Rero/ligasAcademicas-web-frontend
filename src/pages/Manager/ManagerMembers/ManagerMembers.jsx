@@ -59,6 +59,14 @@ import {
   notifySuccess,
   notifyWarning,
 } from '../../../utils/toast';
+import {
+  buildRequestErrorMessage,
+  filterBySearch,
+  formatRole,
+  isSameId,
+  mapById,
+  normalizeId,
+} from '../utils';
 
 const initialFormState = {
   name: '',
@@ -70,45 +78,6 @@ const initialFormState = {
   squad: '',
   isActive: true,
 };
-
-function normalizeId(value) {
-  return String(value || '');
-}
-
-function isSameId(left, right) {
-  return normalizeId(left) === normalizeId(right);
-}
-
-function buildRequestErrorMessage(err, fallback) {
-  const responseMessage = err?.response?.data?.message;
-
-  if (Array.isArray(responseMessage)) {
-    return responseMessage.join(' | ');
-  }
-
-  if (typeof responseMessage === 'string' && responseMessage.trim()) {
-    return responseMessage;
-  }
-
-  if (typeof err?.message === 'string' && err.message.trim()) {
-    return err.message;
-  }
-
-  return fallback;
-}
-
-function formatRole(role) {
-  if (!role) return 'Não definido';
-
-  return String(role)
-    .replace(/[-_]/g, ' ')
-    .trim()
-    .split(/\s+/)
-    .map((word) =>
-      word ? word[0].toLocaleUpperCase('pt-BR') + word.slice(1) : '',
-    )
-    .join(' ');
-}
 
 export default function ManagerMembers() {
   const theme = useTheme();
@@ -163,23 +132,9 @@ export default function ManagerMembers() {
     enabled: Boolean(managerLeagueId),
   });
 
-  const usersById = useMemo(
-    () =>
-      users.reduce((acc, user) => {
-        acc[normalizeId(user._id)] = user;
-        return acc;
-      }, {}),
-    [users],
-  );
+  const usersById = useMemo(() => mapById(users), [users]);
 
-  const squadsById = useMemo(
-    () =>
-      squads.reduce((acc, squad) => {
-        acc[normalizeId(squad._id)] = squad;
-        return acc;
-      }, {}),
-    [squads],
-  );
+  const squadsById = useMemo(() => mapById(squads), [squads]);
 
   const members = useMemo(() => {
     return leagueMemberships
@@ -202,19 +157,11 @@ export default function ManagerMembers() {
   }, [leagueMemberships, usersById]);
 
   const filteredMembers = useMemo(() => {
-    const normalizedQuery = searchTerm.trim().toLocaleLowerCase('pt-BR');
-    if (!normalizedQuery) return members;
-
-    return members.filter(({ user, membership }) => {
-      const role = String(membership.role || '').toLocaleLowerCase('pt-BR');
-      const name = String(user.name || '').toLocaleLowerCase('pt-BR');
-      const email = String(user.email || '').toLocaleLowerCase('pt-BR');
-      return (
-        name.includes(normalizedQuery) ||
-        email.includes(normalizedQuery) ||
-        role.includes(normalizedQuery)
-      );
-    });
+    return filterBySearch(members, searchTerm, ({ user, membership }) => [
+      user.name,
+      user.email,
+      membership.role,
+    ]);
   }, [members, searchTerm]);
 
   useEffect(() => {
@@ -391,7 +338,7 @@ export default function ManagerMembers() {
 
     if (userUpdateSucceeded || membershipUpdateSucceeded) {
       notifyWarning(
-        'As alterações foram aplicadas apenas parcialmente. Revise os dados atualizados e tente novamente para concluir a operacao',
+        'As alterações foram aplicadas apenas parcialmente. Revise os dados atualizados e tente novamente para concluir a operação',
       );
       return;
     }

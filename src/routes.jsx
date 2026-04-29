@@ -19,6 +19,7 @@ import {
   ManagerEvents,
   ManagerEventsList,
   ManagerMembers,
+  ManagerSquads,
   StudentEvents,
   StudentDashboard,
   StudentTeam,
@@ -110,6 +111,7 @@ const router = createBrowserRouter(
               <Route path="eventos" element={<ManagerEventsList />} />
               <Route path="criar-evento" element={<ManagerEvents />} />
               <Route path="membros" element={<ManagerMembers />} />
+              <Route path="subequipes" element={<ManagerSquads />} />
               <Route path="cadastrar-membro" element={<Register />} />
               <Route path="perfil" element={<Profile />} />
               <Route path="profile" element={<Profile />} />

@@ -8,6 +8,7 @@ export { default as ManagerDashboard } from './Manager/ManagerDashboard/ManagerD
 export { default as ManagerEvents } from './Manager/ManagerEvents/ManagerEvents';
 export { default as ManagerEventsList } from './Manager/ManagerEventsList/ManagerEventsList';
 export { default as ManagerMembers } from './Manager/ManagerMembers/ManagerMembers';
+export { default as ManagerSquads } from './Manager/ManagerSquads/ManagerSquads';
 export { default as StudentEvents } from './Student/StudentEvents/StudentEvents';
 export { default as StudentDashboard } from './Student/StudentDashboard/StudentDashboard';
 export { default as StudentTeam } from './Student/StudentTeam/StudentTeam';
