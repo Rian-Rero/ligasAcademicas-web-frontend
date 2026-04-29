@@ -374,7 +374,7 @@ export default function ManagerMembers() {
       notifyError(
         buildRequestErrorMessage(
           err,
-          'As alteracoes foram processadas, mas nao foi possivel atualizar os dados na tela',
+          'As alterações foram processadas, mas nao foi possivel atualizar os dados na tela',
         ),
       );
       return;
@@ -391,7 +391,7 @@ export default function ManagerMembers() {
 
     if (userUpdateSucceeded || membershipUpdateSucceeded) {
       notifyWarning(
-        'As alteracoes foram aplicadas apenas parcialmente. Revise os dados atualizados e tente novamente para concluir a operacao',
+        'As alterações foram aplicadas apenas parcialmente. Revise os dados atualizados e tente novamente para concluir a operacao',
       );
       return;
     }
@@ -402,7 +402,7 @@ export default function ManagerMembers() {
         : membershipUpdateResult.reason;
 
     notifyError(
-      buildRequestErrorMessage(error, 'Nao foi possivel salvar as alteracoes'),
+      buildRequestErrorMessage(error, 'Nao foi possivel salvar as alterações'),
     );
   };
 

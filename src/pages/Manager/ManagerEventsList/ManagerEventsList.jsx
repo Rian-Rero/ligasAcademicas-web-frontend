@@ -361,7 +361,7 @@ export default function ManagerEventsList() {
                   onClick={() => setSelectedEventId(normalizeId(event._id))}
                 >
                   <EventTitle>
-                    <strong>{event.title || 'Evento sem titulo'}</strong>
+                    <strong>{event.title || 'Evento sem título'}</strong>
                     <EventBadge $variant={event.squad ? 'squad' : 'global'}>
                       {event.squad ? 'Subequipe' : 'Global'}
                     </EventBadge>
@@ -393,11 +393,11 @@ export default function ManagerEventsList() {
           <FormGrid>
             <Field>
               <Label>
-                <FiTag /> Titulo do evento
+                <FiTag /> Título do evento
               </Label>
               <TextInput
                 type="text"
-                placeholder="Digite o titulo do evento"
+                placeholder="Digite o título do evento"
                 {...register('title')}
                 disabled={!canEdit}
               />
@@ -469,7 +469,7 @@ export default function ManagerEventsList() {
             )}
 
             <Field $fullWidth>
-              <Label>Descricao</Label>
+              <Label>Descrição</Label>
               <TextArea
                 placeholder="Descreva o objetivo do evento"
                 {...register('description')}
@@ -531,7 +531,7 @@ export default function ManagerEventsList() {
                   </>
                 ) : (
                   <>
-                    <FiSave /> Salvar alteracoes
+                    <FiSave /> Salvar alterações
                   </>
                 )}
               </ActionButton>

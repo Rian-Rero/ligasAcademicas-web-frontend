@@ -169,12 +169,12 @@ export default function StudentEvents() {
       }
 
       await refetchAttendances();
-      notifySuccess('Presenca confirmada com sucesso');
+      notifySuccess('Presença confirmada com sucesso');
     } catch (err) {
       notifyError(
         buildRequestErrorMessage(
           err,
-          'Nao foi possivel confirmar sua presenca',
+          'Nao foi possivel confirmar sua presença',
         ),
       );
     } finally {
@@ -188,7 +188,7 @@ export default function StudentEvents() {
         <div>
           <HeaderTitle>MEUS EVENTOS</HeaderTitle>
           <HeaderSubtitle>
-            Confira os eventos disponiveis e confirme sua presenca para garantir
+            Confira os eventos disponiveis e confirme sua presença para garantir
             sua vaga.
           </HeaderSubtitle>
         </div>
@@ -215,10 +215,10 @@ export default function StudentEvents() {
           const attendance = attendanceByEvent[normalizeId(event._id)];
           const isConfirmed = Boolean(attendance?.isConfirmed);
           const isPending = pendingEventId === normalizeId(event._id);
-          let confirmButtonContent = 'Confirmar presenca';
+          let confirmButtonContent = 'Confirmar presença';
 
           if (isConfirmed) {
-            confirmButtonContent = 'Presenca confirmada';
+            confirmButtonContent = 'Presença confirmada';
           }
 
           if (isPending) {
@@ -246,7 +246,7 @@ export default function StudentEvents() {
               </AgendaInfo>
 
               <div>
-                <strong>{event.title || 'Evento sem titulo'}</strong>
+                <strong>{event.title || 'Evento sem título'}</strong>
                 <span>{event.location || 'Local a definir'}</span>
                 <EventMeta>
                   <EventBadge $variant={event.squad ? 'squad' : 'global'}>
@@ -258,7 +258,7 @@ export default function StudentEvents() {
                     </EventBadge>
                   )}
                   <EventBadge $variant={isConfirmed ? 'confirmed' : 'pending'}>
-                    {isConfirmed ? 'Presenca confirmada' : 'A confirmar'}
+                    {isConfirmed ? 'Presença confirmada' : 'A confirmar'}
                   </EventBadge>
                 </EventMeta>
               </div>

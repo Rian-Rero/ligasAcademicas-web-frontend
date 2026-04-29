@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { FiCalendar, FiMapPin, FiTag, FiUsers } from 'react-icons/fi';
 import { GrAddCircle } from 'react-icons/gr';
@@ -62,6 +63,8 @@ export default function ManagerEvents() {
   const theme = useTheme();
   const navigate = useNavigate();
   const authUser = useAuthStore((state) => state.auth?.user);
+
+  const queryClient = useQueryClient();
 
   const { data: memberships = [], isLoading: isLoadingMemberships } =
     useGetLeagueMemberships({
@@ -154,6 +157,7 @@ export default function ManagerEvents() {
         scope: 'global',
         squad: '',
       });
+      queryClient.invalidateQueries(['events']);
     } catch (err) {
       notifyError(buildEventCreateErrorMessage(err));
     }
@@ -183,11 +187,11 @@ export default function ManagerEvents() {
           <FormGrid>
             <Field>
               <Label>
-                <FiTag /> Titulo do evento
+                <FiTag /> Título do evento
               </Label>
               <TextInput
                 type="text"
-                placeholder="Digite o titulo do evento"
+                placeholder="Digite o título do evento"
                 {...register('title')}
                 disabled={!canSubmit}
               />
@@ -262,7 +266,7 @@ export default function ManagerEvents() {
             )}
 
             <Field $fullWidth>
-              <Label>Descricao</Label>
+              <Label>Descrição</Label>
               <TextArea
                 placeholder="Descreva o objetivo do evento"
                 {...register('description')}
@@ -307,8 +311,8 @@ export default function ManagerEvents() {
           <PreviewTitle>Resumo do evento</PreviewTitle>
           <PreviewList>
             <PreviewItem>
-              <PreviewLabel>Titulo</PreviewLabel>
-              <PreviewValue>{previewTitle || 'Titulo a definir'}</PreviewValue>
+              <PreviewLabel>Título</PreviewLabel>
+              <PreviewValue>{previewTitle || 'Título a definir'}</PreviewValue>
             </PreviewItem>
 
             <PreviewItem>
@@ -349,9 +353,9 @@ export default function ManagerEvents() {
             </PreviewItem>
 
             <PreviewItem>
-              <PreviewLabel>Descricao</PreviewLabel>
+              <PreviewLabel>Descrição</PreviewLabel>
               <PreviewValue>
-                {previewDescription || 'Descricao a definir'}
+                {previewDescription || 'Descrição a definir'}
               </PreviewValue>
             </PreviewItem>
           </PreviewList>
