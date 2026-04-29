@@ -24,6 +24,7 @@ import {
   StudentTeam,
   EmailConfirmation,
   ForgotPassword,
+  RedefinePassword,
   ChangePassword,
   Home,
   Login,
@@ -90,6 +91,7 @@ const router = createBrowserRouter(
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="redefinir-senha/:token" element={<RedefinePassword />} />
         <Route
           path="email-confirmation/:token"
           element={<EmailConfirmation />}
