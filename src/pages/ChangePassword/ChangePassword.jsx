@@ -21,14 +21,44 @@ import {
 } from './utils';
 import { Logo } from '../../components/common';
 import { FormInput } from '../../components/features';
+import { useGetLeagueMembershipsOnDemand } from '../../hooks/query/leagueMembership';
 import { useChangeUserPassword } from '../../hooks/query/user';
 import useAuthStore from '../../stores/auth';
+import { hasAdminRole, hasManagerRole } from '../../utils/roles';
 import { notifyError, notifySuccess } from '../../utils/toast';
+
+async function resolvePostChangePasswordRoute(getActiveMemberships) {
+  const authUser = useAuthStore.getState().auth?.user;
+  if (!authUser?._id) return '/student/dashboard';
+
+  if (hasAdminRole(authUser?.globalRole)) return '/admin/dashboard';
+
+  if (hasManagerRole(authUser?.globalRole)) return '/manager/dashboard';
+
+  try {
+    const activeMemberships = await getActiveMemberships({
+      user: authUser._id,
+      isActive: true,
+    });
+
+    const hasManagementMembership = activeMemberships.some((membership) =>
+      hasManagerRole(membership?.role),
+    );
+
+    return hasManagementMembership
+      ? '/manager/dashboard'
+      : '/student/dashboard';
+  } catch {
+    return '/student/dashboard';
+  }
+}
 
 export default function ChangePassword() {
   const theme = useTheme();
   const navigate = useNavigate();
   const authUser = useAuthStore((state) => state.auth?.user);
+  const { mutateAsync: getActiveMemberships } =
+    useGetLeagueMembershipsOnDemand();
 
   const schema = authUser?.mustChangePassword
     ? changePasswordValidationSchemaForced
@@ -42,9 +72,12 @@ export default function ChangePassword() {
 
   const { mutate: changePassword, isPending: isLoading } =
     useChangeUserPassword({
-      onSuccess: () => {
+      onSuccess: async () => {
         notifySuccess('Senha alterada com sucesso!');
-        navigate('/student/dashboard', { replace: true });
+
+        const nextRoute =
+          await resolvePostChangePasswordRoute(getActiveMemberships);
+        navigate(nextRoute, { replace: true });
       },
       onError: (err) => notifyError(err?.message || 'Erro ao alterar senha'),
     });
