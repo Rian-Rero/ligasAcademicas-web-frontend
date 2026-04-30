@@ -356,3 +356,102 @@ export const SmallActionButton = styled.button`
   gap: 0.5rem;
   cursor: pointer;
 `;
+
+export const MembershipModeSelector = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const MembershipModeButton = styled.button`
+  border: 1px solid
+    ${({ $active }) => ($active ? '#29a3ff' : 'rgba(255, 255, 255, 0.14)')};
+  background: ${({ $active }) =>
+    $active ? 'rgba(0, 140, 255, 0.18)' : 'rgba(255, 255, 255, 0.03)'};
+  color: #fff;
+  border-radius: 1.4rem;
+  padding: 1rem 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(41, 163, 255, 0.8);
+  }
+
+  strong {
+    display: block;
+    font-size: 1.35rem;
+    margin-bottom: 0.3rem;
+  }
+
+  span {
+    display: block;
+    font-size: 1.12rem;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.4;
+  }
+`;
+
+export const MembershipPanel = styled.div`
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.1rem;
+  border-radius: 1.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+`;
+
+export const MembershipPanelHeader = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+`;
+
+export const MembershipPanelTitle = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  strong {
+    font-size: 1.45rem;
+  }
+
+  span {
+    font-size: 1.18rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+`;
+
+export const MembershipTypeBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: rgba(0, 255, 128, 0.14);
+  color: #b0ffd2;
+`;
+
+export const MembershipHelpBox = styled.div`
+  padding: 1rem 1.1rem;
+  border-radius: 1.2rem;
+  background: rgba(0, 140, 255, 0.12);
+  border: 1px solid rgba(0, 140, 255, 0.18);
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 1.2rem;
+  line-height: 1.5;
+`;

@@ -79,6 +79,13 @@ import {
   MembershipMeta,
   MembershipActions,
   SmallActionButton,
+  MembershipModeSelector,
+  MembershipModeButton,
+  MembershipPanel,
+  MembershipPanelHeader,
+  MembershipPanelTitle,
+  MembershipTypeBadge,
+  MembershipHelpBox,
 } from '../Styles';
 
 export default function AdminUsers() {
@@ -93,6 +100,7 @@ export default function AdminUsers() {
   const [selectedLeagueId, setSelectedLeagueId] = useState(
     searchParams.get('league') || '',
   );
+  const [membershipMode, setMembershipMode] = useState('university');
   const [isDeleteUserConfirmOpen, setIsDeleteUserConfirmOpen] = useState(false);
   const [isDeleteMembershipConfirmOpen, setIsDeleteMembershipConfirmOpen] =
     useState(false);
@@ -254,27 +262,49 @@ export default function AdminUsers() {
   );
 
   useEffect(() => {
+    if (!selectedMembership?._id) {
+      setMembershipMode('university');
+      return;
+    }
+
+    setMembershipMode(
+      selectedMembership.academicLeague ? 'league' : 'university',
+    );
+  }, [selectedMembership]);
+
+  useEffect(() => {
     if (!selectedUser?._id) {
       reset(adminUserDefaultValues);
       return;
     }
-
     const leagueOfMembership = leagues.find((league) =>
       isSameId(league._id, selectedMembership?.academicLeague),
     );
+
+    // Prefer university from league when membership references an academicLeague,
+    // otherwise fall back to membership.university (university-only membership)
+    const membershipUniversityId =
+      leagueOfMembership?.university || selectedMembership?.university;
 
     reset({
       name: selectedUser.name || '',
       email: selectedUser.email || '',
       globalRole: selectedUser.globalRole || 'league-member',
       emailVerified: selectedUser.emailVerified ? 'true' : 'false',
-      membershipUniversity: normalizeId(leagueOfMembership?.university),
+      membershipUniversity: normalizeId(membershipUniversityId),
       academicLeague: normalizeId(selectedMembership?.academicLeague),
       role: selectedMembership?.role || '',
       squad: normalizeId(selectedMembership?.squad),
       isActive: selectedMembership?.isActive ? 'true' : 'false',
     });
   }, [leagues, reset, selectedMembership, selectedUser]);
+
+  useEffect(() => {
+    if (membershipMode === 'university') {
+      setValue('academicLeague', '');
+      setValue('squad', '');
+    }
+  }, [membershipMode, setValue]);
 
   const availableLeaguesForMembership = useMemo(
     () =>
@@ -305,6 +335,49 @@ export default function AdminUsers() {
     [academicLeague, squads],
   );
 
+  const buildMembershipPayload = (values, userId) => {
+    const payload = {
+      user: normalizeId(userId),
+      membershipType: membershipMode,
+      university: normalizeId(values.membershipUniversity),
+      role: values.role.trim(),
+      isActive: values.isActive === 'true',
+    };
+
+    if (membershipMode === 'league') {
+      payload.academicLeague = normalizeId(values.academicLeague);
+      payload.squad = normalizeId(values.squad);
+    }
+
+    return payload;
+  };
+
+  const validateMembershipValues = (values) => {
+    if (!values.membershipUniversity) {
+      notifyWarning('Selecione uma universidade para o vínculo');
+      return false;
+    }
+
+    if (!values.role?.trim()) {
+      notifyWarning('Informe um cargo ou descrição para o vínculo');
+      return false;
+    }
+
+    if (membershipMode === 'league') {
+      if (!values.academicLeague) {
+        notifyWarning('Selecione uma liga para o vínculo com liga');
+        return false;
+      }
+
+      if (!values.squad) {
+        notifyWarning('Selecione uma subequipe para o vínculo com liga');
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   useEffect(() => {
     const currentSquad = getValues('squad');
     if (!academicLeague || !currentSquad) return;
@@ -331,6 +404,7 @@ export default function AdminUsers() {
   const handleStartNewUser = () => {
     setSelectedUserId('');
     setSelectedMembershipId('');
+    setMembershipMode('university');
     reset(adminUserDefaultValues);
   };
 
@@ -341,23 +415,14 @@ export default function AdminUsers() {
     }
 
     const values = getValues();
-    const role = values.role.trim();
-
-    if (!values.academicLeague || !values.squad || !role) {
-      notifyWarning('Preencha liga, subequipe e papel para criar o vinculo');
+    if (!validateMembershipValues(values)) {
       return;
     }
 
     try {
-      const payload = {
-        user: normalizeId(selectedUser._id),
-        academicLeague: normalizeId(values.academicLeague),
-        squad: normalizeId(values.squad),
-        role,
-        isActive: values.isActive === 'true',
-      };
-
-      const createdMembership = await createMembership(payload);
+      const createdMembership = await createMembership(
+        buildMembershipPayload(values, selectedUser._id),
+      );
 
       if (!createdMembership || !createdMembership._id) {
         notifyError('Não foi possível criar o vínculo');
@@ -405,16 +470,17 @@ export default function AdminUsers() {
     const email = values.email.trim().toLocaleLowerCase('pt-BR');
     const globalRole = values.globalRole.trim() || 'league-member';
     const role = values.role.trim();
+    const hasMembershipInput = Boolean(
+      values.membershipUniversity ||
+      values.academicLeague ||
+      values.squad ||
+      role,
+    );
 
     try {
       if (selectedUser?._id) {
-        if (selectedMembership?._id) {
-          if (!values.academicLeague || !values.squad || !role) {
-            notifyWarning(
-              'Preencha liga, subequipe e papel para atualizar o vinculo',
-            );
-            return;
-          }
+        if (selectedMembership?._id && !validateMembershipValues(values)) {
+          return;
         }
 
         await updateUserByManagement({
@@ -430,13 +496,13 @@ export default function AdminUsers() {
         if (selectedMembership?._id) {
           await updateMembership({
             _id: selectedMembership._id,
-            inputData: {
-              academicLeague: values.academicLeague,
-              squad: values.squad,
-              role,
-              isActive: values.isActive === 'true',
-            },
+            inputData: buildMembershipPayload(values, selectedUser._id),
           });
+        } else if (hasMembershipInput) {
+          if (!validateMembershipValues(values)) return;
+          await createMembership(
+            buildMembershipPayload(values, selectedUser._id),
+          );
         }
 
         await handleRefresh();
@@ -451,20 +517,9 @@ export default function AdminUsers() {
         emailVerified: values.emailVerified === 'true',
       });
 
-      if (values.academicLeague || values.squad || role) {
-        if (!values.academicLeague || !values.squad || !role) {
-          notifyWarning(
-            'Usuario criado. Para criar vinculo agora, preencha liga, subequipe e papel',
-          );
-        } else {
-          await createMembership({
-            user: createdUser._id,
-            academicLeague: values.academicLeague,
-            squad: values.squad,
-            role,
-            isActive: values.isActive === 'true',
-          });
-        }
+      if (hasMembershipInput) {
+        if (!validateMembershipValues(values)) return;
+        await createMembership(buildMembershipPayload(values, createdUser._id));
       }
 
       await handleRefresh();
@@ -645,17 +700,29 @@ export default function AdminUsers() {
                   const league = leagues.find((item) =>
                     isSameId(item._id, membership.academicLeague),
                   );
+                  const university = universities.find((item) =>
+                    isSameId(
+                      item._id,
+                      membership.university || league?.university,
+                    ),
+                  );
                   const squad = squads.find((item) =>
                     isSameId(item._id, membership.squad),
                   );
+                  const isLeagueMembership = Boolean(membership.academicLeague);
 
                   return (
                     <MembershipItem key={membership._id}>
                       <MembershipMeta>
-                        <strong>{league?.name || 'Liga'}</strong>
+                        <strong>
+                          {isLeagueMembership
+                            ? league?.name || 'Liga'
+                            : university?.name || 'Universidade'}
+                        </strong>
                         <span>
-                          {squad?.name || 'Sem subequipe'} —{' '}
-                          {formatRole(membership.role)}
+                          {isLeagueMembership
+                            ? `${squad?.name || 'Sem subequipe'} • ${formatRole(membership.role)}`
+                            : `${formatRole(membership.role)} • vínculo direto à universidade`}
                         </span>
                         <span
                           style={{
@@ -668,11 +735,25 @@ export default function AdminUsers() {
                       </MembershipMeta>
 
                       <MembershipActions>
+                        <MembershipTypeBadge>
+                          {isLeagueMembership
+                            ? 'Liga + subequipe'
+                            : 'Universidade'}
+                        </MembershipTypeBadge>
                         <SmallActionButton
                           type="button"
-                          onClick={() =>
-                            setSelectedMembershipId(normalizeId(membership._id))
-                          }
+                          onClick={() => {
+                            setSelectedMembershipId(
+                              normalizeId(membership._id),
+                            );
+                            // focus the role input so user can start editing quickly
+                            setTimeout(() => {
+                              const el = document.querySelector(
+                                'input[name="role"], select[name="membershipUniversity"]',
+                              );
+                              if (el) el.focus();
+                            }, 50);
+                          }}
                         >
                           Editar
                         </SmallActionButton>
@@ -706,84 +787,159 @@ export default function AdminUsers() {
               )}
             </Field>
 
-            <Field>
-              <Label>Papel na liga</Label>
-              <TextInput
-                {...register('role')}
-                placeholder="Ex.: presidente, membro..."
-              />
-              {errors.role && (
-                <ErrorMessage>{errors.role.message}</ErrorMessage>
-              )}
+            <Field $fullWidth>
+              <Label>Tipo de vínculo</Label>
+              <MembershipModeSelector>
+                <MembershipModeButton
+                  type="button"
+                  $active={membershipMode === 'university'}
+                  onClick={() => setMembershipMode('university')}
+                >
+                  <strong>Universidade</strong>
+                  <span>Vincule o usuário só à universidade, sem liga.</span>
+                </MembershipModeButton>
+
+                <MembershipModeButton
+                  type="button"
+                  $active={membershipMode === 'league'}
+                  onClick={() => setMembershipMode('league')}
+                >
+                  <strong>Liga + subequipe</strong>
+                  <span>Crie um vínculo completo com liga e subequipe.</span>
+                </MembershipModeButton>
+              </MembershipModeSelector>
             </Field>
 
-            <Field>
-              <Label>Universidade do vinculo</Label>
-              <SelectInput {...register('membershipUniversity')}>
-                <option value="">Todas</option>
-                {universities.map((university) => (
-                  <option
-                    key={university._id}
-                    value={normalizeId(university._id)}
-                  >
-                    {university.name}
-                  </option>
-                ))}
-              </SelectInput>
-              {errors.membershipUniversity && (
-                <ErrorMessage>
-                  {errors.membershipUniversity.message}
-                </ErrorMessage>
-              )}
-            </Field>
+            <MembershipPanel>
+              <MembershipPanelHeader>
+                <MembershipPanelTitle>
+                  <strong>
+                    {membershipMode === 'league'
+                      ? 'Vínculo com liga'
+                      : 'Vínculo direto com universidade'}
+                  </strong>
+                  <span>
+                    {membershipMode === 'league'
+                      ? 'Universidade é herdada da liga e a subequipe é obrigatória.'
+                      : 'A universidade é o único vínculo necessário. Liga e subequipe ficam ocultas.'}
+                  </span>
+                </MembershipPanelTitle>
 
-            <Field>
-              <Label>Liga</Label>
-              <SelectInput {...register('academicLeague')}>
-                <option value="">Selecione uma liga</option>
-                {availableLeaguesForMembership.map((league) => (
-                  <option key={league._id} value={normalizeId(league._id)}>
-                    {league.name}
-                  </option>
-                ))}
-              </SelectInput>
-              {errors.academicLeague && (
-                <ErrorMessage>{errors.academicLeague.message}</ErrorMessage>
-              )}
-            </Field>
+                <MembershipTypeBadge>
+                  {membershipMode === 'league'
+                    ? 'Modo liga'
+                    : 'Modo universidade'}
+                </MembershipTypeBadge>
+              </MembershipPanelHeader>
 
-            <Field>
-              <Label>Subequipe</Label>
-              <SelectInput {...register('squad')}>
-                <option value="">Selecione uma subequipe</option>
-                {availableSquads.map((squad) => (
-                  <option key={squad._id} value={normalizeId(squad._id)}>
-                    {squad.name}
-                  </option>
-                ))}
-              </SelectInput>
-              {errors.squad && (
-                <ErrorMessage>{errors.squad.message}</ErrorMessage>
-              )}
-            </Field>
+              <FormGrid>
+                <Field $fullWidth>
+                  <Label>Universidade</Label>
+                  <SelectInput {...register('membershipUniversity')}>
+                    <option value="">Selecione uma universidade</option>
+                    {universities.map((university) => (
+                      <option
+                        key={university._id}
+                        value={normalizeId(university._id)}
+                      >
+                        {university.name}
+                      </option>
+                    ))}
+                  </SelectInput>
+                  {errors.membershipUniversity && (
+                    <ErrorMessage>
+                      {errors.membershipUniversity.message}
+                    </ErrorMessage>
+                  )}
+                </Field>
 
-            <Field>
-              <Label>Ativo</Label>
-              <SelectInput {...register('isActive')}>
-                <option value="true">Sim</option>
-                <option value="false">Nao</option>
-              </SelectInput>
-              {errors.isActive && (
-                <ErrorMessage>{errors.isActive.message}</ErrorMessage>
-              )}
-            </Field>
+                {membershipMode === 'league' ? (
+                  <>
+                    <Field>
+                      <Label>Liga</Label>
+                      <SelectInput {...register('academicLeague')}>
+                        <option value="">Selecione uma liga</option>
+                        {availableLeaguesForMembership.map((league) => (
+                          <option
+                            key={league._id}
+                            value={normalizeId(league._id)}
+                          >
+                            {league.name}
+                          </option>
+                        ))}
+                      </SelectInput>
+                      {errors.academicLeague && (
+                        <ErrorMessage>
+                          {errors.academicLeague.message}
+                        </ErrorMessage>
+                      )}
+                    </Field>
+
+                    <Field>
+                      <Label>Subequipe</Label>
+                      <SelectInput {...register('squad')}>
+                        <option value="">Selecione uma subequipe</option>
+                        {availableSquads.map((squad) => (
+                          <option
+                            key={squad._id}
+                            value={normalizeId(squad._id)}
+                          >
+                            {squad.name}
+                          </option>
+                        ))}
+                      </SelectInput>
+                      {errors.squad && (
+                        <ErrorMessage>{errors.squad.message}</ErrorMessage>
+                      )}
+                    </Field>
+                  </>
+                ) : (
+                  <Field $fullWidth>
+                    <MembershipHelpBox>
+                      Selecione apenas a universidade. Esse modo é ideal para
+                      usuários que não pertencem a uma liga específica.
+                    </MembershipHelpBox>
+                  </Field>
+                )}
+
+                <Field>
+                  <Label>
+                    {membershipMode === 'league'
+                      ? 'Cargo na liga'
+                      : 'Cargo / descrição do vínculo'}
+                  </Label>
+                  <TextInput
+                    {...register('role')}
+                    placeholder={
+                      membershipMode === 'league'
+                        ? 'Ex.: presidente, membro...'
+                        : 'Ex.: administrativo, contato...'
+                    }
+                  />
+                  {errors.role && (
+                    <ErrorMessage>{errors.role.message}</ErrorMessage>
+                  )}
+                </Field>
+
+                <Field>
+                  <Label>Status</Label>
+                  <SelectInput {...register('isActive')}>
+                    <option value="true">Ativo</option>
+                    <option value="false">Inativo</option>
+                  </SelectInput>
+                  {errors.isActive && (
+                    <ErrorMessage>{errors.isActive.message}</ErrorMessage>
+                  )}
+                </Field>
+              </FormGrid>
+            </MembershipPanel>
 
             <Field $fullWidth>
               <HelperText>
                 {formErrorMessage ||
                   (selectedMembership
-                    ? `Vinculo selecionado: ${selectedMembership.role} - ${selectedMembership.isActive ? 'ativo' : 'inativo'}`
-                    : 'Usuários podem ter multiplos vínculos. Use Novo vinculo para adicionar quantos forem necessários.')}
+                    ? `Editando vínculo: ${selectedMembership.role} • ${selectedMembership.isActive ? 'ativo' : 'inativo'}`
+                    : 'Preencha os campos acima e use “Adicionar vínculo”. Você pode salvar o usuário sem criar vínculo, ou criar vínculo só com universidade.')}
               </HelperText>
             </Field>
           </FormGrid>
@@ -797,7 +953,7 @@ export default function AdminUsers() {
               onClick={handleAddMembership}
               disabled={isSaving || !selectedUser?._id}
             >
-              <FiPlus /> Novo vinculo
+              <FiPlus /> Adicionar vínculo
             </ActionButton>
             <ActionButton
               type="button"
@@ -825,7 +981,7 @@ export default function AdminUsers() {
               ) : (
                 <FiSave />
               )}
-              Salvar
+              Salvar usuário
             </ActionButton>
           </ActionRow>
         </FormCard>

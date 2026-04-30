@@ -24,19 +24,27 @@ export const adminUserSchema = z
 
     if (!hasMembershipData) return;
 
-    if (!values.academicLeague) {
+    if (!values.membershipUniversity) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ['academicLeague'],
-        message: 'Selecione uma liga',
+        path: ['membershipUniversity'],
+        message: 'Selecione uma universidade',
       });
     }
 
-    if (!values.squad) {
+    if (values.academicLeague && !values.squad) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['squad'],
         message: 'Selecione uma subequipe',
+      });
+    }
+
+    if (!values.academicLeague && values.squad) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['academicLeague'],
+        message: 'Selecione uma liga para usar uma subequipe',
       });
     }
 
