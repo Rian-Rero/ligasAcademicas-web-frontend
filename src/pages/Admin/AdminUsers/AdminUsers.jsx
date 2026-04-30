@@ -1,18 +1,30 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { FiRefreshCw, FiSave, FiSearch, FiUser } from 'react-icons/fi';
+import {
+  FiPlus,
+  FiRefreshCw,
+  FiSave,
+  FiSearch,
+  FiTrash2,
+  FiUser,
+} from 'react-icons/fi';
 import { useSearchParams } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
+import { ConfirmDialog } from '../../../components/common';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
 import {
+  useCreateLeagueMembership,
+  useDeleteLeagueMembership,
   useGetLeagueMemberships,
   useUpdateLeagueMembership,
 } from '../../../hooks/query/leagueMembership';
 import { useGetSquads } from '../../../hooks/query/squad';
 import { useGetUniversities } from '../../../hooks/query/university';
 import {
+  useCreateUser,
+  useDeleteUser,
   useGetUsers,
   useUpdateUserByManagement,
 } from '../../../hooks/query/user';
@@ -56,17 +68,7 @@ import {
   SelectInput,
   TextInput,
 } from '../Styles';
-
-const initialFormState = {
-  name: '',
-  email: '',
-  globalRole: '',
-  emailVerified: false,
-  academicLeague: '',
-  role: '',
-  squad: '',
-  isActive: true,
-};
+import { adminUserDefaultValues, useAdminUserForm } from './useAdminUserForm';
 
 export default function AdminUsers() {
   const theme = useTheme();
@@ -80,7 +82,9 @@ export default function AdminUsers() {
   const [selectedLeagueId, setSelectedLeagueId] = useState(
     searchParams.get('league') || '',
   );
-  const [formState, setFormState] = useState(initialFormState);
+  const [isDeleteUserConfirmOpen, setIsDeleteUserConfirmOpen] = useState(false);
+  const [isDeleteMembershipConfirmOpen, setIsDeleteMembershipConfirmOpen] =
+    useState(false);
 
   const { data: universities = [], refetch: refetchUniversities } =
     useGetUniversities();
@@ -91,10 +95,31 @@ export default function AdminUsers() {
   const { data: memberships = [], refetch: refetchMemberships } =
     useGetLeagueMemberships();
 
+  const { mutateAsync: createUser, isPending: isCreatingUser } =
+    useCreateUser();
+  const { mutateAsync: deleteUser, isPending: isDeletingUser } =
+    useDeleteUser();
   const { mutateAsync: updateUserByManagement, isPending: isUpdatingUser } =
     useUpdateUserByManagement();
+  const { mutateAsync: createMembership, isPending: isCreatingMembership } =
+    useCreateLeagueMembership();
+  const { mutateAsync: deleteMembership, isPending: isDeletingMembership } =
+    useDeleteLeagueMembership();
   const { mutateAsync: updateMembership, isPending: isUpdatingMembership } =
     useUpdateLeagueMembership();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useAdminUserForm();
+
+  const membershipUniversity = watch('membershipUniversity');
+  const academicLeague = watch('academicLeague');
 
   const filteredLeagues = useMemo(
     () =>
@@ -106,7 +131,7 @@ export default function AdminUsers() {
     [leagues, selectedUniversityId],
   );
 
-  const filteredMemberships = useMemo(
+  const scopedMemberships = useMemo(
     () =>
       memberships.filter((membership) => {
         const matchesLeague =
@@ -125,28 +150,37 @@ export default function AdminUsers() {
 
   const membershipsByUser = useMemo(
     () =>
-      filteredMemberships.reduce((acc, membership) => {
+      memberships.reduce((acc, membership) => {
         const userId = normalizeId(membership.user);
         acc[userId] = acc[userId] || [];
         acc[userId].push(membership);
         return acc;
       }, {}),
-    [filteredMemberships],
+    [memberships],
   );
 
   const filteredUsers = useMemo(() => {
-    const usersWithMemberships = users.filter((user) =>
-      filteredMemberships.some((membership) =>
-        isSameId(membership.user, user._id),
-      ),
-    );
+    const hasScopeFilters = Boolean(selectedUniversityId || selectedLeagueId);
+    const usersInScope = hasScopeFilters
+      ? users.filter((user) =>
+          scopedMemberships.some((membership) =>
+            isSameId(membership.user, user._id),
+          ),
+        )
+      : users;
 
-    return filterBySearch(usersWithMemberships, searchTerm, (user) => [
+    return filterBySearch(usersInScope, searchTerm, (user) => [
       user.name,
       user.email,
       user.globalRole,
     ]);
-  }, [filteredMemberships, searchTerm, users]);
+  }, [
+    scopedMemberships,
+    searchTerm,
+    selectedLeagueId,
+    selectedUniversityId,
+    users,
+  ]);
 
   useEffect(() => {
     if (!selectedUniversityId) return;
@@ -161,20 +195,16 @@ export default function AdminUsers() {
   }, [filteredLeagues, selectedLeagueId, selectedUniversityId]);
 
   useEffect(() => {
-    if (!filteredUsers.length) {
-      setSelectedUserId('');
-      setSelectedMembershipId('');
-      return;
-    }
-
     const hasSelectedUser = filteredUsers.some((user) =>
       isSameId(user._id, selectedUserId),
     );
 
-    if (!hasSelectedUser) {
-      setSelectedUserId(normalizeId(filteredUsers[0]._id));
+    if (!hasSelectedUser && selectedUserId) {
+      setSelectedUserId('');
+      setSelectedMembershipId('');
+      reset(adminUserDefaultValues);
     }
-  }, [filteredUsers, selectedUserId]);
+  }, [filteredUsers, reset, selectedUserId]);
 
   const selectedUser = useMemo(
     () => users.find((user) => isSameId(user._id, selectedUserId)) || null,
@@ -187,7 +217,7 @@ export default function AdminUsers() {
   );
 
   useEffect(() => {
-    if (!selectedUserMemberships.length) {
+    if (!selectedUser?._id) {
       setSelectedMembershipId('');
       return;
     }
@@ -197,9 +227,9 @@ export default function AdminUsers() {
     );
 
     if (!hasSelectedMembership) {
-      setSelectedMembershipId(normalizeId(selectedUserMemberships[0]._id));
+      setSelectedMembershipId(normalizeId(selectedUserMemberships[0]?._id));
     }
-  }, [selectedMembershipId, selectedUserMemberships]);
+  }, [selectedMembershipId, selectedUser?._id, selectedUserMemberships]);
 
   const selectedMembership = useMemo(
     () =>
@@ -210,141 +240,247 @@ export default function AdminUsers() {
   );
 
   useEffect(() => {
-    if (!selectedUser) {
-      setFormState(initialFormState);
+    if (!selectedUser?._id) {
+      reset(adminUserDefaultValues);
       return;
     }
 
-    setFormState({
+    const leagueOfMembership = leagues.find((league) =>
+      isSameId(league._id, selectedMembership?.academicLeague),
+    );
+
+    reset({
       name: selectedUser.name || '',
       email: selectedUser.email || '',
-      globalRole: selectedUser.globalRole || '',
-      emailVerified: Boolean(selectedUser.emailVerified),
-      academicLeague: normalizeId(selectedMembership?.academicLeague) || '',
+      globalRole: selectedUser.globalRole || 'league-member',
+      emailVerified: selectedUser.emailVerified ? 'true' : 'false',
+      membershipUniversity: normalizeId(leagueOfMembership?.university),
+      academicLeague: normalizeId(selectedMembership?.academicLeague),
       role: selectedMembership?.role || '',
-      squad: normalizeId(selectedMembership?.squad) || '',
-      isActive: selectedMembership
-        ? Boolean(selectedMembership.isActive)
-        : true,
+      squad: normalizeId(selectedMembership?.squad),
+      isActive: selectedMembership?.isActive ? 'true' : 'false',
     });
-  }, [selectedMembership, selectedUser]);
+  }, [leagues, reset, selectedMembership, selectedUser]);
 
-  useEffect(() => {
-    if (!formState.academicLeague) return;
-
-    if (selectedUniversityId) {
-      const belongsToUniversity = leagues.some(
-        (league) =>
-          isSameId(league._id, formState.academicLeague) &&
-          isSameId(league.university, selectedUniversityId),
-      );
-
-      if (!belongsToUniversity) {
-        setFormState((prevState) => ({ ...prevState, academicLeague: '' }));
-      }
-    }
-  }, [formState.academicLeague, leagues, selectedUniversityId]);
-
-  const availableSquads = useMemo(
+  const availableLeaguesForMembership = useMemo(
     () =>
-      squads.filter((squad) =>
-        isSameId(squad.academicLeague, formState.academicLeague),
-      ),
-    [formState.academicLeague, squads],
+      membershipUniversity
+        ? leagues.filter((league) =>
+            isSameId(league.university, membershipUniversity),
+          )
+        : leagues,
+    [membershipUniversity, leagues],
   );
 
   useEffect(() => {
-    if (!formState.academicLeague) return;
+    if (!academicLeague) return;
 
-    const hasSelectedSquad = availableSquads.some((squad) =>
-      isSameId(squad._id, formState.squad),
+    const hasLeague = availableLeaguesForMembership.some((league) =>
+      isSameId(league._id, academicLeague),
     );
 
-    if (hasSelectedSquad) return;
+    if (!hasLeague) {
+      setValue('academicLeague', '');
+      setValue('squad', '');
+    }
+  }, [academicLeague, availableLeaguesForMembership, setValue]);
 
-    setFormState((prevState) => ({
-      ...prevState,
-      squad: normalizeId(availableSquads[0]?._id),
-    }));
-  }, [availableSquads, formState.academicLeague, formState.squad]);
+  const availableSquads = useMemo(
+    () =>
+      squads.filter((squad) => isSameId(squad.academicLeague, academicLeague)),
+    [academicLeague, squads],
+  );
 
-  const handleTextChange = (field) => (event) => {
-    setFormState((prevState) => ({
-      ...prevState,
-      [field]: event.target.value,
-    }));
+  useEffect(() => {
+    const currentSquad = getValues('squad');
+    if (!academicLeague || !currentSquad) return;
+
+    const hasSelectedSquad = availableSquads.some((squad) =>
+      isSameId(squad._id, currentSquad),
+    );
+
+    if (!hasSelectedSquad) {
+      setValue('squad', '');
+    }
+  }, [academicLeague, availableSquads, getValues, setValue]);
+
+  const handleRefresh = async () => {
+    await Promise.all([
+      refetchUniversities(),
+      refetchLeagues(),
+      refetchSquads(),
+      refetchUsers(),
+      refetchMemberships(),
+    ]);
   };
 
-  const handleSave = async (event) => {
-    event.preventDefault();
+  const handleStartNewUser = () => {
+    setSelectedUserId('');
+    setSelectedMembershipId('');
+    reset(adminUserDefaultValues);
+  };
 
-    if (!selectedUser?._id || !selectedMembership?._id) {
-      notifyWarning('Selecione um usuário e um vínculo para editar');
+  const handleAddMembership = async () => {
+    if (!selectedUser?._id) {
+      notifyWarning('Selecione um usuario para criar um novo vinculo');
       return;
     }
 
-    const name = formState.name.trim();
-    const email = formState.email.trim().toLocaleLowerCase('pt-BR');
-    const globalRole = formState.globalRole.trim();
-    const role = formState.role.trim();
+    const values = getValues();
+    const role = values.role.trim();
 
-    if (!name || !email || !formState.academicLeague || !role) {
-      notifyWarning('Preencha os campos obrigatórios do usuário e do vínculo');
-      return;
-    }
-
-    if (!formState.squad) {
-      notifyWarning('Selecione uma subequipe para o vínculo');
+    if (!values.academicLeague || !values.squad || !role) {
+      notifyWarning('Preencha liga, subequipe e papel para criar o vinculo');
       return;
     }
 
     try {
-      await Promise.all([
-        updateUserByManagement({
-          _id: selectedUser._id,
-          newUserData: {
-            name,
-            email,
-            globalRole: globalRole || 'league-member',
-            emailVerified: formState.emailVerified,
-          },
-        }),
-        updateMembership({
-          _id: selectedMembership._id,
-          inputData: {
-            academicLeague: formState.academicLeague,
-            squad: formState.squad,
-            role,
-            isActive: formState.isActive,
-          },
-        }),
-      ]);
+      const createdMembership = await createMembership({
+        user: selectedUser._id,
+        academicLeague: values.academicLeague,
+        squad: values.squad,
+        role,
+        isActive: values.isActive === 'true',
+      });
 
-      await Promise.all([
-        refetchUniversities(),
-        refetchLeagues(),
-        refetchSquads(),
-        refetchUsers(),
-        refetchMemberships(),
-      ]);
-      notifySuccess('Usuário atualizado com sucesso');
+      await handleRefresh();
+      setSelectedMembershipId(normalizeId(createdMembership?._id));
+      notifySuccess('Vinculo criado com sucesso');
     } catch (err) {
       notifyError(
-        buildRequestErrorMessage(err, 'Nao foi possivel atualizar o usuario'),
+        buildRequestErrorMessage(err, 'Nao foi possivel criar o vinculo'),
       );
     }
   };
 
-  const isSaving = isUpdatingUser || isUpdatingMembership;
+  const handleConfirmDeleteMembership = async () => {
+    if (!selectedMembership?._id) return;
+
+    try {
+      await deleteMembership(selectedMembership._id);
+      await handleRefresh();
+      setSelectedMembershipId('');
+      setIsDeleteMembershipConfirmOpen(false);
+      notifySuccess('Vinculo removido com sucesso');
+    } catch (err) {
+      notifyError(
+        buildRequestErrorMessage(err, 'Nao foi possivel remover o vinculo'),
+      );
+    }
+  };
+
+  const handleConfirmDeleteUser = async () => {
+    if (!selectedUser?._id) return;
+
+    try {
+      await deleteUser(selectedUser._id);
+      await handleRefresh();
+      handleStartNewUser();
+      setIsDeleteUserConfirmOpen(false);
+      notifySuccess('Usuario removido com sucesso');
+    } catch (err) {
+      notifyError(
+        buildRequestErrorMessage(err, 'Nao foi possivel remover o usuario'),
+      );
+    }
+  };
+
+  const onSubmit = handleSubmit(async (values) => {
+    const name = values.name.trim();
+    const email = values.email.trim().toLocaleLowerCase('pt-BR');
+    const globalRole = values.globalRole.trim() || 'league-member';
+    const role = values.role.trim();
+
+    try {
+      if (selectedUser?._id) {
+        if (selectedMembership?._id) {
+          if (!values.academicLeague || !values.squad || !role) {
+            notifyWarning(
+              'Preencha liga, subequipe e papel para atualizar o vinculo',
+            );
+            return;
+          }
+        }
+
+        await updateUserByManagement({
+          _id: selectedUser._id,
+          newUserData: {
+            name,
+            email,
+            globalRole,
+            emailVerified: values.emailVerified === 'true',
+          },
+        });
+
+        if (selectedMembership?._id) {
+          await updateMembership({
+            _id: selectedMembership._id,
+            inputData: {
+              academicLeague: values.academicLeague,
+              squad: values.squad,
+              role,
+              isActive: values.isActive === 'true',
+            },
+          });
+        }
+
+        await handleRefresh();
+        notifySuccess('Usuario atualizado com sucesso');
+        return;
+      }
+
+      const createdUser = await createUser({
+        name,
+        email,
+        globalRole,
+        emailVerified: values.emailVerified === 'true',
+      });
+
+      if (values.academicLeague || values.squad || role) {
+        if (!values.academicLeague || !values.squad || !role) {
+          notifyWarning(
+            'Usuario criado. Para criar vinculo agora, preencha liga, subequipe e papel',
+          );
+        } else {
+          await createMembership({
+            user: createdUser._id,
+            academicLeague: values.academicLeague,
+            squad: values.squad,
+            role,
+            isActive: values.isActive === 'true',
+          });
+        }
+      }
+
+      await handleRefresh();
+      setSelectedUserId(normalizeId(createdUser._id));
+      notifySuccess('Usuario criado com sucesso');
+    } catch (err) {
+      notifyError(
+        buildRequestErrorMessage(err, 'Nao foi possivel salvar o usuario'),
+      );
+    }
+  });
+
+  const formErrorMessage =
+    errors.name?.message || errors.email?.message || errors.globalRole?.message;
+
+  const isSaving =
+    isCreatingUser ||
+    isDeletingUser ||
+    isUpdatingUser ||
+    isCreatingMembership ||
+    isDeletingMembership ||
+    isUpdatingMembership;
 
   return (
     <Content>
       <HeaderSection>
         <div>
-          <HeaderTitle>GERENCIAMENTO DE USUÁRIOS</HeaderTitle>
+          <HeaderTitle>GERENCIAMENTO DE USUARIOS</HeaderTitle>
           <HeaderSubtitle>
-            Filtre por universidade e liga para editar o perfil do usuário, o
-            vínculo com a liga e o status de ativação.
+            Filtre por universidade e liga para editar o perfil do usuario, o
+            vinculo com a liga e o status de ativacao.
           </HeaderSubtitle>
         </div>
 
@@ -355,12 +491,12 @@ export default function AdminUsers() {
             </SearchIcon>
             <SearchInput
               type="search"
-              placeholder="Buscar usuário"
+              placeholder="Buscar usuario"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
             />
           </SearchBar>
-          <ActionButton type="button" onClick={() => refetchUsers()}>
+          <ActionButton type="button" onClick={handleRefresh}>
             <FiRefreshCw /> Atualizar
           </ActionButton>
         </HeaderActions>
@@ -368,7 +504,7 @@ export default function AdminUsers() {
 
       <PanelGrid>
         <ListCard>
-          <SectionTitle>Usuários ({filteredUsers.length})</SectionTitle>
+          <SectionTitle>Usuarios ({filteredUsers.length})</SectionTitle>
 
           <FormGrid>
             <Field>
@@ -409,7 +545,7 @@ export default function AdminUsers() {
 
           <EntityList>
             {!filteredUsers.length && (
-              <EmptyState>Nenhum usuário encontrado.</EmptyState>
+              <EmptyState>Nenhum usuario encontrado.</EmptyState>
             )}
 
             {filteredUsers.map((user) => {
@@ -425,7 +561,7 @@ export default function AdminUsers() {
                 >
                   <EntityTitle>
                     <strong>{user.name}</strong>
-                    <EntityBadge>{userMemberships.length} vínculos</EntityBadge>
+                    <EntityBadge>{userMemberships.length} vinculos</EntityBadge>
                   </EntityTitle>
                   <EntityMeta>
                     <span>{user.email}</span>
@@ -437,9 +573,11 @@ export default function AdminUsers() {
           </EntityList>
         </ListCard>
 
-        <FormCard onSubmit={handleSave}>
+        <FormCard onSubmit={onSubmit}>
           <SectionTitle>
-            {selectedUser?._id ? 'Editar usuário' : 'Selecione um usuário'}
+            {selectedUser?._id
+              ? 'Editar usuario e vinculos'
+              : 'Criar novo usuario (ou selecione um existente)'}
           </SectionTitle>
 
           <FormGrid>
@@ -447,30 +585,21 @@ export default function AdminUsers() {
               <Label>
                 <FiUser /> Nome
               </Label>
-              <TextInput
-                value={formState.name}
-                onChange={handleTextChange('name')}
-                placeholder="Nome do usuário"
-              />
+              <TextInput {...register('name')} placeholder="Nome do usuario" />
             </Field>
 
             <Field $fullWidth>
               <Label>E-mail</Label>
               <TextInput
                 type="email"
-                value={formState.email}
-                onChange={handleTextChange('email')}
-                placeholder="E-mail do usuário"
+                {...register('email')}
+                placeholder="E-mail do usuario"
               />
             </Field>
 
             <Field>
               <Label>Perfil global</Label>
-              <SelectInput
-                value={formState.globalRole}
-                onChange={handleTextChange('globalRole')}
-              >
-                <option value="">Selecione</option>
+              <SelectInput {...register('globalRole')}>
                 <option value="admin">Administrador</option>
                 <option value="manager">Gestor</option>
                 <option value="league-member">Membro de liga</option>
@@ -478,38 +607,55 @@ export default function AdminUsers() {
             </Field>
 
             <Field>
-              <Label>E-mail verificado</Label>
+              <Label>Vinculo selecionado</Label>
               <SelectInput
-                value={formState.emailVerified ? 'true' : 'false'}
+                value={selectedMembershipId}
                 onChange={(event) =>
-                  setFormState((prevState) => ({
-                    ...prevState,
-                    emailVerified: event.target.value === 'true',
-                  }))
+                  setSelectedMembershipId(event.target.value)
                 }
               >
+                <option value="">Sem vinculo selecionado</option>
+                {selectedUserMemberships.map((membership) => {
+                  const league = leagues.find((item) =>
+                    isSameId(item._id, membership.academicLeague),
+                  );
+                  const squad = squads.find((item) =>
+                    isSameId(item._id, membership.squad),
+                  );
+
+                  return (
+                    <option
+                      key={membership._id}
+                      value={normalizeId(membership._id)}
+                    >
+                      {league?.name || 'Liga'} -{' '}
+                      {squad?.name || 'Sem subequipe'} -{' '}
+                      {formatRole(membership.role)}
+                    </option>
+                  );
+                })}
+              </SelectInput>
+            </Field>
+
+            <Field>
+              <Label>E-mail verificado</Label>
+              <SelectInput {...register('emailVerified')}>
                 <option value="true">Sim</option>
-                <option value="false">Não</option>
+                <option value="false">Nao</option>
               </SelectInput>
             </Field>
 
             <Field>
               <Label>Papel na liga</Label>
               <TextInput
-                value={formState.role}
-                onChange={handleTextChange('role')}
+                {...register('role')}
                 placeholder="Ex.: presidente, membro..."
               />
             </Field>
 
             <Field>
-              <Label>Universidade</Label>
-              <SelectInput
-                value={selectedUniversityId}
-                onChange={(event) =>
-                  setSelectedUniversityId(event.target.value)
-                }
-              >
+              <Label>Universidade do vinculo</Label>
+              <SelectInput {...register('membershipUniversity')}>
                 <option value="">Todas</option>
                 {universities.map((university) => (
                   <option
@@ -524,12 +670,9 @@ export default function AdminUsers() {
 
             <Field>
               <Label>Liga</Label>
-              <SelectInput
-                value={formState.academicLeague}
-                onChange={handleTextChange('academicLeague')}
-              >
+              <SelectInput {...register('academicLeague')}>
                 <option value="">Selecione uma liga</option>
-                {filteredLeagues.map((league) => (
+                {availableLeaguesForMembership.map((league) => (
                   <option key={league._id} value={normalizeId(league._id)}>
                     {league.name}
                   </option>
@@ -539,10 +682,7 @@ export default function AdminUsers() {
 
             <Field>
               <Label>Subequipe</Label>
-              <SelectInput
-                value={formState.squad}
-                onChange={handleTextChange('squad')}
-              >
+              <SelectInput {...register('squad')}>
                 <option value="">Selecione uma subequipe</option>
                 {availableSquads.map((squad) => (
                   <option key={squad._id} value={normalizeId(squad._id)}>
@@ -554,34 +694,50 @@ export default function AdminUsers() {
 
             <Field>
               <Label>Ativo</Label>
-              <SelectInput
-                value={formState.isActive ? 'true' : 'false'}
-                onChange={(event) =>
-                  setFormState((prevState) => ({
-                    ...prevState,
-                    isActive: event.target.value === 'true',
-                  }))
-                }
-              >
+              <SelectInput {...register('isActive')}>
                 <option value="true">Sim</option>
-                <option value="false">Não</option>
+                <option value="false">Nao</option>
               </SelectInput>
             </Field>
 
             <Field $fullWidth>
               <HelperText>
-                {selectedMembership
-                  ? `Vínculo selecionado: ${selectedMembership.role} • ${selectedMembership.isActive ? 'ativo' : 'inativo'}`
-                  : 'Escolha um usuário para editar seu vínculo na liga.'}
+                {formErrorMessage ||
+                  (selectedMembership
+                    ? `Vinculo selecionado: ${selectedMembership.role} - ${selectedMembership.isActive ? 'ativo' : 'inativo'}`
+                    : 'Usuarios podem ter multiplos vinculos. Use Novo vinculo para adicionar quantos forem necessarios.')}
               </HelperText>
             </Field>
           </FormGrid>
 
           <ActionRow>
+            <ActionButton type="button" onClick={handleStartNewUser}>
+              <FiPlus /> Novo usuario
+            </ActionButton>
             <ActionButton
-              type="submit"
+              type="button"
+              onClick={handleAddMembership}
               disabled={isSaving || !selectedUser?._id}
             >
+              <FiPlus /> Novo vinculo
+            </ActionButton>
+            <ActionButton
+              type="button"
+              $variant="warning"
+              onClick={() => setIsDeleteMembershipConfirmOpen(true)}
+              disabled={isSaving || !selectedMembership?._id}
+            >
+              <FiTrash2 /> Remover vinculo
+            </ActionButton>
+            <ActionButton
+              type="button"
+              $variant="warning"
+              onClick={() => setIsDeleteUserConfirmOpen(true)}
+              disabled={isSaving || !selectedUser?._id}
+            >
+              <FiTrash2 /> Remover usuario
+            </ActionButton>
+            <ActionButton type="submit" disabled={isSaving}>
               {isSaving ? (
                 <ClipLoader
                   size={16}
@@ -596,6 +752,28 @@ export default function AdminUsers() {
           </ActionRow>
         </FormCard>
       </PanelGrid>
+
+      <ConfirmDialog
+        isOpen={isDeleteMembershipConfirmOpen}
+        title="Remover vinculo"
+        description="Essa acao remove o vinculo selecionado do usuario com a liga e subequipe."
+        confirmLabel="Remover"
+        cancelLabel="Cancelar"
+        onConfirm={handleConfirmDeleteMembership}
+        onCancel={() => setIsDeleteMembershipConfirmOpen(false)}
+        isLoading={isSaving}
+      />
+
+      <ConfirmDialog
+        isOpen={isDeleteUserConfirmOpen}
+        title="Remover usuario"
+        description="Essa acao remove o usuario selecionado. Verifique dependencias antes de confirmar."
+        confirmLabel="Remover"
+        cancelLabel="Cancelar"
+        onConfirm={handleConfirmDeleteUser}
+        onCancel={() => setIsDeleteUserConfirmOpen(false)}
+        isLoading={isSaving}
+      />
     </Content>
   );
 }

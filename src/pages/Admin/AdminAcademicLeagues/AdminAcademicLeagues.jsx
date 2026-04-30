@@ -1,15 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { FiRefreshCw, FiSave, FiSearch, FiTrash2 } from 'react-icons/fi';
+import {
+  FiPlus,
+  FiRefreshCw,
+  FiSave,
+  FiSearch,
+  FiTrash2,
+} from 'react-icons/fi';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
 import { ConfirmDialog } from '../../../components/common';
 import {
-  useGetAcademicLeagues,
   useCreateAcademicLeague,
   useDeleteAcademicLeague,
+  useGetAcademicLeagues,
   useUpdateAcademicLeague,
 } from '../../../hooks/query/academicLeague';
 import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
@@ -54,20 +60,16 @@ import {
   TextArea,
   TextInput,
 } from '../Styles';
-
-const initialFormState = {
-  university: '',
-  name: '',
-  description: '',
-  area: '',
-};
+import {
+  adminAcademicLeagueDefaultValues,
+  useAdminAcademicLeagueForm,
+} from './useAdminAcademicLeagueForm';
 
 export default function AdminAcademicLeagues() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLeagueId, setSelectedLeagueId] = useState('');
-  const [formState, setFormState] = useState(initialFormState);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const { data: universities = [], refetch: refetchUniversities } =
@@ -83,6 +85,13 @@ export default function AdminAcademicLeagues() {
     useUpdateAcademicLeague();
   const { mutateAsync: deleteAcademicLeague, isPending: isDeleting } =
     useDeleteAcademicLeague();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useAdminAcademicLeagueForm();
 
   const filteredLeagues = useMemo(
     () =>
@@ -109,17 +118,12 @@ export default function AdminAcademicLeagues() {
   );
 
   useEffect(() => {
-    if (!filteredLeagues.length) {
-      setSelectedLeagueId('');
-      return;
-    }
-
     const hasSelectedLeague = filteredLeagues.some((league) =>
       isSameId(league._id, selectedLeagueId),
     );
 
-    if (!hasSelectedLeague) {
-      setSelectedLeagueId(normalizeId(filteredLeagues[0]._id));
+    if (!hasSelectedLeague && selectedLeagueId) {
+      setSelectedLeagueId('');
     }
   }, [filteredLeagues, selectedLeagueId]);
 
@@ -129,53 +133,29 @@ export default function AdminAcademicLeagues() {
 
   useEffect(() => {
     if (!selectedLeague) {
-      setFormState(initialFormState);
+      reset(adminAcademicLeagueDefaultValues);
       return;
     }
 
-    setFormState({
+    reset({
       university: normalizeId(selectedLeague.university),
       name: selectedLeague.name || '',
       description: selectedLeague.description || '',
       area: selectedLeague.area || '',
     });
-  }, [selectedLeague]);
+  }, [reset, selectedLeague]);
 
-  useEffect(() => {
-    if (formState.university) return;
-    if (!universities.length) return;
-
-    setFormState((prevState) => ({
-      ...prevState,
-      university: normalizeId(universities[0]._id),
-    }));
-  }, [formState.university, universities]);
-
-  const handleTextChange = (field) => (event) => {
-    setFormState((prevState) => ({
-      ...prevState,
-      [field]: event.target.value,
-    }));
+  const handleCreateNew = () => {
+    setSelectedLeagueId('');
+    reset(adminAcademicLeagueDefaultValues);
   };
 
-  const handleSave = async (event) => {
-    event.preventDefault();
-
-    const universityId = formState.university;
-    const name = formState.name.trim();
-    const description = formState.description.trim();
-    const area = formState.area.trim();
-
-    if (!universityId || !name || !description) {
-      notifyWarning('Selecione a universidade e preencha nome e descrição');
-      return;
-    }
-
+  const onSubmit = handleSubmit(async (values) => {
     const payload = {
-      university: universityId,
-      name,
-      description,
-      area,
+      university: values.university,
+      name: values.name.trim(),
+      description: values.description.trim(),
+      area: values.area?.trim() || '',
     };
 
     try {
@@ -195,17 +175,17 @@ export default function AdminAcademicLeagues() {
         refetchLeagues(),
         refetchMemberships(),
       ]);
-      setSelectedLeagueId('');
-      setFormState(initialFormState);
+
+      handleCreateNew();
     } catch (err) {
       notifyError(
         buildRequestErrorMessage(
           err,
-          'Nao foi possivel salvar a liga academica',
+          'Nao foi possivel salvar a liga acadêmica',
         ),
       );
     }
-  };
+  });
 
   const handleRequestDelete = () => {
     if (!selectedLeague?._id) {
@@ -218,7 +198,7 @@ export default function AdminAcademicLeagues() {
 
   const handleOpenUsers = () => {
     if (!selectedLeague?._id) {
-      notifyWarning('Selecione uma liga para abrir seus usuários');
+      notifyWarning('Selecione uma liga para abrir seus usuarios');
       return;
     }
 
@@ -237,13 +217,13 @@ export default function AdminAcademicLeagues() {
 
     try {
       await deleteAcademicLeague(selectedLeague._id);
-      notifySuccess('Liga acadêmica removida com sucesso');
+      notifySuccess('Liga academica removida com sucesso');
       await Promise.all([
         refetchUniversities(),
         refetchLeagues(),
         refetchMemberships(),
       ]);
-      setSelectedLeagueId('');
+      handleCreateNew();
       setIsDeleteConfirmOpen(false);
     } catch (err) {
       notifyError(
@@ -255,16 +235,21 @@ export default function AdminAcademicLeagues() {
     }
   };
 
+  const formErrorMessage =
+    errors.university?.message ||
+    errors.name?.message ||
+    errors.description?.message;
+
   const isSaving = isCreating || isUpdating || isDeleting;
 
   return (
     <Content>
       <HeaderSection>
         <div>
-          <HeaderTitle>ADMINISTRAÇÃO DE LIGAS ACADÊMICAS</HeaderTitle>
+          <HeaderTitle>ADMINISTRACAO DE LIGAS ACADEMICAS</HeaderTitle>
           <HeaderSubtitle>
-            Mantenha as ligas vinculadas à universidade correta e use a página
-            de usuários para controlar membros e papéis.
+            Mantenha as ligas vinculadas a universidade correta e use a pagina
+            de usuarios para controlar membros e papeis.
           </HeaderSubtitle>
         </div>
 
@@ -288,7 +273,7 @@ export default function AdminAcademicLeagues() {
 
       <PanelGrid>
         <ListCard>
-          <SectionTitle>Ligas acadêmicas</SectionTitle>
+          <SectionTitle>Ligas academicas</SectionTitle>
           <EntityList>
             {!filteredLeagues.length && (
               <EmptyState>Nenhuma liga encontrada.</EmptyState>
@@ -311,13 +296,13 @@ export default function AdminAcademicLeagues() {
                 >
                   <EntityTitle>
                     <strong>{league.name}</strong>
-                    <EntityBadge>{members.length} usuários</EntityBadge>
+                    <EntityBadge>{members.length} usuarios</EntityBadge>
                   </EntityTitle>
                   <EntityMeta>
                     <span>
-                      {university?.name || 'Universidade não informada'}
+                      {university?.name || 'Universidade nao informada'}
                     </span>
-                    <span>{league.area || 'Área não informada'}</span>
+                    <span>{league.area || 'Area nao informada'}</span>
                   </EntityMeta>
                 </EntityItem>
               );
@@ -325,18 +310,15 @@ export default function AdminAcademicLeagues() {
           </EntityList>
         </ListCard>
 
-        <FormCard onSubmit={handleSave}>
+        <FormCard onSubmit={onSubmit}>
           <SectionTitle>
-            {selectedLeague?._id ? 'Editar liga' : 'Nova liga acadêmica'}
+            {selectedLeague?._id ? 'Editar liga' : 'Criar nova liga academica'}
           </SectionTitle>
 
           <FormGrid>
             <Field $fullWidth>
               <Label>Universidade</Label>
-              <SelectInput
-                value={formState.university}
-                onChange={handleTextChange('university')}
-              >
+              <SelectInput {...register('university')}>
                 <option value="">Selecione uma universidade</option>
                 {universities.map((university) => (
                   <option
@@ -351,43 +333,41 @@ export default function AdminAcademicLeagues() {
 
             <Field $fullWidth>
               <Label>Nome</Label>
-              <TextInput
-                value={formState.name}
-                onChange={handleTextChange('name')}
-                placeholder="Nome da liga"
-              />
+              <TextInput {...register('name')} placeholder="Nome da liga" />
             </Field>
 
             <Field $fullWidth>
-              <Label>Descrição</Label>
+              <Label>Descricao</Label>
               <TextArea
-                value={formState.description}
-                onChange={handleTextChange('description')}
-                placeholder="Descreva a liga e seu propósito"
+                {...register('description')}
+                placeholder="Descreva a liga e seu proposito"
               />
             </Field>
 
             <Field $fullWidth>
-              <Label>Área</Label>
+              <Label>Area</Label>
               <TextInput
-                value={formState.area}
-                onChange={handleTextChange('area')}
-                placeholder="Ex.: saúde, tecnologia, engenharia..."
+                {...register('area')}
+                placeholder="Ex.: saude, tecnologia, engenharia..."
               />
             </Field>
 
             <Field $fullWidth>
               <HelperText>
-                {selectedLeague?._id
-                  ? `${leagueMembers.length} usuários vinculados a esta liga.`
-                  : 'Depois de salvar, use a página de usuários para vincular membros.'}
+                {formErrorMessage ||
+                  (selectedLeague?._id
+                    ? `${leagueMembers.length} usuarios vinculados a esta liga.`
+                    : 'Preencha os campos para criar uma nova liga academica.')}
               </HelperText>
             </Field>
           </FormGrid>
 
           <ActionRow>
+            <ActionButton type="button" onClick={handleCreateNew}>
+              <FiPlus /> Nova liga
+            </ActionButton>
             <ActionButton type="button" onClick={handleOpenUsers}>
-              Gerenciar usuários
+              Gerenciar usuarios
             </ActionButton>
             <ActionButton
               type="button"
@@ -415,8 +395,8 @@ export default function AdminAcademicLeagues() {
 
       <ConfirmDialog
         isOpen={isDeleteConfirmOpen}
-        title="Remover liga acadêmica"
-        description="Essa ação remove a liga selecionada. Se houver usuários vinculados, confira o impacto antes de confirmar."
+        title="Remover liga academica"
+        description="Essa acao remove a liga selecionada. Se houver usuarios vinculados, confira o impacto antes de confirmar."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDelete}

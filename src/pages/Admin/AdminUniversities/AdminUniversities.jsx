@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { FiRefreshCw, FiSave, FiSearch, FiTrash2 } from 'react-icons/fi';
+import {
+  FiPlus,
+  FiRefreshCw,
+  FiSave,
+  FiSearch,
+  FiTrash2,
+} from 'react-icons/fi';
 import { LuBuilding } from 'react-icons/lu';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
@@ -52,19 +58,15 @@ import {
   SectionTitle,
   TextInput,
 } from '../Styles';
-
-const initialFormState = {
-  name: '',
-  street: '',
-  number: '',
-  complement: '',
-};
+import {
+  adminUniversityDefaultValues,
+  useAdminUniversityForm,
+} from './useAdminUniversityForm';
 
 export default function AdminUniversities() {
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUniversityId, setSelectedUniversityId] = useState('');
-  const [formState, setFormState] = useState(initialFormState);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   const { data: universities = [], refetch: refetchUniversities } =
@@ -80,6 +82,13 @@ export default function AdminUniversities() {
     useUpdateUniversity();
   const { mutateAsync: deleteUniversity, isPending: isDeleting } =
     useDeleteUniversity();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useAdminUniversityForm();
 
   const filteredUniversities = useMemo(
     () =>
@@ -121,17 +130,12 @@ export default function AdminUniversities() {
   );
 
   useEffect(() => {
-    if (!filteredUniversities.length) {
-      setSelectedUniversityId('');
-      return;
-    }
-
     const hasSelectedUniversity = filteredUniversities.some((university) =>
       isSameId(university._id, selectedUniversityId),
     );
 
-    if (!hasSelectedUniversity) {
-      setSelectedUniversityId(normalizeId(filteredUniversities[0]._id));
+    if (!hasSelectedUniversity && selectedUniversityId) {
+      setSelectedUniversityId('');
     }
   }, [filteredUniversities, selectedUniversityId]);
 
@@ -141,47 +145,29 @@ export default function AdminUniversities() {
 
   useEffect(() => {
     if (!selectedUniversity) {
-      setFormState(initialFormState);
+      reset(adminUniversityDefaultValues);
       return;
     }
 
-    setFormState({
+    reset({
       name: selectedUniversity.name || '',
       street: selectedUniversity.street || '',
       number: String(selectedUniversity.number || ''),
       complement: selectedUniversity.complement || '',
     });
-  }, [selectedUniversity]);
+  }, [reset, selectedUniversity]);
 
-  const handleTextChange = (field) => (event) => {
-    setFormState((prevState) => ({
-      ...prevState,
-      [field]: event.target.value,
-    }));
+  const handleCreateNew = () => {
+    setSelectedUniversityId('');
+    reset(adminUniversityDefaultValues);
   };
 
-  const handleSave = async (event) => {
-    event.preventDefault();
-
-    const normalizedName = formState.name.trim();
-    const normalizedStreet = formState.street.trim();
-    const normalizedNumber = Number(formState.number);
-    const normalizedComplement = formState.complement.trim();
-
-    if (
-      !normalizedName ||
-      !normalizedStreet ||
-      Number.isNaN(normalizedNumber)
-    ) {
-      notifyWarning('Preencha nome, rua e número da universidade');
-      return;
-    }
-
+  const onSubmit = handleSubmit(async (values) => {
     const payload = {
-      name: normalizedName,
-      street: normalizedStreet,
-      number: normalizedNumber,
-      complement: normalizedComplement,
+      name: values.name.trim(),
+      street: values.street.trim(),
+      number: Number(values.number),
+      complement: values.complement?.trim() || '',
     };
 
     try {
@@ -201,14 +187,14 @@ export default function AdminUniversities() {
         refetchLeagues(),
         refetchMemberships(),
       ]);
-      setSelectedUniversityId('');
-      setFormState(initialFormState);
+
+      handleCreateNew();
     } catch (err) {
       notifyError(
         buildRequestErrorMessage(err, 'Nao foi possivel salvar a universidade'),
       );
     }
-  };
+  });
 
   const handleRequestDelete = () => {
     if (!selectedUniversity?._id) {
@@ -230,7 +216,7 @@ export default function AdminUniversities() {
         refetchLeagues(),
         refetchMemberships(),
       ]);
-      setSelectedUniversityId('');
+      handleCreateNew();
       setIsDeleteConfirmOpen(false);
     } catch (err) {
       notifyError(
@@ -242,16 +228,19 @@ export default function AdminUniversities() {
     }
   };
 
+  const formErrorMessage =
+    errors.name?.message || errors.street?.message || errors.number?.message;
+
   const isSaving = isCreating || isUpdating || isDeleting;
 
   return (
     <Content>
       <HeaderSection>
         <div>
-          <HeaderTitle>ADMINISTRAÇÃO DE UNIVERSIDADES</HeaderTitle>
+          <HeaderTitle>ADMINISTRACAO DE UNIVERSIDADES</HeaderTitle>
           <HeaderSubtitle>
             Cadastre, edite e remova universidades mantendo as ligas e os
-            vínculos organizados no mesmo padrão visual do sistema.
+            vinculos organizados no mesmo padrao visual do sistema.
           </HeaderSubtitle>
         </div>
 
@@ -314,7 +303,7 @@ export default function AdminUniversities() {
                         ? ` - ${university.complement}`
                         : ''}
                     </span>
-                    <span>{relatedMembers.length} usuários vinculados</span>
+                    <span>{relatedMembers.length} usuarios vinculados</span>
                   </EntityMeta>
                 </EntityItem>
               );
@@ -322,11 +311,11 @@ export default function AdminUniversities() {
           </EntityList>
         </ListCard>
 
-        <FormCard onSubmit={handleSave}>
+        <FormCard onSubmit={onSubmit}>
           <SectionTitle>
             {selectedUniversity?._id
               ? 'Editar universidade'
-              : 'Nova universidade'}
+              : 'Criar nova universidade'}
           </SectionTitle>
 
           <FormGrid>
@@ -335,8 +324,7 @@ export default function AdminUniversities() {
                 <LuBuilding /> Nome
               </Label>
               <TextInput
-                value={formState.name}
-                onChange={handleTextChange('name')}
+                {...register('name')}
                 placeholder="Nome da universidade"
               />
             </Field>
@@ -344,41 +332,42 @@ export default function AdminUniversities() {
             <Field $fullWidth>
               <Label>Rua</Label>
               <TextInput
-                value={formState.street}
-                onChange={handleTextChange('street')}
+                {...register('street')}
                 placeholder="Rua, avenida ou campus"
               />
             </Field>
 
             <Field>
-              <Label>Número</Label>
+              <Label>Numero</Label>
               <TextInput
                 type="number"
-                value={formState.number}
-                onChange={handleTextChange('number')}
-                placeholder="Número"
+                {...register('number')}
+                placeholder="Numero"
               />
             </Field>
 
             <Field>
               <Label>Complemento</Label>
               <TextInput
-                value={formState.complement}
-                onChange={handleTextChange('complement')}
+                {...register('complement')}
                 placeholder="Bloco, sala, campus..."
               />
             </Field>
 
             <Field $fullWidth>
               <HelperText>
-                {selectedUniversity?._id
-                  ? `${universityLeagues.length} ligas e ${universityMemberCount} usuários vinculados a esta universidade.`
-                  : 'Salve a universidade para começar a vincular ligas e usuários.'}
+                {formErrorMessage ||
+                  (selectedUniversity?._id
+                    ? `${universityLeagues.length} ligas e ${universityMemberCount} usuarios vinculados a esta universidade.`
+                    : 'Preencha os campos para criar uma nova universidade.')}
               </HelperText>
             </Field>
           </FormGrid>
 
           <ActionRow>
+            <ActionButton type="button" onClick={handleCreateNew}>
+              <FiPlus /> Nova universidade
+            </ActionButton>
             <ActionButton
               type="button"
               $variant="warning"
@@ -406,7 +395,7 @@ export default function AdminUniversities() {
       <ConfirmDialog
         isOpen={isDeleteConfirmOpen}
         title="Remover universidade"
-        description="Essa ação remove a universidade selecionada. Verifique se não há dependências importantes antes de confirmar."
+        description="Essa acao remove a universidade selecionada. Verifique se nao ha dependencias importantes antes de confirmar."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDelete}

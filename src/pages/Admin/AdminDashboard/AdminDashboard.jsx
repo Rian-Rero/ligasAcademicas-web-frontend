@@ -31,6 +31,7 @@ import {
 } from './Styles';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
 import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
+import { useGetSquads } from '../../../hooks/query/squad';
 import { useGetUniversities } from '../../../hooks/query/university';
 import { useGetUsers } from '../../../hooks/query/user';
 
@@ -45,6 +46,7 @@ export default function AdminDashboard() {
 
   const { data: universities = [] } = useGetUniversities();
   const { data: leagues = [] } = useGetAcademicLeagues();
+  const { data: squads = [] } = useGetSquads();
   const { data: users = [] } = useGetUsers();
   const { data: memberships = [] } = useGetLeagueMemberships();
 
@@ -68,6 +70,11 @@ export default function AdminDashboard() {
       label: 'Usuários na base',
       value: users.length,
       icon: <FiUsers />,
+    },
+    {
+      label: 'Subequipes ativas',
+      value: squads.length,
+      icon: <TbUsersGroup />,
     },
     {
       label: 'Vínculos ativos',
@@ -157,6 +164,13 @@ export default function AdminDashboard() {
               <FiUsers />
               Usuários
             </ShortcutBox>
+            <ShortcutBox
+              type="button"
+              onClick={() => navigate('/admin/subequipes')}
+            >
+              <TbUsersGroup />
+              Subequipes
+            </ShortcutBox>
           </ShortcutBoxes>
         </FeaturedTeamsCard>
       </MiddleSection>
@@ -177,6 +191,13 @@ export default function AdminDashboard() {
           >
             <CgFileDocument />
             Nova liga
+          </ShortcutBox>
+          <ShortcutBox
+            type="button"
+            onClick={() => navigate('/admin/subequipes')}
+          >
+            <TbUsersGroup />
+            Gerenciar subequipes
           </ShortcutBox>
           <ShortcutBox
             type="button"

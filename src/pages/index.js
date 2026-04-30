@@ -17,4 +17,5 @@ export { default as ChangePassword } from './ChangePassword/ChangePassword';
 export { default as AdminDashboard } from './Admin/AdminDashboard/AdminDashboard';
 export { default as AdminUniversities } from './Admin/AdminUniversities/AdminUniversities';
 export { default as AdminAcademicLeagues } from './Admin/AdminAcademicLeagues/AdminAcademicLeagues';
+export { default as AdminSquads } from './Admin/AdminSquads/AdminSquads';
 export { default as AdminUsers } from './Admin/AdminUsers/AdminUsers';

@@ -37,6 +37,7 @@ import {
   Profile,
   Register,
 } from './pages';
+import AdminSquads from './pages/Admin/AdminSquads/AdminSquads';
 import useAuthStore from './stores/auth';
 import { hasAdminRole, hasManagerRole } from './utils/roles';
 
@@ -107,6 +108,7 @@ const router = createBrowserRouter(
                 path="ligas-academicas"
                 element={<AdminAcademicLeagues />}
               />
+              <Route path="subequipes" element={<AdminSquads />} />
               <Route path="usuarios" element={<AdminUsers />} />
               <Route path="perfil" element={<Profile />} />
               <Route path="profile" element={<Profile />} />

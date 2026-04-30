@@ -1,4 +1,4 @@
-import { FiShield, FiUser } from 'react-icons/fi';
+import { FiShield, FiUser, FiUsers } from 'react-icons/fi';
 import {
   TbBuildingCommunity,
   TbLayoutDashboard,
@@ -39,8 +39,13 @@ const navigation = [
     path: '/admin/ligas-academicas',
   },
   {
-    label: 'Usuários',
+    label: 'Subequipes',
     icon: <TbUsersGroup />,
+    path: '/admin/subequipes',
+  },
+  {
+    label: 'Usuários',
+    icon: <FiUsers />,
     path: '/admin/usuarios',
   },
   {
