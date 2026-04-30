@@ -1,29 +1,16 @@
 import { FiCalendar, FiUsers, FiUser } from 'react-icons/fi';
 import { GrAddCircle } from 'react-icons/gr';
-import {
-  TbCertificate,
-  TbLayoutDashboard,
-  TbUsersGroup,
-  TbLogout2,
-} from 'react-icons/tb';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { TbCertificate, TbLayoutDashboard, TbUsersGroup } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 
+import { SideBarLayout } from '../../components/common';
 import { useGetAcademicLeagues } from '../../hooks/query/academicLeague';
 import { useGetLeagueMemberships } from '../../hooks/query/leagueMembership';
 import { useLogout } from '../../hooks/query/sessions';
 import { useGetUniversities } from '../../hooks/query/university';
 import useAuthStore from '../../stores/auth';
-import {
-  Avatar,
-  Container,
-  ProfileCard,
-  SideBar,
-  SideBarMenu,
-  SideBarMenuItem,
-  LogoutButton,
-} from '../StudentSideBarLayout/Styles';
 
-const navigation = [
+const NAVIGATION = [
   {
     label: 'Dashboard',
     icon: <TbLayoutDashboard />,
@@ -63,7 +50,6 @@ const navigation = [
 
 export default function ManagerSideBarLayout() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { mutate: logout } = useLogout({
     onSettled: () => navigate('/login', { replace: true }),
   });
@@ -91,44 +77,15 @@ export default function ManagerSideBarLayout() {
   const activeUniversity = universities[0];
 
   return (
-    <Container>
-      <SideBar>
-        <ProfileCard>
-          <Avatar
-            $imageUrl={authUser?.imageURL}
-            role="img"
-            aria-label="Foto do gestor"
-          />
-          <div>
-            <strong>{authUser?.name || 'Nome do Gestor'}</strong>
-            <span>
-              {activeUniversity?.name || activeLeague?.name || 'Instituição'}
-            </span>
-          </div>
-        </ProfileCard>
-
-        <SideBarMenu>
-          {navigation.map(({ label, icon, path }) => (
-            <SideBarMenuItem
-              key={label}
-              type="button"
-              $active={location.pathname === path}
-              onClick={() => navigate(path)}
-            >
-              <span>{icon}</span>
-              {label}
-            </SideBarMenuItem>
-          ))}
-        </SideBarMenu>
-
-        <LogoutButton type="button" onClick={() => logout()}>
-          <span>
-            <TbLogout2 /> Sair
-          </span>
-        </LogoutButton>
-      </SideBar>
-
-      <Outlet />
-    </Container>
+    <SideBarLayout
+      navigation={NAVIGATION}
+      profileInfo={{
+        avatar: authUser?.imageURL,
+        name: authUser?.name || 'Gestor',
+        subtitle: activeUniversity?.name || activeLeague?.name || 'Instituição',
+        avatarAlt: 'Foto do gestor',
+      }}
+      onLogout={() => logout()}
+    />
   );
 }

@@ -1,28 +1,19 @@
-import { FiCalendar, FiShield, FiUser, FiUsers } from 'react-icons/fi';
+import { FiCalendar, FiUser, FiUsers } from 'react-icons/fi';
 import {
   TbBuildingCommunity,
   TbLayoutDashboard,
-  TbLogout2,
   TbSchool,
   TbUsersGroup,
 } from 'react-icons/tb';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
+import { SideBarLayout } from '../../components/common';
 import { useGetAcademicLeagues } from '../../hooks/query/academicLeague';
 import { useLogout } from '../../hooks/query/sessions';
 import { useGetUniversities } from '../../hooks/query/university';
 import useAuthStore from '../../stores/auth';
-import {
-  Avatar,
-  Container,
-  LogoutButton,
-  ProfileCard,
-  SideBar,
-  SideBarMenu,
-  SideBarMenuItem,
-} from '../StudentSideBarLayout/Styles';
 
-const navigation = [
+const NAVIGATION = [
   {
     label: 'Dashboard',
     icon: <TbLayoutDashboard />,
@@ -62,7 +53,6 @@ const navigation = [
 
 export default function AdminSideBarLayout() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { mutate: logout } = useLogout({
     onSettled: () => navigate('/login', { replace: true }),
   });
@@ -72,48 +62,17 @@ export default function AdminSideBarLayout() {
   const { data: leagues = [] } = useGetAcademicLeagues();
 
   return (
-    <Container>
-      <SideBar>
-        <ProfileCard>
-          <Avatar
-            $imageUrl={authUser?.imageURL}
-            role="img"
-            aria-label="Foto do administrador"
-          />
-          <div>
-            <strong>{authUser?.name || 'Administrador'}</strong>
-            <span>
-              <FiShield />
-              <em>
-                {authUser?.globalRole || 'Admin absoluto'} •{' '}
-                {universities.length} universidades • {leagues.length} ligas
-              </em>
-            </span>
-          </div>
-        </ProfileCard>
-
-        <SideBarMenu>
-          {navigation.map(({ label, icon, path }) => (
-            <SideBarMenuItem
-              key={label}
-              type="button"
-              $active={location.pathname === path}
-              onClick={() => navigate(path)}
-            >
-              <span>{icon}</span>
-              {label}
-            </SideBarMenuItem>
-          ))}
-        </SideBarMenu>
-
-        <LogoutButton type="button" onClick={() => logout()}>
-          <span>
-            <TbLogout2 /> Sair
-          </span>
-        </LogoutButton>
-      </SideBar>
-
-      <Outlet />
-    </Container>
+    <SideBarLayout
+      navigation={NAVIGATION}
+      profileInfo={{
+        avatar: authUser?.imageURL,
+        name: authUser?.name || 'Administrador',
+        subtitle: authUser?.globalRole
+          ? `${authUser.globalRole} • ${universities.length} universidades • ${leagues.length} ligas`
+          : 'Admin absoluto',
+        avatarAlt: 'Foto do administrador',
+      }}
+      onLogout={() => logout()}
+    />
   );
 }

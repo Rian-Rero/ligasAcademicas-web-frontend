@@ -11,6 +11,7 @@ export default createGlobalStyle`
 
 html {
   font-size: 62.5%;
+  overflow: hidden;
 }
 
 body {
@@ -21,7 +22,9 @@ body {
   position: relative;
   color: #fff;
 
-  overflow-x: hidden;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 
 html,
@@ -89,6 +92,7 @@ body::after {
 html,
 body,
 #root {
+  width: 100%;
   height: 100%;
 }
 

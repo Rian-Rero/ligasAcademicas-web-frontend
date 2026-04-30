@@ -1,23 +1,15 @@
 import { FiCalendar, FiUsers, FiUser } from 'react-icons/fi';
-import { TbCertificate, TbLayoutDashboard, TbLogout2 } from 'react-icons/tb';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { TbCertificate, TbLayoutDashboard } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 
-import {
-  Avatar,
-  Container,
-  LogoutButton,
-  ProfileCard,
-  SideBar,
-  SideBarMenu,
-  SideBarMenuItem,
-} from './Styles';
+import { SideBarLayout } from '../../components/common';
 import { useGetAcademicLeagues } from '../../hooks/query/academicLeague';
 import { useGetLeagueMemberships } from '../../hooks/query/leagueMembership';
 import { useLogout } from '../../hooks/query/sessions';
 import { useGetUniversities } from '../../hooks/query/university';
 import useAuthStore from '../../stores/auth';
 
-const navigation = [
+const NAVIGATION = [
   {
     label: 'Dashboard',
     icon: <TbLayoutDashboard />,
@@ -47,7 +39,6 @@ const navigation = [
 
 export default function StudentSideBarLayout() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { mutate: logout } = useLogout({
     onSettled: () => navigate('/login', { replace: true }),
   });
@@ -76,44 +67,17 @@ export default function StudentSideBarLayout() {
   const activeUniversity = universities[0];
 
   return (
-    <Container>
-      <SideBar>
-        <ProfileCard>
-          <Avatar
-            $imageUrl={authUser?.imageURL}
-            role="img"
-            aria-label={
-              authUser?.name ? `Foto de ${authUser.name}` : 'Foto do aluno'
-            }
-          />
-          <div>
-            <strong>{authUser?.name}</strong>
-            <span>{activeUniversity?.name}</span>
-          </div>
-        </ProfileCard>
-
-        <SideBarMenu>
-          {navigation.map(({ label, icon, path }) => (
-            <SideBarMenuItem
-              key={label}
-              type="button"
-              $active={location.pathname === path}
-              onClick={() => navigate(path)}
-            >
-              <span>{icon}</span>
-              {label}
-            </SideBarMenuItem>
-          ))}
-        </SideBarMenu>
-
-        <LogoutButton type="button" onClick={() => logout()}>
-          <span>
-            <TbLogout2 /> Sair
-          </span>
-        </LogoutButton>
-      </SideBar>
-
-      <Outlet />
-    </Container>
+    <SideBarLayout
+      navigation={NAVIGATION}
+      profileInfo={{
+        avatar: authUser?.imageURL,
+        name: authUser?.name || 'Aluno',
+        subtitle: activeUniversity?.name || 'Carregando...',
+        avatarAlt: authUser?.name
+          ? `Foto de ${authUser.name}`
+          : 'Foto do aluno',
+      }}
+      onLogout={() => logout()}
+    />
   );
 }
