@@ -159,6 +159,43 @@ export const InfoValue = styled.strong`
   line-height: 1.2;
 `;
 
+export const InlineInfoContent = styled.span`
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+`;
+
+export const CalendarStatusPill = styled.span`
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: ${({ $isLinked }) => ($isLinked ? '#9affb5' : '#ffd56a')};
+  background: ${({ $isLinked }) =>
+    $isLinked ? 'rgba(52, 232, 158, 0.16)' : 'rgba(255, 183, 0, 0.15)'};
+`;
+
+export const TextButton = styled.button`
+  background: transparent;
+  color: #a6d0ff;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 1.35rem;
+  font-weight: 700;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    text-decoration: none;
+  }
+`;
+
 export const FormActions = styled.div`
   display: flex;
   justify-content: flex-end;

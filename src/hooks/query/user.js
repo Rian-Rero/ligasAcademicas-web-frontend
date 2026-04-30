@@ -5,11 +5,13 @@ import {
   createUser,
   deleteUser,
   forgotPassword,
+  getGoogleCalendarLinkUrl,
   getUserById,
   getUsers,
   redefinePassword,
   changeUserPassword,
   resetUserPasswordByManagement,
+  unlinkGoogleCalendar,
   updateUser,
   updateUserByManagement,
   verifyEmail,
@@ -167,6 +169,28 @@ export function useDeleteUser({
 } = {}) {
   return useMutation({
     mutationFn: deleteUser,
+    onSuccess,
+    onError,
+  });
+}
+
+export function useGetGoogleCalendarLinkUrl({
+  onSuccess = () => {},
+  onError = (err) => console.log(err),
+} = {}) {
+  return useMutation({
+    mutationFn: getGoogleCalendarLinkUrl,
+    onSuccess,
+    onError,
+  });
+}
+
+export function useUnlinkGoogleCalendar({
+  onSuccess = () => {},
+  onError = (err) => console.log(err),
+} = {}) {
+  return useMutation({
+    mutationFn: unlinkGoogleCalendar,
     onSuccess,
     onError,
   });
