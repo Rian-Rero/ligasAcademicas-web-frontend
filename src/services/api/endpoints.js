@@ -78,6 +78,14 @@ export const unlinkGoogleCalendar = async (_id) => {
 
   return data;
 };
+export const uploadUserProfilePhoto = async ({ _id, file }) => {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const { data } = await api.put(`/users/${_id}/profile-photo`, formData);
+
+  return data;
+};
 export const forgotPassword = async (email) => {
   const { data } = await api.post(`/users/forgot-password`, { email });
 

@@ -15,6 +15,8 @@ import {
   CtaLink,
   DesktopNav,
   HeaderActions,
+  HeaderAvatar,
+  HeaderAvatarLink,
   HeaderBadge,
   HeaderSurface,
   ItensBox,
@@ -83,6 +85,17 @@ function getAuthenticatedContext(authUser, memberships = []) {
     dashboardLabel: 'Dashboard',
     profileLabel: 'Meu perfil',
   };
+}
+
+function getInitials(name) {
+  if (!name) return 'AL';
+
+  return String(name)
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word[0]?.toLocaleUpperCase('pt-BR') || '')
+    .join('');
 }
 
 export default function Header() {
@@ -170,6 +183,20 @@ export default function Header() {
 
             {isAuthenticated ? (
               <>
+                <HeaderAvatarLink to={authenticatedContext.profileTo}>
+                  <HeaderAvatar
+                    $imageUrl={authUser?.imageURL}
+                    role="img"
+                    aria-label={
+                      authUser?.name
+                        ? `Foto de ${authUser.name}`
+                        : 'Foto do usuário'
+                    }
+                  >
+                    {!authUser?.imageURL && getInitials(authUser?.name)}
+                  </HeaderAvatar>
+                </HeaderAvatarLink>
+
                 <CtaLink to={authenticatedContext.profileTo}>
                   {authenticatedContext.profileLabel}
                 </CtaLink>

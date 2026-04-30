@@ -305,3 +305,12 @@ export const FormActionContent = styled.span`
   justify-content: center;
   gap: 0.8rem;
 `;
+
+export const HiddenFileInput = styled.input`
+  display: none;
+`;
+
+export const UploadHint = styled.small`
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 1.2rem;
+`;

@@ -216,6 +216,38 @@ export const HeaderActions = styled.div`
   gap: clamp(0.7rem, 1vw, 1.2rem);
 `;
 
+export const HeaderAvatarLink = styled(Link)`
+  display: inline-flex;
+  text-decoration: none;
+
+  @media (max-width: 920px) {
+    display: none;
+  }
+`;
+
+export const HeaderAvatar = styled.span`
+  width: 3.8rem;
+  height: 3.8rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    0 0.8rem 1.8rem rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+  font-size: 1.18rem;
+  font-weight: 800;
+
+  background: ${({ $imageUrl }) =>
+    $imageUrl
+      ? `url(${$imageUrl}) center / cover no-repeat`
+      : 'radial-gradient(circle at top left, #57b8ff 10%, #0f2f6e 60%)'};
+`;
+
 export const HeaderBadge = styled.span`
   display: inline-flex;
   align-items: center;

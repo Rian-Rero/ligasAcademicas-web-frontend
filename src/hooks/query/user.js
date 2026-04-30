@@ -12,6 +12,7 @@ import {
   changeUserPassword,
   resetUserPasswordByManagement,
   unlinkGoogleCalendar,
+  uploadUserProfilePhoto,
   updateUser,
   updateUserByManagement,
   verifyEmail,
@@ -191,6 +192,17 @@ export function useUnlinkGoogleCalendar({
 } = {}) {
   return useMutation({
     mutationFn: unlinkGoogleCalendar,
+    onSuccess,
+    onError,
+  });
+}
+
+export function useUploadUserProfilePhoto({
+  onSuccess = () => {},
+  onError = (err) => console.log(err),
+} = {}) {
+  return useMutation({
+    mutationFn: uploadUserProfilePhoto,
     onSuccess,
     onError,
   });

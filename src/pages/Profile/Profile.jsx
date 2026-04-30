@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -6,6 +6,7 @@ import {
   FiAlertCircle,
   FiCalendar,
   FiCheckCircle,
+  FiCamera,
   FiMail,
   FiSave,
   FiShield,
@@ -34,6 +35,7 @@ import {
   HeaderSection,
   HeaderSubtitle,
   HeaderTitle,
+  HiddenFileInput,
   IdentityBlock,
   InfoGrid,
   InlineInfoContent,
@@ -42,6 +44,7 @@ import {
   InfoValue,
   SectionTitle,
   TextButton,
+  UploadHint,
 } from './Styles';
 import {
   buildProfileUpdateErrorMessage,
@@ -54,6 +57,7 @@ import { useGetUniversities } from '../../hooks/query/university';
 import {
   useGetGoogleCalendarLinkUrl,
   useUnlinkGoogleCalendar,
+  useUploadUserProfilePhoto,
   useUpdateUser,
 } from '../../hooks/query/user';
 import { getUserById } from '../../services/api/endpoints';
@@ -87,6 +91,9 @@ export default function Profile() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const hasHandledGoogleCallback = useRef(false);
+  const fileInputRef = useRef(null);
+  const [selectedProfilePhoto, setSelectedProfilePhoto] = useState(null);
+  const [profilePhotoPreviewUrl, setProfilePhotoPreviewUrl] = useState('');
   const authUser = useAuthStore((state) => state.auth?.user);
   const setUser = useAuthStore((state) => state.setUser);
 
@@ -192,6 +199,22 @@ export default function Profile() {
       },
     });
 
+  const { mutate: uploadProfilePhoto, isPending: isUploadingProfilePhoto } =
+    useUploadUserProfilePhoto({
+      onSuccess: (updatedUser) => {
+        setUser({ ...authUser, ...updatedUser });
+        if (profilePhotoPreviewUrl) {
+          URL.revokeObjectURL(profilePhotoPreviewUrl);
+        }
+        setSelectedProfilePhoto(null);
+        setProfilePhotoPreviewUrl('');
+        notifySuccess('Foto de perfil atualizada com sucesso!');
+      },
+      onError: (err) => {
+        notifyError(buildProfileUpdateErrorMessage(err));
+      },
+    });
+
   const onSubmit = ({ name }) => {
     if (!authUser?._id) {
       notifyError('Não foi possível identificar o usuário autenticado');
@@ -214,6 +237,77 @@ export default function Profile() {
   const isGoogleLinked = Boolean(authUser?.googleCalendarLinked);
   const displayRole = formatRole(
     activeMembership?.role || authUser?.globalRole,
+  );
+
+  const handleSelectProfilePhoto = (event) => {
+    const selectedFile = event.target.files?.[0];
+    if (!selectedFile) return;
+
+    if (!authUser?._id) {
+      notifyError('Não foi possível identificar o usuário autenticado');
+      return;
+    }
+
+    const isValidMimeType = ['image/jpeg', 'image/png', 'image/webp'].includes(
+      selectedFile.type,
+    );
+
+    if (!isValidMimeType) {
+      notifyError('Formato inválido. Use JPG, PNG ou WEBP.');
+      // eslint-disable-next-line no-param-reassign
+      event.target.value = '';
+      return;
+    }
+
+    const fileSizeInMB = selectedFile.size / (1024 * 1024);
+    if (fileSizeInMB > 5) {
+      notifyError('A imagem deve ter no máximo 5MB.');
+      // eslint-disable-next-line no-param-reassign
+      event.target.value = '';
+      return;
+    }
+
+    if (profilePhotoPreviewUrl) {
+      URL.revokeObjectURL(profilePhotoPreviewUrl);
+    }
+
+    const localPreviewUrl = URL.createObjectURL(selectedFile);
+    setSelectedProfilePhoto(selectedFile);
+    setProfilePhotoPreviewUrl(localPreviewUrl);
+
+    // Allow re-selecting the same file later.
+    // eslint-disable-next-line no-param-reassign
+    event.target.value = '';
+  };
+
+  const handleUploadSelectedProfilePhoto = () => {
+    if (!authUser?._id || !selectedProfilePhoto) {
+      notifyError('Selecione uma imagem para enviar');
+      return;
+    }
+
+    uploadProfilePhoto({
+      _id: authUser._id,
+      file: selectedProfilePhoto,
+    });
+  };
+
+  const handleCancelProfilePhotoPreview = () => {
+    if (profilePhotoPreviewUrl) {
+      URL.revokeObjectURL(profilePhotoPreviewUrl);
+    }
+
+    setSelectedProfilePhoto(null);
+    setProfilePhotoPreviewUrl('');
+  };
+
+  useEffect(
+    () => () => {
+      if (profilePhotoPreviewUrl) {
+        URL.revokeObjectURL(profilePhotoPreviewUrl);
+      }
+    },
+    [profilePhotoPreviewUrl],
   );
 
   return (
@@ -240,18 +334,64 @@ export default function Profile() {
 
           <IdentityBlock>
             <Avatar
-              $imageUrl={authUser?.imageURL}
+              $imageUrl={profilePhotoPreviewUrl || authUser?.imageURL}
               role="img"
               aria-label={
                 authUser?.name ? `Foto de ${authUser.name}` : 'Foto do usuário'
               }
             >
-              {!authUser?.imageURL && getInitials(authUser?.name)}
+              {!profilePhotoPreviewUrl &&
+                !authUser?.imageURL &&
+                getInitials(authUser?.name)}
             </Avatar>
 
             <div>
               <strong>{authUser?.name || 'Usuário'}</strong>
               <span>{activeLeague?.name || 'Liga não vinculada'}</span>
+              <InlineInfoContent>
+                <HiddenFileInput
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={handleSelectProfilePhoto}
+                />
+                <TextButton
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploadingProfilePhoto}
+                >
+                  <InlineInfoContent>
+                    <FiCamera />
+                    Escolher foto
+                  </InlineInfoContent>
+                </TextButton>
+
+                {selectedProfilePhoto && (
+                  <>
+                    <TextButton
+                      type="button"
+                      onClick={handleUploadSelectedProfilePhoto}
+                      disabled={isUploadingProfilePhoto}
+                    >
+                      <InlineInfoContent>
+                        <FiSave />
+                        {isUploadingProfilePhoto
+                          ? 'Enviando foto...'
+                          : 'Enviar foto'}
+                      </InlineInfoContent>
+                    </TextButton>
+
+                    <TextButton
+                      type="button"
+                      onClick={handleCancelProfilePhotoPreview}
+                      disabled={isUploadingProfilePhoto}
+                    >
+                      Cancelar
+                    </TextButton>
+                  </>
+                )}
+              </InlineInfoContent>
+              <UploadHint>Formatos: JPG, PNG ou WEBP (max. 5MB)</UploadHint>
             </div>
           </IdentityBlock>
 
