@@ -5,8 +5,8 @@ import { IoClose, IoLogIn, IoMenu } from 'react-icons/io5';
 import { TbLogout2 } from 'react-icons/tb';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import AvatarMenu from './AvatarMenu';
 import {
-  ActionButton,
   BrandArea,
   BrandInfo,
   BrandSubtitle,
@@ -15,8 +15,6 @@ import {
   CtaLink,
   DesktopNav,
   HeaderActions,
-  HeaderAvatar,
-  HeaderAvatarLink,
   HeaderBadge,
   HeaderSurface,
   ItensBox,
@@ -182,29 +180,12 @@ export default function Header() {
             </HeaderBadge>
 
             {isAuthenticated ? (
-              <>
-                <HeaderAvatarLink to={authenticatedContext.profileTo}>
-                  <HeaderAvatar
-                    $imageUrl={authUser?.imageURL}
-                    role="img"
-                    aria-label={
-                      authUser?.name
-                        ? `Foto de ${authUser.name}`
-                        : 'Foto do usuário'
-                    }
-                  >
-                    {!authUser?.imageURL && getInitials(authUser?.name)}
-                  </HeaderAvatar>
-                </HeaderAvatarLink>
-
-                <CtaLink to={authenticatedContext.profileTo}>
-                  {authenticatedContext.profileLabel}
-                </CtaLink>
-
-                <ActionButton type="button" onClick={() => logout()}>
-                  <TbLogout2 /> Sair
-                </ActionButton>
-              </>
+              <AvatarMenu
+                imageUrl={authUser?.imageURL}
+                initials={getInitials(authUser?.name)}
+                profileTo={authenticatedContext.profileTo}
+                onLogout={() => logout()}
+              />
             ) : (
               <CtaLink to={ctaData.to}>{ctaData.label}</CtaLink>
             )}

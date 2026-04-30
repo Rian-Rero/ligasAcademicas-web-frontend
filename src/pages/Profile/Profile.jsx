@@ -46,6 +46,7 @@ import {
   TextButton,
   UploadHint,
 } from './Styles';
+import UploadProfilePhotoModal from './UploadProfilePhotoModal';
 import {
   buildProfileUpdateErrorMessage,
   profileValidationSchema,
@@ -94,6 +95,7 @@ export default function Profile() {
   const fileInputRef = useRef(null);
   const [selectedProfilePhoto, setSelectedProfilePhoto] = useState(null);
   const [profilePhotoPreviewUrl, setProfilePhotoPreviewUrl] = useState('');
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const authUser = useAuthStore((state) => state.auth?.user);
   const setUser = useAuthStore((state) => state.setUser);
 
@@ -299,6 +301,11 @@ export default function Profile() {
 
     setSelectedProfilePhoto(null);
     setProfilePhotoPreviewUrl('');
+    setIsUploadModalOpen(false);
+  };
+
+  const handleOpenUploadModal = () => {
+    setIsUploadModalOpen(true);
   };
 
   useEffect(
@@ -357,39 +364,14 @@ export default function Profile() {
                 />
                 <TextButton
                   type="button"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={handleOpenUploadModal}
                   disabled={isUploadingProfilePhoto}
                 >
                   <InlineInfoContent>
                     <FiCamera />
-                    Escolher foto
+                    Alterar foto
                   </InlineInfoContent>
                 </TextButton>
-
-                {selectedProfilePhoto && (
-                  <>
-                    <TextButton
-                      type="button"
-                      onClick={handleUploadSelectedProfilePhoto}
-                      disabled={isUploadingProfilePhoto}
-                    >
-                      <InlineInfoContent>
-                        <FiSave />
-                        {isUploadingProfilePhoto
-                          ? 'Enviando foto...'
-                          : 'Enviar foto'}
-                      </InlineInfoContent>
-                    </TextButton>
-
-                    <TextButton
-                      type="button"
-                      onClick={handleCancelProfilePhotoPreview}
-                      disabled={isUploadingProfilePhoto}
-                    >
-                      Cancelar
-                    </TextButton>
-                  </>
-                )}
               </InlineInfoContent>
               <UploadHint>Formatos: JPG, PNG ou WEBP (max. 5MB)</UploadHint>
             </div>
@@ -522,6 +504,16 @@ export default function Profile() {
           </FormActions>
         </Form>
       </InfoGrid>
+
+      <UploadProfilePhotoModal
+        isOpen={isUploadModalOpen}
+        onClose={handleCancelProfilePhotoPreview}
+        previewUrl={profilePhotoPreviewUrl}
+        isLoading={isUploadingProfilePhoto}
+        onConfirm={handleUploadSelectedProfilePhoto}
+        onSelectFile={handleSelectProfilePhoto}
+        userInitials={getInitials(authUser?.name)}
+      />
     </Content>
   );
 }
