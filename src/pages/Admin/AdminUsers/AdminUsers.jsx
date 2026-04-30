@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import {
   FiPlus,
@@ -90,6 +91,7 @@ import {
 
 export default function AdminUsers() {
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchParams] = useSearchParams();
   const [selectedUserId, setSelectedUserId] = useState('');
@@ -105,14 +107,11 @@ export default function AdminUsers() {
   const [isDeleteMembershipConfirmOpen, setIsDeleteMembershipConfirmOpen] =
     useState(false);
 
-  const { data: universities = [], refetch: refetchUniversities } =
-    useGetUniversities();
-  const { data: leagues = [], refetch: refetchLeagues } =
-    useGetAcademicLeagues();
-  const { data: squads = [], refetch: refetchSquads } = useGetSquads();
-  const { data: users = [], refetch: refetchUsers } = useGetUsers();
-  const { data: memberships = [], refetch: refetchMemberships } =
-    useGetLeagueMemberships();
+  const { data: universities = [] } = useGetUniversities();
+  const { data: leagues = [] } = useGetAcademicLeagues();
+  const { data: squads = [] } = useGetSquads();
+  const { data: users = [] } = useGetUsers();
+  const { data: memberships = [] } = useGetLeagueMemberships();
 
   const { mutateAsync: createUser, isPending: isCreatingUser } =
     useCreateUser();
@@ -393,11 +392,11 @@ export default function AdminUsers() {
 
   const handleRefresh = async () => {
     await Promise.all([
-      refetchUniversities(),
-      refetchLeagues(),
-      refetchSquads(),
-      refetchUsers(),
-      refetchMemberships(),
+      queryClient.invalidateQueries(['universities']),
+      queryClient.invalidateQueries(['academic-leagues']),
+      queryClient.invalidateQueries(['squads']),
+      queryClient.invalidateQueries(['users']),
+      queryClient.invalidateQueries(['league-memberships']),
     ]);
   };
 

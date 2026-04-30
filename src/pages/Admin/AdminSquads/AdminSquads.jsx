@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import {
   FiPlus,
@@ -68,6 +69,7 @@ import {
 export default function AdminSquads() {
   const theme = useTheme();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSquadId, setSelectedSquadId] = useState('');
@@ -75,13 +77,10 @@ export default function AdminSquads() {
   const [filterLeagueId, setFilterLeagueId] = useState('');
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
-  const { data: universities = [], refetch: refetchUniversities } =
-    useGetUniversities();
-  const { data: leagues = [], refetch: refetchLeagues } =
-    useGetAcademicLeagues();
-  const { data: squads = [], refetch: refetchSquads } = useGetSquads();
-  const { data: memberships = [], refetch: refetchMemberships } =
-    useGetLeagueMemberships();
+  const { data: universities = [] } = useGetUniversities();
+  const { data: leagues = [] } = useGetAcademicLeagues();
+  const { data: squads = [] } = useGetSquads();
+  const { data: memberships = [] } = useGetLeagueMemberships();
 
   const { mutateAsync: createSquad, isPending: isCreating } = useCreateSquad();
   const { mutateAsync: updateSquad, isPending: isUpdating } = useUpdateSquad();
@@ -113,6 +112,16 @@ export default function AdminSquads() {
     [filterUniversityId, leagues],
   );
 
+  const availableLeaguesForForm = useMemo(
+    () =>
+      formUniversity
+        ? leagues.filter((league) =>
+            isSameId(league.university, formUniversity),
+          )
+        : leagues,
+    [formUniversity, leagues],
+  );
+
   const filteredSquads = useMemo(() => {
     const byScope = squads.filter((squad) => {
       if (!filterUniversityId && !filterLeagueId) return true;
@@ -134,6 +143,11 @@ export default function AdminSquads() {
       squad.function,
     ]);
   }, [filterLeagueId, filterUniversityId, leagues, searchTerm, squads]);
+
+  const selectedSquad = useMemo(
+    () => squads.find((squad) => isSameId(squad._id, selectedSquadId)) || null,
+    [selectedSquadId, squads],
+  );
 
   useEffect(() => {
     if (!filterUniversityId || !filterLeagueId) return;
@@ -158,11 +172,6 @@ export default function AdminSquads() {
     setIsDeleteConfirmOpen(false);
   }, [selectedSquadId]);
 
-  const selectedSquad = useMemo(
-    () => squads.find((squad) => isSameId(squad._id, selectedSquadId)) || null,
-    [selectedSquadId, squads],
-  );
-
   useEffect(() => {
     if (!selectedSquad) {
       reset(adminSquadDefaultValues);
@@ -181,16 +190,6 @@ export default function AdminSquads() {
       function: selectedSquad.function || '',
     });
   }, [leagues, reset, selectedSquad]);
-
-  const availableLeaguesForForm = useMemo(
-    () =>
-      formUniversity
-        ? leagues.filter((league) =>
-            isSameId(league.university, formUniversity),
-          )
-        : leagues,
-    [formUniversity, leagues],
-  );
 
   useEffect(() => {
     if (!formAcademicLeague) return;
@@ -227,10 +226,10 @@ export default function AdminSquads() {
       }
 
       await Promise.all([
-        refetchUniversities(),
-        refetchLeagues(),
-        refetchSquads(),
-        refetchMemberships(),
+        queryClient.invalidateQueries(['universities']),
+        queryClient.invalidateQueries(['academic-leagues']),
+        queryClient.invalidateQueries(['squads']),
+        queryClient.invalidateQueries(['league-memberships']),
       ]);
 
       handleCreateNew();
@@ -273,10 +272,10 @@ export default function AdminSquads() {
       await deleteSquad(selectedSquad._id);
       notifySuccess('Subequipe removida com sucesso');
       await Promise.all([
-        refetchUniversities(),
-        refetchLeagues(),
-        refetchSquads(),
-        refetchMemberships(),
+        queryClient.invalidateQueries(['universities']),
+        queryClient.invalidateQueries(['academic-leagues']),
+        queryClient.invalidateQueries(['squads']),
+        queryClient.invalidateQueries(['league-memberships']),
       ]);
       handleCreateNew();
       setIsDeleteConfirmOpen(false);
@@ -316,7 +315,17 @@ export default function AdminSquads() {
               onChange={(event) => setSearchTerm(event.target.value)}
             />
           </SearchBar>
-          <ActionButton type="button" onClick={() => refetchSquads()}>
+          <ActionButton
+            type="button"
+            onClick={() =>
+              Promise.all([
+                queryClient.invalidateQueries(['universities']),
+                queryClient.invalidateQueries(['academic-leagues']),
+                queryClient.invalidateQueries(['squads']),
+                queryClient.invalidateQueries(['league-memberships']),
+              ])
+            }
+          >
             <FiRefreshCw /> Atualizar
           </ActionButton>
         </HeaderActions>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import {
   FiCalendar,
@@ -117,6 +118,7 @@ function formatDateTimeDisplay(dateValue) {
 
 export default function ManagerEventsList() {
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const authUser = useAuthStore((state) => state.auth?.user);
 
@@ -136,15 +138,13 @@ export default function ManagerEventsList() {
 
   const activeLeague = leagues[0];
 
-  const {
-    data: eventsFromApi = [],
-    isLoading: isLoadingEvents,
-    refetch: refetchEvents,
-  } = useGetEvents({
-    filters: { academicLeague: managerLeagueId },
-    enabled: Boolean(managerLeagueId),
-    onError: () => {},
-  });
+  const { data: eventsFromApi = [], isLoading: isLoadingEvents } = useGetEvents(
+    {
+      filters: { academicLeague: managerLeagueId },
+      enabled: Boolean(managerLeagueId),
+      onError: () => {},
+    },
+  );
 
   const { data: squads = [] } = useGetSquads({
     filters: { academicLeague: managerLeagueId },
@@ -263,7 +263,7 @@ export default function ManagerEventsList() {
     try {
       await deleteEvent(selectedEvent._id);
       notifySuccess('Evento removido com sucesso');
-      await refetchEvents();
+      await queryClient.invalidateQueries(['events']);
       setIsDeleteConfirmOpen(false);
     } catch (err) {
       notifyError(
@@ -302,7 +302,7 @@ export default function ManagerEventsList() {
     try {
       await updateEvent(payload);
       notifySuccess('Evento atualizado com sucesso');
-      await refetchEvents();
+      await queryClient.invalidateQueries(['events']);
     } catch (err) {
       notifyError(
         buildRequestErrorMessage(err, 'Nao foi possivel atualizar o evento'),

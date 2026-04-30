@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import {
   FiCheckCircle,
   FiKey,
@@ -81,6 +82,7 @@ const initialFormState = {
 
 export default function ManagerMembers() {
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const authUser = useAuthStore((state) => state.auth?.user);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -94,14 +96,11 @@ export default function ManagerMembers() {
 
   const managerLeagueId = normalizeId(managerMemberships[0]?.academicLeague);
 
-  const {
-    data: leagueMemberships = [],
-    isLoading: isLoadingMemberships,
-    refetch: refetchMemberships,
-  } = useGetLeagueMemberships({
-    filters: { academicLeague: managerLeagueId },
-    enabled: Boolean(managerLeagueId),
-  });
+  const { data: leagueMemberships = [], isLoading: isLoadingMemberships } =
+    useGetLeagueMemberships({
+      filters: { academicLeague: managerLeagueId },
+      enabled: Boolean(managerLeagueId),
+    });
 
   const memberIds = useMemo(
     () =>
@@ -113,11 +112,7 @@ export default function ManagerMembers() {
     [leagueMemberships],
   );
 
-  const {
-    data: users = [],
-    isLoading: isLoadingUsers,
-    refetch: refetchUsers,
-  } = useGetUsersByIds({
+  const { data: users = [], isLoading: isLoadingUsers } = useGetUsersByIds({
     userIds: memberIds,
     enabled: memberIds.length > 0,
   });
@@ -262,7 +257,10 @@ export default function ManagerMembers() {
 
   const handleRefresh = async () => {
     try {
-      await Promise.all([refetchMemberships(), refetchUsers()]);
+      await Promise.all([
+        queryClient.invalidateQueries(['league-memberships']),
+        queryClient.invalidateQueries(['users']),
+      ]);
       notifySuccess('Lista de membros atualizada');
     } catch (err) {
       notifyError(
@@ -316,7 +314,10 @@ export default function ManagerMembers() {
     );
 
     try {
-      await Promise.all([refetchMemberships(), refetchUsers()]);
+      await Promise.all([
+        queryClient.invalidateQueries(['league-memberships']),
+        queryClient.invalidateQueries(['users']),
+      ]);
     } catch (err) {
       notifyError(
         buildRequestErrorMessage(

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import {
   FiEdit,
   FiRefreshCw,
@@ -100,6 +101,7 @@ function normalizeSquadFormValues(formState) {
 
 export default function ManagerSquads() {
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const authUser = useAuthStore((state) => state.auth?.user);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -143,11 +145,7 @@ export default function ManagerSquads() {
     [managerLeagueId],
   );
 
-  const {
-    data: squads = [],
-    isLoading: isLoadingSquads,
-    refetch: refetchSquads,
-  } = useGetSquads({
+  const { data: squads = [], isLoading: isLoadingSquads } = useGetSquads({
     filters: squadsFilters,
     enabled: Boolean(managerLeagueId),
   });
@@ -157,14 +155,11 @@ export default function ManagerSquads() {
     [managerLeagueId],
   );
 
-  const {
-    data: leagueMemberships = [],
-    isLoading: isLoadingMemberships,
-    refetch: refetchMemberships,
-  } = useGetLeagueMemberships({
-    filters: leagueMembershipsFilters,
-    enabled: Boolean(managerLeagueId),
-  });
+  const { data: leagueMemberships = [], isLoading: isLoadingMemberships } =
+    useGetLeagueMemberships({
+      filters: leagueMembershipsFilters,
+      enabled: Boolean(managerLeagueId),
+    });
 
   const memberIds = useMemo(
     () =>
@@ -176,11 +171,7 @@ export default function ManagerSquads() {
     [leagueMemberships],
   );
 
-  const {
-    data: users = [],
-    isLoading: isLoadingUsers,
-    refetch: refetchUsers,
-  } = useGetUsersByIds({
+  const { data: users = [], isLoading: isLoadingUsers } = useGetUsersByIds({
     userIds: memberIds,
     enabled: memberIds.length > 0,
   });
@@ -348,9 +339,9 @@ export default function ManagerSquads() {
   const handleRefresh = async () => {
     try {
       await Promise.all([
-        refetchSquads(),
-        refetchMemberships(),
-        refetchUsers(),
+        queryClient.invalidateQueries(['squads']),
+        queryClient.invalidateQueries(['league-memberships']),
+        queryClient.invalidateQueries(['users']),
       ]);
       notifySuccess('Dados de subequipes atualizados');
     } catch (err) {
@@ -388,7 +379,7 @@ export default function ManagerSquads() {
         ...(functionLabel && { function: functionLabel }),
       });
 
-      await refetchSquads();
+      await queryClient.invalidateQueries(['squads']);
 
       notifySuccess('Subequipe criada com sucesso');
       setFormState(initialFormState);
@@ -427,7 +418,7 @@ export default function ManagerSquads() {
         },
       });
 
-      await refetchSquads();
+      await queryClient.invalidateQueries(['squads']);
       notifySuccess('Subequipe atualizada com sucesso');
       setFormState(initialFormState);
       setEditingSquadId('');
@@ -462,7 +453,10 @@ export default function ManagerSquads() {
 
     try {
       await deleteSquad(editingSquadId);
-      await Promise.all([refetchSquads(), refetchMemberships()]);
+      await Promise.all([
+        queryClient.invalidateQueries(['squads']),
+        queryClient.invalidateQueries(['league-memberships']),
+      ]);
       setIsDeleteConfirmOpen(false);
       notifySuccess('Subequipe removida com sucesso');
       setFormState(initialFormState);
@@ -519,7 +513,7 @@ export default function ManagerSquads() {
         inputData: { squad: selectedSquad._id },
       });
 
-      await refetchMemberships();
+      await queryClient.invalidateQueries(['league-memberships']);
       notifySuccess('Membro alocado na subequipe com sucesso');
     } catch (err) {
       notifyRequestError(err, 'Não foi possível alocar o membro');
@@ -554,7 +548,7 @@ export default function ManagerSquads() {
         inputData: { role: nextRole },
       });
 
-      await refetchMemberships();
+      await queryClient.invalidateQueries(['league-memberships']);
       notifySuccess('Função do membro atualizada com sucesso');
     } catch (err) {
       notifyRequestError(err, 'Não foi possível atualizar a função do membro');

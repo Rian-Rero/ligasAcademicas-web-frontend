@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
@@ -69,6 +70,7 @@ function formatDateTime(dateValue) {
 
 export default function StudentEvents() {
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const authUser = useAuthStore((state) => state.auth?.user);
   const [pendingEventId, setPendingEventId] = useState('');
 
@@ -112,15 +114,12 @@ export default function StudentEvents() {
     },
   );
 
-  const {
-    data: attendances = [],
-    isLoading: isLoadingAttendances,
-    refetch: refetchAttendances,
-  } = useGetAttendances({
-    filters: { leagueMembership: activeMembership?._id },
-    enabled: Boolean(activeMembership?._id),
-    onError: () => {},
-  });
+  const { data: attendances = [], isLoading: isLoadingAttendances } =
+    useGetAttendances({
+      filters: { leagueMembership: activeMembership?._id },
+      enabled: Boolean(activeMembership?._id),
+      onError: () => {},
+    });
 
   const attendanceByEvent = useMemo(
     () =>
@@ -168,7 +167,7 @@ export default function StudentEvents() {
         await confirmAttendance(attendance._id);
       }
 
-      await refetchAttendances();
+      await queryClient.invalidateQueries(['attendances']);
       notifySuccess('Presença confirmada com sucesso');
     } catch (err) {
       notifyError(

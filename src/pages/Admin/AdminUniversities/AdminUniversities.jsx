@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import {
   FiPlus,
@@ -64,16 +65,14 @@ import {
 
 export default function AdminUniversities() {
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUniversityId, setSelectedUniversityId] = useState('');
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
-  const { data: universities = [], refetch: refetchUniversities } =
-    useGetUniversities();
-  const { data: leagues = [], refetch: refetchLeagues } =
-    useGetAcademicLeagues();
-  const { data: memberships = [], refetch: refetchMemberships } =
-    useGetLeagueMemberships();
+  const { data: universities = [] } = useGetUniversities();
+  const { data: leagues = [] } = useGetAcademicLeagues();
+  const { data: memberships = [] } = useGetLeagueMemberships();
 
   const { mutateAsync: createUniversity, isPending: isCreating } =
     useCreateUniversity();
@@ -185,9 +184,9 @@ export default function AdminUniversities() {
       }
 
       await Promise.all([
-        refetchUniversities(),
-        refetchLeagues(),
-        refetchMemberships(),
+        queryClient.invalidateQueries(['universities']),
+        queryClient.invalidateQueries(['academic-leagues']),
+        queryClient.invalidateQueries(['league-memberships']),
       ]);
 
       handleCreateNew();
@@ -212,9 +211,9 @@ export default function AdminUniversities() {
       await deleteUniversity(selectedUniversity._id);
       notifySuccess('Universidade removida com sucesso');
       await Promise.all([
-        refetchUniversities(),
-        refetchLeagues(),
-        refetchMemberships(),
+        queryClient.invalidateQueries(['universities']),
+        queryClient.invalidateQueries(['academic-leagues']),
+        queryClient.invalidateQueries(['league-memberships']),
       ]);
       handleCreateNew();
       setIsDeleteConfirmOpen(false);
@@ -251,7 +250,16 @@ export default function AdminUniversities() {
               onChange={(event) => setSearchTerm(event.target.value)}
             />
           </SearchBar>
-          <ActionButton type="button" onClick={() => refetchUniversities()}>
+          <ActionButton
+            type="button"
+            onClick={() =>
+              Promise.all([
+                queryClient.invalidateQueries(['universities']),
+                queryClient.invalidateQueries(['academic-leagues']),
+                queryClient.invalidateQueries(['league-memberships']),
+              ])
+            }
+          >
             <FiRefreshCw /> Atualizar
           </ActionButton>
         </HeaderActions>

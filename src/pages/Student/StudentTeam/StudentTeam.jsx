@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { FiRefreshCw, FiSearch } from 'react-icons/fi';
 import { HiOutlineMail } from 'react-icons/hi';
 import {
@@ -72,6 +73,7 @@ function getInitials(name) {
 }
 
 export default function StudentTeam() {
+  const queryClient = useQueryClient();
   const authUser = useAuthStore((state) => state.auth?.user);
   const [selectedMemberId, setSelectedMemberId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -104,14 +106,11 @@ export default function StudentTeam() {
 
   const activeUniversity = universities[0];
 
-  const {
-    data: squadMemberships = [],
-    isLoading: isLoadingMemberships,
-    refetch: refetchMemberships,
-  } = useGetLeagueMemberships({
-    filters: { squad: activeMembership?.squad, isActive: true },
-    enabled: Boolean(activeMembership?.squad),
-  });
+  const { data: squadMemberships = [], isLoading: isLoadingMemberships } =
+    useGetLeagueMemberships({
+      filters: { squad: activeMembership?.squad, isActive: true },
+      enabled: Boolean(activeMembership?.squad),
+    });
 
   const squadMemberUserIds = useMemo(
     () => [
@@ -125,14 +124,12 @@ export default function StudentTeam() {
     [squadMemberships],
   );
 
-  const {
-    data: squadUsers = [],
-    isLoading: isLoadingUsers,
-    refetch: refetchUsers,
-  } = useGetUsersByIds({
-    userIds: squadMemberUserIds,
-    enabled: squadMemberUserIds.length > 0,
-  });
+  const { data: squadUsers = [], isLoading: isLoadingUsers } = useGetUsersByIds(
+    {
+      userIds: squadMemberUserIds,
+      enabled: squadMemberUserIds.length > 0,
+    },
+  );
 
   const team = useMemo(() => {
     if (!squadMemberUserIds.length || !squadUsers.length) {
@@ -233,7 +230,10 @@ export default function StudentTeam() {
 
   const handleRefresh = async () => {
     try {
-      await Promise.all([refetchMemberships(), refetchUsers()]);
+      await Promise.all([
+        queryClient.invalidateQueries(['league-memberships']),
+        queryClient.invalidateQueries(['users']),
+      ]);
       notifySuccess('Lista de membros atualizada');
     } catch (err) {
       notifyError('Não foi possível atualizar a lista de membros');
