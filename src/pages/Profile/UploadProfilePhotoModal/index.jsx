@@ -90,22 +90,12 @@ export default function UploadProfilePhotoModal({
         </ModalBody>
 
         <ModalFooter>
-          <ModalButton
-            type="button"
-            onClick={onClose}
-            disabled={isLoading}
-            $variant="secondary"
-          >
+          <ModalButton type="button" onClick={onClose} disabled={isLoading}>
             <FiX /> Cancelar
           </ModalButton>
 
           {previewUrl && (
-            <ModalButton
-              type="button"
-              onClick={onConfirm}
-              disabled={isLoading}
-              $variant="primary"
-            >
+            <ModalButton type="button" onClick={onConfirm} disabled={isLoading}>
               <FiCheck />
               {isLoading ? 'Enviando...' : 'Confirmar'}
             </ModalButton>

@@ -181,43 +181,21 @@ export const ModalButton = styled.button`
   border-radius: 0.8rem;
   font-size: 1.3rem;
   font-weight: 700;
-  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   cursor: pointer;
   transition: all 0.2s ease-out;
   white-space: nowrap;
 
-  ${({ $variant }) => {
-    if ($variant === 'primary') {
-      return `
-        background: linear-gradient(135deg, #0088d0 0%, #ffc107 100%);
-        color: #ffffff;
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+  }
 
-        &:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(0, 140, 255, 0.3);
-        }
-
-        &:active:not(:disabled) {
-          transform: translateY(0);
-        }
-      `;
-    }
-
-    return `
-      background: rgba(255, 255, 255, 0.08);
-      color: rgba(255, 255, 255, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-
-      &:hover:not(:disabled) {
-        background: rgba(255, 255, 255, 0.12);
-        color: #ffffff;
-      }
-
-      &:active:not(:disabled) {
-        background: rgba(255, 255, 255, 0.1);
-      }
-    `;
-  }}
+  &:active:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+  }
 
   &:disabled {
     cursor: not-allowed;
