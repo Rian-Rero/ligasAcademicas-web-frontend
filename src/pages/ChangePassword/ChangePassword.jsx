@@ -15,7 +15,10 @@ import {
   Button,
   ButtonContent,
 } from './Styles';
-import { changePasswordValidationSchema } from './utils';
+import {
+  changePasswordValidationSchema,
+  changePasswordValidationSchemaForced,
+} from './utils';
 import { Logo } from '../../components/common';
 import { FormInput } from '../../components/features';
 import { useChangeUserPassword } from '../../hooks/query/user';
@@ -27,11 +30,15 @@ export default function ChangePassword() {
   const navigate = useNavigate();
   const authUser = useAuthStore((state) => state.auth?.user);
 
+  const schema = authUser?.mustChangePassword
+    ? changePasswordValidationSchemaForced
+    : changePasswordValidationSchema;
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(changePasswordValidationSchema) });
+  } = useForm({ resolver: zodResolver(schema) });
 
   const { mutate: changePassword, isPending: isLoading } =
     useChangeUserPassword({
@@ -42,13 +49,17 @@ export default function ChangePassword() {
       onError: (err) => notifyError(err?.message || 'Erro ao alterar senha'),
     });
 
-  const onSubmit = ({ newPassword }) => {
+  const onSubmit = ({ currentPassword, newPassword }) => {
     if (!authUser?._id) {
       notifyError('Usuário não autenticado');
       return;
     }
 
-    changePassword({ _id: authUser._id, newPassword });
+    changePassword({
+      _id: authUser._id,
+      newPassword,
+      currentPassword,
+    });
   };
 
   return (
@@ -74,6 +85,22 @@ export default function ChangePassword() {
               customColor={theme.colors.font.white}
               borderString={`1px solid ${theme.colors.white}`}
             />
+
+            {!authUser?.mustChangePassword && (
+              <FormInput
+                name="currentPassword"
+                label="Senha atual"
+                hideLabel
+                type="password"
+                placeholder="Digite sua senha atual"
+                icon={FiLock}
+                register={register}
+                errors={errors}
+                borderRadius="4rem"
+                customColor={theme.colors.font.white}
+                borderString={`1px solid ${theme.colors.white}`}
+              />
+            )}
 
             <FormInput
               name="confirmPassword"
