@@ -79,6 +79,12 @@ export default function Login() {
     onSuccess: async () => {
       notifySuccess('Login realizado com sucesso!');
 
+      const authUser = useAuthStore.getState().auth?.user;
+      if (authUser?.mustChangePassword) {
+        navigate('/change-password', { replace: true });
+        return;
+      }
+
       const nextRoute = await resolvePostLoginRoute(getActiveMemberships);
       navigate(nextRoute, { replace: true });
     },

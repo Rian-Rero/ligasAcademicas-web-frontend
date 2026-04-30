@@ -9,8 +9,10 @@ import {
   FiSave,
   FiShield,
   FiUser,
+  FiLock,
 } from 'react-icons/fi';
 import { TbSchool } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
@@ -69,6 +71,7 @@ function getInitials(name) {
 
 export default function Profile() {
   const theme = useTheme();
+  const navigate = useNavigate();
   const authUser = useAuthStore((state) => state.auth?.user);
   const setUser = useAuthStore((state) => state.setUser);
 
@@ -214,6 +217,28 @@ export default function Profile() {
               <TbSchool /> Liga acadêmica
             </InfoLabel>
             <InfoValue>{activeLeague?.name || 'Não vinculada'}</InfoValue>
+          </InfoItem>
+
+          <InfoItem>
+            <InfoLabel>
+              <FiLock /> Senha
+            </InfoLabel>
+            <InfoValue>
+              <button
+                type="button"
+                onClick={() => navigate('/change-password')}
+                style={{
+                  background: 'transparent',
+                  color: theme.colors.primary,
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 0,
+                  fontWeight: 700,
+                }}
+              >
+                Alterar senha
+              </button>
+            </InfoValue>
           </InfoItem>
         </Card>
 
