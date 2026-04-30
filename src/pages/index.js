@@ -19,3 +19,4 @@ export { default as AdminUniversities } from './Admin/AdminUniversities/AdminUni
 export { default as AdminAcademicLeagues } from './Admin/AdminAcademicLeagues/AdminAcademicLeagues';
 export { default as AdminSquads } from './Admin/AdminSquads/AdminSquads';
 export { default as AdminUsers } from './Admin/AdminUsers/AdminUsers';
+export { default as AdminEvents } from './Admin/AdminEvents/AdminEvents';

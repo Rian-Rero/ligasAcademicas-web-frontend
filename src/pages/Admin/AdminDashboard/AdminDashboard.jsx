@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { CgFileDocument } from 'react-icons/cg';
-import { FiUsers } from 'react-icons/fi';
+import { FiCalendar, FiUsers } from 'react-icons/fi';
 import { GrAddCircle } from 'react-icons/gr';
 import { TbBuildingCommunity, TbSchool, TbUsersGroup } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
@@ -171,6 +171,13 @@ export default function AdminDashboard() {
               <TbUsersGroup />
               Subequipes
             </ShortcutBox>
+            <ShortcutBox
+              type="button"
+              onClick={() => navigate('/admin/eventos')}
+            >
+              <FiCalendar />
+              Eventos
+            </ShortcutBox>
           </ShortcutBoxes>
         </FeaturedTeamsCard>
       </MiddleSection>
@@ -192,12 +199,9 @@ export default function AdminDashboard() {
             <CgFileDocument />
             Nova liga
           </ShortcutBox>
-          <ShortcutBox
-            type="button"
-            onClick={() => navigate('/admin/subequipes')}
-          >
-            <TbUsersGroup />
-            Gerenciar subequipes
+          <ShortcutBox type="button" onClick={() => navigate('/admin/eventos')}>
+            <FiCalendar />
+            Criar evento
           </ShortcutBox>
           <ShortcutBox
             type="button"

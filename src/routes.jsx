@@ -18,6 +18,7 @@ import {
 import {
   AdminAcademicLeagues,
   AdminDashboard,
+  AdminEvents,
   AdminUniversities,
   AdminUsers,
   ManagerDashboard,
@@ -108,6 +109,7 @@ const router = createBrowserRouter(
                 path="ligas-academicas"
                 element={<AdminAcademicLeagues />}
               />
+              <Route path="eventos" element={<AdminEvents />} />
               <Route path="subequipes" element={<AdminSquads />} />
               <Route path="usuarios" element={<AdminUsers />} />
               <Route path="perfil" element={<Profile />} />

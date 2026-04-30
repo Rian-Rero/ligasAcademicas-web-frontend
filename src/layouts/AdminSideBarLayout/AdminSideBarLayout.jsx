@@ -1,4 +1,4 @@
-import { FiShield, FiUser, FiUsers } from 'react-icons/fi';
+import { FiCalendar, FiShield, FiUser, FiUsers } from 'react-icons/fi';
 import {
   TbBuildingCommunity,
   TbLayoutDashboard,
@@ -42,6 +42,11 @@ const navigation = [
     label: 'Subequipes',
     icon: <TbUsersGroup />,
     path: '/admin/subequipes',
+  },
+  {
+    label: 'Eventos',
+    icon: <FiCalendar />,
+    path: '/admin/eventos',
   },
   {
     label: 'Usuários',
