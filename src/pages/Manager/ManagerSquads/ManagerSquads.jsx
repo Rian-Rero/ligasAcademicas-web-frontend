@@ -114,35 +114,55 @@ export default function ManagerSquads() {
   const [editingSquadId, setEditingSquadId] = useState('');
   const [editingMemberId, setEditingMemberId] = useState('');
 
+  const managerMembershipsFilters = useMemo(
+    () => ({ user: authUser?._id, isActive: true }),
+    [authUser?._id],
+  );
+
   const { data: managerMemberships = [] } = useGetLeagueMemberships({
-    filters: { user: authUser?._id, isActive: true },
+    filters: managerMembershipsFilters,
     enabled: Boolean(authUser?._id),
   });
 
   const managerLeagueId = normalizeId(managerMemberships[0]?.academicLeague);
 
+  const academicLeagueFilters = useMemo(
+    () => ({ _id: managerLeagueId }),
+    [managerLeagueId],
+  );
+
   const { data: leagues = [] } = useGetAcademicLeagues({
-    filters: { _id: managerLeagueId },
+    filters: academicLeagueFilters,
     enabled: Boolean(managerLeagueId),
   });
 
   const activeLeague = leagues[0];
+
+  const squadsFilters = useMemo(
+    () => ({ academicLeague: managerLeagueId }),
+    [managerLeagueId],
+  );
 
   const {
     data: squads = [],
     isLoading: isLoadingSquads,
     refetch: refetchSquads,
   } = useGetSquads({
-    filters: { academicLeague: managerLeagueId },
+    filters: squadsFilters,
     enabled: Boolean(managerLeagueId),
   });
+
+  const leagueMembershipsFilters = useMemo(
+    () => ({ academicLeague: managerLeagueId, isActive: true }),
+    [managerLeagueId],
+  );
 
   const {
     data: leagueMemberships = [],
     isLoading: isLoadingMemberships,
     refetch: refetchMemberships,
   } = useGetLeagueMemberships({
-    filters: { academicLeague: managerLeagueId, isActive: true },
+    filters: leagueMembershipsFilters,
     enabled: Boolean(managerLeagueId),
   });
 
@@ -210,19 +230,22 @@ export default function ManagerSquads() {
   }, [searchTerm, squads]);
 
   useEffect(() => {
-    if (!filteredSquads.length) {
-      setSelectedSquadId('');
-      return;
-    }
+    setSelectedSquadId((prevSelectedId) => {
+      if (!filteredSquads.length) {
+        return prevSelectedId === '' ? prevSelectedId : '';
+      }
 
-    const hasSelectedSquad = filteredSquads.some((squad) =>
-      isSameId(squad._id, selectedSquadId),
-    );
+      const hasSelectedSquad = filteredSquads.some((squad) =>
+        isSameId(squad._id, prevSelectedId),
+      );
 
-    if (!hasSelectedSquad) {
-      setSelectedSquadId(normalizeId(filteredSquads[0]._id));
-    }
-  }, [filteredSquads, selectedSquadId]);
+      if (!hasSelectedSquad) {
+        return normalizeId(filteredSquads[0]._id);
+      }
+
+      return prevSelectedId;
+    });
+  }, [filteredSquads]);
 
   useEffect(() => {
     setIsDeleteConfirmOpen(false);
@@ -261,15 +284,21 @@ export default function ManagerSquads() {
 
   useEffect(() => {
     setMemberRoleDrafts((prevState) => {
-      const nextDrafts = {};
+      const nextDrafts = { ...prevState };
+      let hasChanges = false;
 
       membersInSelectedSquad.forEach(({ membership }) => {
         const membershipId = normalizeId(membership._id);
-        nextDrafts[membershipId] =
-          prevState[membershipId] ?? membership.role ?? 'league-member';
+        const currentDraft = prevState[membershipId];
+        const nextRole = currentDraft ?? membership.role ?? 'league-member';
+
+        if (currentDraft !== nextRole) {
+          nextDrafts[membershipId] = nextRole;
+          hasChanges = true;
+        }
       });
 
-      return nextDrafts;
+      return hasChanges ? nextDrafts : prevState;
     });
   }, [membersInSelectedSquad]);
 
