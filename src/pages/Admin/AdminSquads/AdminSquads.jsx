@@ -244,12 +244,12 @@ export default function AdminSquads() {
     const currentUniversity = getValues('university');
 
     if (!currentLeague) {
-      notifyWarning('Selecione uma liga para abrir seus usuarios');
+      notifyWarning('Selecione uma liga para abrir seus usuários');
       return;
     }
 
     navigate({
-      pathname: '/admin/usuarios',
+      pathname: '/admin/usuários',
       search: `?${createSearchParams({
         university: currentUniversity,
         league: currentLeague,
@@ -298,10 +298,10 @@ export default function AdminSquads() {
     <Content>
       <HeaderSection>
         <div>
-          <HeaderTitle>ADMINISTRACAO DE SUBEQUIPES</HeaderTitle>
+          <HeaderTitle>ADMINISTRAÇÃO DE SUBEQUIPES</HeaderTitle>
           <HeaderSubtitle>
-            Crie, edite e remova subequipes em qualquer liga. Usuarios podem
-            participar de multiplas ligas e multiplas subequipes atraves de
+            Crie, edite e remova subequipes em qualquer liga. Usuários podem
+            participar de múltiplas ligas e múltiplas subequipes através de
             vínculos diferentes.
           </HeaderSubtitle>
         </div>
@@ -388,7 +388,7 @@ export default function AdminSquads() {
                 >
                   <EntityTitle>
                     <strong>{squad.name}</strong>
-                    <EntityBadge>{members.length} usuarios</EntityBadge>
+                    <EntityBadge>{members.length} usuários</EntityBadge>
                   </EntityTitle>
                   <EntityMeta>
                     <span>{league?.name || 'Liga nao informada'}</span>
@@ -463,7 +463,7 @@ export default function AdminSquads() {
               <HelperText>
                 {formErrorMessage ||
                   (selectedSquad?._id
-                    ? 'Use Gerenciar usuarios para navegar direto aos vínculos desta liga.'
+                    ? 'Use Gerenciar usuários para navegar direto aos vínculos desta liga.'
                     : 'Preencha os campos para criar uma nova subequipe.')}
               </HelperText>
             </Field>
@@ -474,7 +474,7 @@ export default function AdminSquads() {
               <FiPlus /> Nova subequipe
             </ActionButton>
             <ActionButton type="button" onClick={handleOpenUsers}>
-              Gerenciar usuarios
+              Gerenciar usuários
             </ActionButton>
             <ActionButton
               type="button"
@@ -503,7 +503,7 @@ export default function AdminSquads() {
       <ConfirmDialog
         isOpen={isDeleteConfirmOpen}
         title="Remover subequipe"
-        description="Essa acao remove a subequipe selecionada. Revise os vínculos de usuarios antes de confirmar."
+        description="Essa acao remove a subequipe selecionada. Revise os vínculos de usuários antes de confirmar."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDelete}

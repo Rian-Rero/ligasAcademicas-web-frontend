@@ -111,7 +111,7 @@ const router = createBrowserRouter(
               />
               <Route path="eventos" element={<AdminEvents />} />
               <Route path="subequipes" element={<AdminSquads />} />
-              <Route path="usuarios" element={<AdminUsers />} />
+              <Route path="usuários" element={<AdminUsers />} />
               <Route path="perfil" element={<Profile />} />
               <Route path="profile" element={<Profile />} />
               <Route path="*" element={<AdminDashboard />} />

@@ -237,7 +237,7 @@ export default function AdminUniversities() {
     <Content>
       <HeaderSection>
         <div>
-          <HeaderTitle>ADMINISTRACAO DE UNIVERSIDADES</HeaderTitle>
+          <HeaderTitle>ADMINISTRAÇÃO DE UNIVERSIDADES</HeaderTitle>
           <HeaderSubtitle>
             Cadastre, edite e remova universidades mantendo as ligas e os
             vínculos organizados no mesmo padrao visual do sistema.
@@ -303,7 +303,7 @@ export default function AdminUniversities() {
                         ? ` - ${university.complement}`
                         : ''}
                     </span>
-                    <span>{relatedMembers.length} usuarios vinculados</span>
+                    <span>{relatedMembers.length} usuários vinculados</span>
                   </EntityMeta>
                 </EntityItem>
               );
@@ -358,7 +358,7 @@ export default function AdminUniversities() {
               <HelperText>
                 {formErrorMessage ||
                   (selectedUniversity?._id
-                    ? `${universityLeagues.length} ligas e ${universityMemberCount} usuarios vinculados a esta universidade.`
+                    ? `${universityLeagues.length} ligas e ${universityMemberCount} usuários vinculados a esta universidade.`
                     : 'Preencha os campos para criar uma nova universidade.')}
               </HelperText>
             </Field>

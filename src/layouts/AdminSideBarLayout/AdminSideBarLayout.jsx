@@ -51,7 +51,7 @@ const navigation = [
   {
     label: 'Usuários',
     icon: <FiUsers />,
-    path: '/admin/usuarios',
+    path: '/admin/usuários',
   },
   {
     label: 'Meu Perfil',

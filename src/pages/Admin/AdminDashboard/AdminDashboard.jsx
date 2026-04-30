@@ -159,7 +159,7 @@ export default function AdminDashboard() {
             </ShortcutBox>
             <ShortcutBox
               type="button"
-              onClick={() => navigate('/admin/usuarios')}
+              onClick={() => navigate('/admin/usuários')}
             >
               <FiUsers />
               Usuários
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
           </ShortcutBox>
           <ShortcutBox
             type="button"
-            onClick={() => navigate('/admin/usuarios')}
+            onClick={() => navigate('/admin/usuários')}
           >
             <TbUsersGroup />
             Gerenciar usuários

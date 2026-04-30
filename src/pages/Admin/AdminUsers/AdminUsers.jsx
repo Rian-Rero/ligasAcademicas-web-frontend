@@ -504,7 +504,7 @@ export default function AdminUsers() {
 
       <PanelGrid>
         <ListCard>
-          <SectionTitle>Usuarios ({filteredUsers.length})</SectionTitle>
+          <SectionTitle>Usuários ({filteredUsers.length})</SectionTitle>
 
           <FormGrid>
             <Field>
@@ -705,7 +705,7 @@ export default function AdminUsers() {
                 {formErrorMessage ||
                   (selectedMembership
                     ? `Vinculo selecionado: ${selectedMembership.role} - ${selectedMembership.isActive ? 'ativo' : 'inativo'}`
-                    : 'Usuarios podem ter multiplos vínculos. Use Novo vinculo para adicionar quantos forem necessários.')}
+                    : 'Usuários podem ter multiplos vínculos. Use Novo vinculo para adicionar quantos forem necessários.')}
               </HelperText>
             </Field>
           </FormGrid>

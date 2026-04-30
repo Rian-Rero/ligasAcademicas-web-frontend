@@ -198,13 +198,13 @@ export default function AdminAcademicLeagues() {
 
   const handleOpenUsers = () => {
     if (!selectedLeague?._id) {
-      notifyWarning('Selecione uma liga para abrir seus usuarios');
+      notifyWarning('Selecione uma liga para abrir seus usuários');
       return;
     }
 
     const universityId = normalizeId(selectedLeague.university);
     navigate({
-      pathname: '/admin/usuarios',
+      pathname: '/admin/usuários',
       search: `?${createSearchParams({
         university: universityId,
         league: normalizeId(selectedLeague._id),
@@ -246,10 +246,10 @@ export default function AdminAcademicLeagues() {
     <Content>
       <HeaderSection>
         <div>
-          <HeaderTitle>ADMINISTRACAO DE LIGAS ACADEMICAS</HeaderTitle>
+          <HeaderTitle>ADMINISTRAÇÃO DE LIGAS ACADEMICAS</HeaderTitle>
           <HeaderSubtitle>
             Mantenha as ligas vinculadas a universidade correta e use a pagina
-            de usuarios para controlar membros e papeis.
+            de usuários para controlar membros e papeis.
           </HeaderSubtitle>
         </div>
 
@@ -296,7 +296,7 @@ export default function AdminAcademicLeagues() {
                 >
                   <EntityTitle>
                     <strong>{league.name}</strong>
-                    <EntityBadge>{members.length} usuarios</EntityBadge>
+                    <EntityBadge>{members.length} usuários</EntityBadge>
                   </EntityTitle>
                   <EntityMeta>
                     <span>
@@ -356,7 +356,7 @@ export default function AdminAcademicLeagues() {
               <HelperText>
                 {formErrorMessage ||
                   (selectedLeague?._id
-                    ? `${leagueMembers.length} usuarios vinculados a esta liga.`
+                    ? `${leagueMembers.length} usuários vinculados a esta liga.`
                     : 'Preencha os campos para criar uma nova liga acadêmica.')}
               </HelperText>
             </Field>
@@ -367,7 +367,7 @@ export default function AdminAcademicLeagues() {
               <FiPlus /> Nova liga
             </ActionButton>
             <ActionButton type="button" onClick={handleOpenUsers}>
-              Gerenciar usuarios
+              Gerenciar usuários
             </ActionButton>
             <ActionButton
               type="button"
@@ -396,7 +396,7 @@ export default function AdminAcademicLeagues() {
       <ConfirmDialog
         isOpen={isDeleteConfirmOpen}
         title="Remover liga acadêmica"
-        description="Essa acao remove a liga selecionada. Se houver usuarios vinculados, confira o impacto antes de confirmar."
+        description="Essa acao remove a liga selecionada. Se houver usuários vinculados, confira o impacto antes de confirmar."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDelete}
