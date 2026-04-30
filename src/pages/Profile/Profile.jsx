@@ -6,7 +6,6 @@ import {
   FiAlertCircle,
   FiCalendar,
   FiCheckCircle,
-  FiLink,
   FiMail,
   FiSave,
   FiShield,
@@ -14,6 +13,7 @@ import {
   FiLock,
   FiXCircle,
 } from 'react-icons/fi';
+import { SiGoogle } from 'react-icons/si';
 import { TbSchool } from 'react-icons/tb';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
@@ -25,6 +25,8 @@ import {
   CalendarStatusPill,
   Card,
   Content,
+  GoogleButtonIcon,
+  GoogleConnectButton,
   Form,
   FormAction,
   FormActionContent,
@@ -321,16 +323,18 @@ export default function Profile() {
                     </InlineInfoContent>
                   </TextButton>
                 ) : (
-                  <TextButton
+                  <GoogleConnectButton
                     type="button"
                     onClick={() => getLinkUrl(authUser?._id)}
                     disabled={isLinkingGoogle}
                   >
-                    <InlineInfoContent>
-                      <FiLink />
-                      {isLinkingGoogle ? 'Redirecionando...' : 'Vincular conta'}
-                    </InlineInfoContent>
-                  </TextButton>
+                    <GoogleButtonIcon aria-hidden="true">
+                      <SiGoogle />
+                    </GoogleButtonIcon>
+                    {isLinkingGoogle
+                      ? 'Redirecionando...'
+                      : 'Conectar com o Google'}
+                  </GoogleConnectButton>
                 )}
               </InlineInfoContent>
             </InfoValue>

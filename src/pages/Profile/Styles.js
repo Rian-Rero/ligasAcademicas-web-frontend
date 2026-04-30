@@ -196,6 +196,63 @@ export const TextButton = styled.button`
   }
 `;
 
+export const GoogleConnectButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  border: 1px solid rgba(86, 163, 255, 0.28);
+  border-radius: 999px;
+  padding: 0.85rem 1.25rem;
+  cursor: pointer;
+  font-size: 1.28rem;
+  font-weight: 700;
+  color: #ffffff;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04))
+      padding-box,
+    linear-gradient(135deg, rgba(0, 140, 255, 0.78), rgba(59, 114, 255, 0.72))
+      border-box;
+  box-shadow:
+    0 0.8rem 2rem rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.03);
+    box-shadow:
+      0 1rem 2.4rem rgba(0, 0, 0, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.75;
+    transform: none;
+    filter: saturate(0.9);
+  }
+`;
+
+export const GoogleButtonIcon = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #4285f4;
+  flex-shrink: 0;
+
+  svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+`;
+
 export const FormActions = styled.div`
   display: flex;
   justify-content: flex-end;
