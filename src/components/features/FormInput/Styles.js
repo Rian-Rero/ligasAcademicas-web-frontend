@@ -83,6 +83,8 @@ export const Input = styled.input`
   &:focus {
     outline: none;
     border-color: rgba(0, 140, 255, 0.75);
+    color: ${(props) => props.$customColor ?? '#ffffff'};
+
     background: linear-gradient(
       165deg,
       rgba(10, 27, 54, 0.9),

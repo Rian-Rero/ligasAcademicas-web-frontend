@@ -1,0 +1,59 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+export const adminEventSchema = z
+  .object({
+    academicLeague: z.string().trim().min(1, 'Selecione uma liga'),
+    title: z
+      .string()
+      .trim()
+      .min(3, 'O titulo deve ter pelo menos 3 caracteres')
+      .max(120, 'O titulo deve ter no maximo 120 caracteres'),
+    description: z
+      .string()
+      .trim()
+      .min(3, 'A descricao deve ter pelo menos 3 caracteres')
+      .max(500, 'A descricao deve ter no maximo 500 caracteres'),
+    dateTime: z
+      .string()
+      .trim()
+      .nonempty('Informe a data e horario do evento')
+      .refine(
+        (value) => !Number.isNaN(new Date(value).getTime()),
+        'Informe uma data valida',
+      ),
+    location: z
+      .string()
+      .trim()
+      .min(2, 'O local deve ter pelo menos 2 caracteres')
+      .max(180, 'O local deve ter no maximo 180 caracteres'),
+    scope: z.enum(['global', 'squad']),
+    squad: z.string().trim().optional(),
+  })
+  .superRefine((values, ctx) => {
+    if (values.scope === 'squad' && !values.squad) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['squad'],
+        message: 'Selecione a subequipe do evento',
+      });
+    }
+  });
+
+export const adminEventDefaultValues = {
+  academicLeague: '',
+  title: '',
+  description: '',
+  dateTime: '',
+  location: '',
+  scope: 'global',
+  squad: '',
+};
+
+export function useAdminEventForm() {
+  return useForm({
+    resolver: zodResolver(adminEventSchema),
+    defaultValues: adminEventDefaultValues,
+  });
+}

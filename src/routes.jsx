@@ -11,10 +11,16 @@ import {
 import { useGetLeagueMemberships } from './hooks/query/leagueMembership';
 import {
   AppLayout,
+  AdminSideBarLayout,
   StudentSideBarLayout,
   ManagerSideBarLayout,
 } from './layouts';
 import {
+  AdminAcademicLeagues,
+  AdminDashboard,
+  AdminEvents,
+  AdminUniversities,
+  AdminUsers,
   ManagerDashboard,
   ManagerEvents,
   ManagerEventsList,
@@ -32,25 +38,9 @@ import {
   Profile,
   Register,
 } from './pages';
+import AdminSquads from './pages/Admin/AdminSquads/AdminSquads';
 import useAuthStore from './stores/auth';
-
-const MANAGER_ROLE_KEYWORDS = [
-  'admin',
-  'manager',
-  'gest',
-  'diret',
-  'presid',
-  'coorden',
-];
-
-function hasManagerRole(role) {
-  if (!role) return false;
-
-  const normalizedRole = String(role).trim().toLocaleLowerCase('pt-BR');
-  return MANAGER_ROLE_KEYWORDS.some((keyword) =>
-    normalizedRole.includes(keyword),
-  );
-}
+import { hasAdminRole, hasManagerRole } from './utils/roles';
 
 // For the routes that need the user to be logged in
 function PrivateRoutes() {
@@ -85,6 +75,17 @@ function ManagerPrivateRoutes() {
   );
 }
 
+function AdminPrivateRoutes() {
+  const authUser = useAuthStore((state) => state.auth?.user);
+  const { pathname: from } = useLocation();
+
+  return hasAdminRole(authUser?.globalRole) ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/manager/dashboard" replace state={{ from }} />
+  );
+}
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
@@ -99,6 +100,24 @@ const router = createBrowserRouter(
         />
         <Route element={<PrivateRoutes />}>
           <Route path="change-password" element={<ChangePassword />} />
+
+          <Route element={<AdminPrivateRoutes />}>
+            <Route path="admin" element={<AdminSideBarLayout />}>
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="universidades" element={<AdminUniversities />} />
+              <Route
+                path="ligas-academicas"
+                element={<AdminAcademicLeagues />}
+              />
+              <Route path="eventos" element={<AdminEvents />} />
+              <Route path="subequipes" element={<AdminSquads />} />
+              <Route path="usuarios" element={<AdminUsers />} />
+              <Route path="perfil" element={<Profile />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="*" element={<AdminDashboard />} />
+            </Route>
+          </Route>
+
           <Route path="student" element={<StudentSideBarLayout />}>
             <Route index element={<StudentDashboard />} />
             <Route path="dashboard" element={<StudentDashboard />} />

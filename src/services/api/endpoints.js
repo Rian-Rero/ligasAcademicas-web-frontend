@@ -68,6 +68,16 @@ export const deleteUser = async (_id) => {
 
   return data;
 };
+export const getGoogleCalendarLinkUrl = async (_id) => {
+  const { data } = await api.post(`/users/${_id}/google-calendar/link-url`);
+
+  return data;
+};
+export const unlinkGoogleCalendar = async (_id) => {
+  const { data } = await api.delete(`/users/${_id}/google-calendar/link`);
+
+  return data;
+};
 export const forgotPassword = async (email) => {
   const { data } = await api.post(`/users/forgot-password`, { email });
 

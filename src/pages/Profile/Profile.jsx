@@ -1,26 +1,32 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import {
   FiAlertCircle,
+  FiCalendar,
   FiCheckCircle,
   FiMail,
   FiSave,
   FiShield,
   FiUser,
   FiLock,
+  FiXCircle,
 } from 'react-icons/fi';
+import { SiGoogle } from 'react-icons/si';
 import { TbSchool } from 'react-icons/tb';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
 import {
   Avatar,
   Badge,
+  CalendarStatusPill,
   Card,
   Content,
+  GoogleButtonIcon,
+  GoogleConnectButton,
   Form,
   FormAction,
   FormActionContent,
@@ -30,10 +36,12 @@ import {
   HeaderTitle,
   IdentityBlock,
   InfoGrid,
+  InlineInfoContent,
   InfoItem,
   InfoLabel,
   InfoValue,
   SectionTitle,
+  TextButton,
 } from './Styles';
 import {
   buildProfileUpdateErrorMessage,
@@ -43,7 +51,12 @@ import { FormInput } from '../../components/features';
 import { useGetAcademicLeagues } from '../../hooks/query/academicLeague';
 import { useGetLeagueMemberships } from '../../hooks/query/leagueMembership';
 import { useGetUniversities } from '../../hooks/query/university';
-import { useUpdateUser } from '../../hooks/query/user';
+import {
+  useGetGoogleCalendarLinkUrl,
+  useUnlinkGoogleCalendar,
+  useUpdateUser,
+} from '../../hooks/query/user';
+import { getUserById } from '../../services/api/endpoints';
 import useAuthStore from '../../stores/auth';
 import { notifyError, notifySuccess } from '../../utils/toast';
 
@@ -72,6 +85,8 @@ function getInitials(name) {
 export default function Profile() {
   const theme = useTheme();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const hasHandledGoogleCallback = useRef(false);
   const authUser = useAuthStore((state) => state.auth?.user);
   const setUser = useAuthStore((state) => state.setUser);
 
@@ -112,6 +127,33 @@ export default function Profile() {
     reset({ name: authUser?.name || '' });
   }, [authUser?.name, reset]);
 
+  useEffect(() => {
+    const callbackStatus = searchParams.get('googleCalendar');
+    if (!callbackStatus || !authUser?._id || hasHandledGoogleCallback.current)
+      return;
+
+    hasHandledGoogleCallback.current = true;
+
+    const callbackMessage = searchParams.get('message');
+    setSearchParams({});
+
+    if (callbackStatus === 'linked') {
+      notifySuccess('Conta Google vinculada com sucesso!');
+    } else {
+      notifyError(
+        callbackMessage || 'Não foi possível vincular a conta Google',
+      );
+    }
+
+    getUserById(authUser._id)
+      .then((freshUser) => {
+        setUser({ ...authUser, ...freshUser });
+      })
+      .catch((err) => {
+        notifyError(buildProfileUpdateErrorMessage(err));
+      });
+  }, [authUser, searchParams, setSearchParams, setUser]);
+
   const { mutate: updateUser, isPending: isSaving } = useUpdateUser({
     onSuccess: (updatedUser) => {
       const nextUser = {
@@ -128,6 +170,27 @@ export default function Profile() {
       notifyError(buildProfileUpdateErrorMessage(err));
     },
   });
+
+  const { mutate: getLinkUrl, isPending: isLinkingGoogle } =
+    useGetGoogleCalendarLinkUrl({
+      onSuccess: ({ authUrl }) => {
+        window.location.assign(authUrl);
+      },
+      onError: (err) => {
+        notifyError(buildProfileUpdateErrorMessage(err));
+      },
+    });
+
+  const { mutate: unlinkGoogle, isPending: isUnlinkingGoogle } =
+    useUnlinkGoogleCalendar({
+      onSuccess: (updatedUser) => {
+        setUser({ ...authUser, ...updatedUser });
+        notifySuccess('Conta Google desvinculada com sucesso!');
+      },
+      onError: (err) => {
+        notifyError(buildProfileUpdateErrorMessage(err));
+      },
+    });
 
   const onSubmit = ({ name }) => {
     if (!authUser?._id) {
@@ -148,6 +211,7 @@ export default function Profile() {
   };
 
   const isEmailVerified = Boolean(authUser?.emailVerified);
+  const isGoogleLinked = Boolean(authUser?.googleCalendarLinked);
   const displayRole = formatRole(
     activeMembership?.role || authUser?.globalRole,
   );
@@ -224,20 +288,55 @@ export default function Profile() {
               <FiLock /> Senha
             </InfoLabel>
             <InfoValue>
-              <button
+              <TextButton
                 type="button"
                 onClick={() => navigate('/change-password')}
-                style={{
-                  background: 'transparent',
-                  color: theme.colors.primary,
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
-                  fontWeight: 700,
-                }}
               >
                 Alterar senha
-              </button>
+              </TextButton>
+            </InfoValue>
+          </InfoItem>
+
+          <InfoItem>
+            <InfoLabel>
+              <FiCalendar /> Google Agenda
+            </InfoLabel>
+            <InfoValue>
+              <InlineInfoContent>
+                <CalendarStatusPill $isLinked={isGoogleLinked}>
+                  {isGoogleLinked ? 'Vinculado' : 'Não vinculado'}
+                </CalendarStatusPill>
+
+                {isGoogleLinked && authUser?.googleCalendarEmail
+                  ? authUser.googleCalendarEmail
+                  : 'Sincronize eventos automaticamente com seu calendário'}
+
+                {isGoogleLinked ? (
+                  <TextButton
+                    type="button"
+                    onClick={() => unlinkGoogle(authUser?._id)}
+                    disabled={isUnlinkingGoogle}
+                  >
+                    <InlineInfoContent>
+                      <FiXCircle />
+                      {isUnlinkingGoogle ? 'Desvinculando...' : 'Desvincular'}
+                    </InlineInfoContent>
+                  </TextButton>
+                ) : (
+                  <GoogleConnectButton
+                    type="button"
+                    onClick={() => getLinkUrl(authUser?._id)}
+                    disabled={isLinkingGoogle}
+                  >
+                    <GoogleButtonIcon aria-hidden="true">
+                      <SiGoogle />
+                    </GoogleButtonIcon>
+                    {isLinkingGoogle
+                      ? 'Redirecionando...'
+                      : 'Conectar com o Google'}
+                  </GoogleConnectButton>
+                )}
+              </InlineInfoContent>
             </InfoValue>
           </InfoItem>
         </Card>

@@ -21,33 +21,18 @@ import { FormInput } from '../../components/features';
 import { useGetLeagueMembershipsOnDemand } from '../../hooks/query/leagueMembership';
 import { useLogin } from '../../hooks/query/sessions';
 import useAuthStore from '../../stores/auth';
+import { hasAdminRole, hasManagerRole } from '../../utils/roles';
 import { notifyError, notifySuccess } from '../../utils/toast';
-
-const MANAGER_ROLE_KEYWORDS = [
-  'admin',
-  'manager',
-  'gest',
-  'diret',
-  'presid',
-  'coorden',
-];
 
 const AUTH_INPUT_BACKGROUND =
   'linear-gradient(165deg, rgba(9, 26, 52, 0.82), rgba(10, 28, 56, 0.72))';
 const AUTH_INPUT_BORDER = '1px solid rgba(170, 212, 255, 0.4)';
 
-function hasManagerRole(role) {
-  if (!role) return false;
-
-  const normalizedRole = String(role).trim().toLocaleLowerCase('pt-BR');
-  return MANAGER_ROLE_KEYWORDS.some((keyword) =>
-    normalizedRole.includes(keyword),
-  );
-}
-
 async function resolvePostLoginRoute(getActiveMemberships) {
   const authUser = useAuthStore.getState().auth?.user;
   if (!authUser?._id) return '/student/dashboard';
+
+  if (hasAdminRole(authUser?.globalRole)) return '/admin/dashboard';
 
   if (hasManagerRole(authUser?.globalRole)) return '/manager/dashboard';
 
