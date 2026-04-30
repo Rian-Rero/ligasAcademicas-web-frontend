@@ -81,10 +81,17 @@ export const redefinePassword = async ({ token, password }) => {
   return data;
 };
 
-export const changeUserPassword = async ({ _id, password }) => {
-  const { data } = await api.put(`/users/${_id}/change-password`, {
-    newPassword: password,
-  });
+export const changeUserPassword = async ({
+  _id,
+  newPassword,
+  password,
+  currentPassword,
+} = {}) => {
+  const finalNewPassword = newPassword ?? password;
+  const body = { newPassword: finalNewPassword };
+  if (currentPassword) body.currentPassword = currentPassword;
+
+  const { data } = await api.put(`/users/${_id}/change-password`, body);
 
   return data;
 };
