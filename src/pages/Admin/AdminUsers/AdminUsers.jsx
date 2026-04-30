@@ -349,17 +349,24 @@ export default function AdminUsers() {
     }
 
     try {
-      const createdMembership = await createMembership({
-        user: selectedUser._id,
-        academicLeague: values.academicLeague,
-        squad: values.squad,
+      const payload = {
+        user: normalizeId(selectedUser._id),
+        academicLeague: normalizeId(values.academicLeague),
+        squad: normalizeId(values.squad),
         role,
         isActive: values.isActive === 'true',
-      });
+      };
+
+      const createdMembership = await createMembership(payload);
+
+      if (!createdMembership || !createdMembership._id) {
+        notifyError('Não foi possível criar o vínculo');
+        return;
+      }
 
       await handleRefresh();
-      setSelectedMembershipId(normalizeId(createdMembership?._id));
-      notifySuccess('Vinculo criado com sucesso');
+      setSelectedMembershipId(normalizeId(createdMembership._id));
+      notifySuccess('Vínculo criado com sucesso');
     } catch (err) {
       notifyError(buildAdminUserErrorMessage(err));
     }
@@ -672,21 +679,11 @@ export default function AdminUsers() {
 
                         <SmallActionButton
                           type="button"
-                          onClick={async () => {
-                            const ok = window.confirm('Remover este vínculo?');
-                            if (!ok) return;
-                            try {
-                              await deleteMembership(membership._id);
-                              await handleRefresh();
-                              if (
-                                isSameId(selectedMembershipId, membership._id)
-                              ) {
-                                setSelectedMembershipId('');
-                              }
-                              notifySuccess('Vínculo removido');
-                            } catch (err) {
-                              notifyError(buildAdminUserErrorMessage(err));
-                            }
+                          onClick={() => {
+                            setSelectedMembershipId(
+                              normalizeId(membership._id),
+                            );
+                            setIsDeleteMembershipConfirmOpen(true);
                           }}
                         >
                           Remover
