@@ -1,12 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import {
-  FiBuilding,
-  FiRefreshCw,
-  FiSave,
-  FiSearch,
-  FiTrash2,
-} from 'react-icons/fi';
+import { FiRefreshCw, FiSave, FiSearch, FiTrash2 } from 'react-icons/fi';
+import { LuBuilding } from 'react-icons/lu';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
@@ -337,7 +332,7 @@ export default function AdminUniversities() {
           <FormGrid>
             <Field $fullWidth>
               <Label>
-                <FiBuilding /> Nome
+                <LuBuilding /> Nome
               </Label>
               <TextInput
                 value={formState.name}
