@@ -217,7 +217,7 @@ export default function AdminAcademicLeagues() {
 
     try {
       await deleteAcademicLeague(selectedLeague._id);
-      notifySuccess('Liga academica removida com sucesso');
+      notifySuccess('Liga acadêmica removida com sucesso');
       await Promise.all([
         refetchUniversities(),
         refetchLeagues(),
@@ -229,7 +229,7 @@ export default function AdminAcademicLeagues() {
       notifyError(
         buildRequestErrorMessage(
           err,
-          'Nao foi possivel remover a liga academica',
+          'Nao foi possivel remover a liga acadêmica',
         ),
       );
     }
@@ -312,7 +312,7 @@ export default function AdminAcademicLeagues() {
 
         <FormCard onSubmit={onSubmit}>
           <SectionTitle>
-            {selectedLeague?._id ? 'Editar liga' : 'Criar nova liga academica'}
+            {selectedLeague?._id ? 'Editar liga' : 'Criar nova liga acadêmica'}
           </SectionTitle>
 
           <FormGrid>
@@ -340,7 +340,7 @@ export default function AdminAcademicLeagues() {
               <Label>Descrição</Label>
               <TextArea
                 {...register('description')}
-                placeholder="Descreva a liga e seu proposito"
+                placeholder="Descreva a liga e seu propósito"
               />
             </Field>
 
@@ -348,7 +348,7 @@ export default function AdminAcademicLeagues() {
               <Label>Area</Label>
               <TextInput
                 {...register('area')}
-                placeholder="Ex.: saude, tecnologia, engenharia..."
+                placeholder="Ex.: saúde, tecnologia, engenharia..."
               />
             </Field>
 
@@ -357,7 +357,7 @@ export default function AdminAcademicLeagues() {
                 {formErrorMessage ||
                   (selectedLeague?._id
                     ? `${leagueMembers.length} usuarios vinculados a esta liga.`
-                    : 'Preencha os campos para criar uma nova liga academica.')}
+                    : 'Preencha os campos para criar uma nova liga acadêmica.')}
               </HelperText>
             </Field>
           </FormGrid>
@@ -395,7 +395,7 @@ export default function AdminAcademicLeagues() {
 
       <ConfirmDialog
         isOpen={isDeleteConfirmOpen}
-        title="Remover liga academica"
+        title="Remover liga acadêmica"
         description="Essa acao remove a liga selecionada. Se houver usuarios vinculados, confira o impacto antes de confirmar."
         confirmLabel="Remover"
         cancelLabel="Cancelar"

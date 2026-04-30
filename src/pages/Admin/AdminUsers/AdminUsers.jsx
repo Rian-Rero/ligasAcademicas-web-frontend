@@ -561,7 +561,7 @@ export default function AdminUsers() {
                 >
                   <EntityTitle>
                     <strong>{user.name}</strong>
-                    <EntityBadge>{userMemberships.length} vinculos</EntityBadge>
+                    <EntityBadge>{userMemberships.length} vínculos</EntityBadge>
                   </EntityTitle>
                   <EntityMeta>
                     <span>{user.email}</span>
@@ -576,7 +576,7 @@ export default function AdminUsers() {
         <FormCard onSubmit={onSubmit}>
           <SectionTitle>
             {selectedUser?._id
-              ? 'Editar usuario e vinculos'
+              ? 'Editar usuario e vínculos'
               : 'Criar novo usuario (ou selecione um existente)'}
           </SectionTitle>
 
@@ -705,7 +705,7 @@ export default function AdminUsers() {
                 {formErrorMessage ||
                   (selectedMembership
                     ? `Vinculo selecionado: ${selectedMembership.role} - ${selectedMembership.isActive ? 'ativo' : 'inativo'}`
-                    : 'Usuarios podem ter multiplos vinculos. Use Novo vinculo para adicionar quantos forem necessarios.')}
+                    : 'Usuarios podem ter multiplos vínculos. Use Novo vinculo para adicionar quantos forem necessários.')}
               </HelperText>
             </Field>
           </FormGrid>

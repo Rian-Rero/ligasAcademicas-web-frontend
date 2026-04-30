@@ -302,7 +302,7 @@ export default function AdminSquads() {
           <HeaderSubtitle>
             Crie, edite e remova subequipes em qualquer liga. Usuarios podem
             participar de multiplas ligas e multiplas subequipes atraves de
-            vinculos diferentes.
+            vínculos diferentes.
           </HeaderSubtitle>
         </div>
 
@@ -452,10 +452,10 @@ export default function AdminSquads() {
             </Field>
 
             <Field $fullWidth>
-              <Label>Funcao</Label>
+              <Label>Função</Label>
               <TextInput
                 {...register('function')}
-                placeholder="Ex.: execucao de projetos, pesquisa, gestao..."
+                placeholder="Ex.: execução de projetos, pesquisa, gestão..."
               />
             </Field>
 
@@ -463,7 +463,7 @@ export default function AdminSquads() {
               <HelperText>
                 {formErrorMessage ||
                   (selectedSquad?._id
-                    ? 'Use Gerenciar usuarios para navegar direto aos vinculos desta liga.'
+                    ? 'Use Gerenciar usuarios para navegar direto aos vínculos desta liga.'
                     : 'Preencha os campos para criar uma nova subequipe.')}
               </HelperText>
             </Field>
@@ -503,7 +503,7 @@ export default function AdminSquads() {
       <ConfirmDialog
         isOpen={isDeleteConfirmOpen}
         title="Remover subequipe"
-        description="Essa acao remove a subequipe selecionada. Revise os vinculos de usuarios antes de confirmar."
+        description="Essa acao remove a subequipe selecionada. Revise os vínculos de usuarios antes de confirmar."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDelete}

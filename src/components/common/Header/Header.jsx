@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 
+import { FiUser } from 'react-icons/fi';
 import { IoClose, IoLogIn, IoMenu } from 'react-icons/io5';
-import { useLocation } from 'react-router-dom';
+import { TbLogout2 } from 'react-icons/tb';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import {
+  ActionButton,
   BrandArea,
   BrandInfo,
   BrandSubtitle,
@@ -17,15 +20,20 @@ import {
   ItensBox,
   LogoLink,
   MenuButton,
+  MobileActionButton,
   MobileCtaLink,
   MobileMenu,
   MobileNav,
   MobileNavItem,
   NavItem,
 } from './Styles';
+import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
+import { useLogout } from '../../../hooks/query/sessions';
+import useAuthStore from '../../../stores/auth';
+import { hasAdminRole, hasManagerRole } from '../../../utils/roles';
 import OnlyLogo from '../OnlyLogo/OnlyLogo';
 
-const navigationLinks = [
+const publicNavigationLinks = [
   { to: '/', label: 'Início', end: true },
   { to: '/login', label: 'Entrar', end: false },
   { to: '/forgot-password', label: 'Recuperar senha', end: false },
@@ -43,8 +51,51 @@ function getCtaData(pathname) {
   return { to: '/login', label: 'Acessar sistema' };
 }
 
+function getAuthenticatedContext(authUser, memberships = []) {
+  const hasManagementMembership = memberships.some((membership) =>
+    hasManagerRole(membership?.role),
+  );
+
+  if (hasAdminRole(authUser?.globalRole)) {
+    return {
+      badge: 'Painel administrativo',
+      dashboardTo: '/admin/dashboard',
+      profileTo: '/admin/profile',
+      dashboardLabel: 'Dashboard',
+      profileLabel: 'Meu perfil',
+    };
+  }
+
+  if (hasManagerRole(authUser?.globalRole) || hasManagementMembership) {
+    return {
+      badge: 'Painel de gestão',
+      dashboardTo: '/manager/dashboard',
+      profileTo: '/manager/profile',
+      dashboardLabel: 'Dashboard',
+      profileLabel: 'Meu perfil',
+    };
+  }
+
+  return {
+    badge: 'Painel do estudante',
+    dashboardTo: '/student/dashboard',
+    profileTo: '/student/profile',
+    dashboardLabel: 'Dashboard',
+    profileLabel: 'Meu perfil',
+  };
+}
+
 export default function Header() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const authUser = useAuthStore((state) => state.auth?.user);
+  const { mutate: logout } = useLogout({
+    onSettled: () => navigate('/login', { replace: true }),
+  });
+  const { data: memberships = [] } = useGetLeagueMemberships({
+    filters: { user: authUser?._id, isActive: true },
+    enabled: Boolean(authUser?._id),
+  });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -63,11 +114,29 @@ export default function Header() {
     return () => window.removeEventListener('keydown', handleEscape);
   }, []);
 
+  const isAuthenticated = Boolean(authUser?._id);
   const ctaData = getCtaData(pathname);
+  const authenticatedContext = isAuthenticated
+    ? getAuthenticatedContext(authUser, memberships)
+    : null;
+  const desktopLinks = isAuthenticated
+    ? [
+        {
+          to: authenticatedContext.dashboardTo,
+          label: authenticatedContext.dashboardLabel,
+          end: true,
+        },
+        {
+          to: authenticatedContext.profileTo,
+          label: authenticatedContext.profileLabel,
+          end: false,
+        },
+      ]
+    : publicNavigationLinks;
 
   return (
-    <Container>
-      <HeaderSurface>
+    <Container $compact={isAuthenticated}>
+      <HeaderSurface $compact={isAuthenticated}>
         <ItensBox>
           <BrandArea>
             <LogoLink to="/" aria-label="Voltar para página inicial">
@@ -76,12 +145,16 @@ export default function Header() {
 
             <BrandInfo>
               <BrandTitle>SGLA</BrandTitle>
-              <BrandSubtitle>Sistema de Ligas Acadêmicas</BrandSubtitle>
+              <BrandSubtitle>
+                {isAuthenticated
+                  ? authenticatedContext.badge
+                  : 'Sistema de Ligas Acadêmicas'}
+              </BrandSubtitle>
             </BrandInfo>
           </BrandArea>
 
           <DesktopNav aria-label="Navegação principal">
-            {navigationLinks.map(({ to, label, end }) => (
+            {desktopLinks.map(({ to, label, end }) => (
               <NavItem key={to} to={to} end={end}>
                 {label}
               </NavItem>
@@ -89,9 +162,25 @@ export default function Header() {
           </DesktopNav>
 
           <HeaderActions>
-            <HeaderBadge>Conectando ligas e universidades</HeaderBadge>
+            <HeaderBadge>
+              {isAuthenticated
+                ? authenticatedContext.badge
+                : 'Conectando ligas e universidades'}
+            </HeaderBadge>
 
-            <CtaLink to={ctaData.to}>{ctaData.label}</CtaLink>
+            {isAuthenticated ? (
+              <>
+                <CtaLink to={authenticatedContext.profileTo}>
+                  {authenticatedContext.profileLabel}
+                </CtaLink>
+
+                <ActionButton type="button" onClick={() => logout()}>
+                  <TbLogout2 /> Sair
+                </ActionButton>
+              </>
+            ) : (
+              <CtaLink to={ctaData.to}>{ctaData.label}</CtaLink>
+            )}
 
             <MenuButton
               type="button"
@@ -113,7 +202,7 @@ export default function Header() {
       {isMobileMenuOpen && (
         <MobileMenu id="mobile-navigation">
           <MobileNav aria-label="Navegação mobile">
-            {navigationLinks.map(({ to, label, end }) => (
+            {desktopLinks.map(({ to, label, end }) => (
               <MobileNavItem
                 key={to}
                 to={to}
@@ -126,12 +215,26 @@ export default function Header() {
           </MobileNav>
 
           <MobileCtaLink
-            to={ctaData.to}
+            to={isAuthenticated ? authenticatedContext.profileTo : ctaData.to}
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            <IoLogIn />
-            {ctaData.label}
+            {isAuthenticated ? <FiUser /> : <IoLogIn />}
+            {isAuthenticated
+              ? authenticatedContext.profileLabel
+              : ctaData.label}
           </MobileCtaLink>
+
+          {isAuthenticated && (
+            <MobileActionButton
+              type="button"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                logout();
+              }}
+            >
+              <TbLogout2 /> Sair
+            </MobileActionButton>
+          )}
         </MobileMenu>
       )}
     </Container>

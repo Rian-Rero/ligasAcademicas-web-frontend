@@ -48,16 +48,23 @@ export const Container = styled.header`
   align-items: center;
 
   width: 100%;
-  padding: clamp(1rem, 1.8vw, 1.6rem) clamp(1.2rem, 2.8vw, 3.2rem) 0;
+  padding: ${({ $compact }) =>
+    $compact
+      ? '0.8rem clamp(1rem, 2vw, 2.4rem) 0'
+      : 'clamp(1rem, 1.8vw, 1.6rem) clamp(1.2rem, 2.8vw, 3.2rem) 0'};
 `;
 
 export const HeaderSurface = styled.div`
   width: min(120rem, 100%);
-  border-radius: 2.4rem;
+  border-radius: ${({ $compact }) => ($compact ? '1.8rem' : '2.4rem')};
   border: 1px solid transparent;
 
   background:
-    linear-gradient(160deg, rgba(6, 14, 27, 0.9), rgba(11, 29, 54, 0.68))
+    linear-gradient(
+        160deg,
+        rgba(6, 14, 27, ${({ $compact }) => ($compact ? '0.96' : '0.9')}),
+        rgba(11, 29, 54, ${({ $compact }) => ($compact ? '0.84' : '0.68')})
+      )
       padding-box,
     linear-gradient(
         120deg,
@@ -67,9 +74,10 @@ export const HeaderSurface = styled.div`
       )
       border-box;
 
-  box-shadow:
-    0 1.5rem 3.4rem rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  box-shadow: ${({ $compact }) =>
+    $compact
+      ? '0 1rem 2.4rem rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.16)'
+      : '0 1.5rem 3.4rem rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.16)'};
 
   backdrop-filter: blur(12px);
   animation: ${slideDown} 0.4s ease;
@@ -82,8 +90,11 @@ export const ItensBox = styled.div`
   gap: clamp(1.2rem, 1.5vw, 2rem);
 
   width: 100%;
-  min-height: 8.2rem;
-  padding: 1.2rem clamp(1.2rem, 2vw, 2rem);
+  min-height: ${({ $compact }) => ($compact ? '6.6rem' : '8.2rem')};
+  padding: ${({ $compact }) =>
+    $compact
+      ? '0.95rem clamp(1rem, 1.6vw, 1.6rem)'
+      : '1.2rem clamp(1.2rem, 2vw, 2rem)'};
 
   @media (max-width: 920px) {
     grid-template-columns: auto auto;
@@ -276,6 +287,51 @@ export const CtaLink = styled(Link)`
   }
 `;
 
+const actionButtonBase = css`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.8rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.32);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 140, 255, 0.35);
+  }
+`;
+
+export const ActionButton = styled.button`
+  ${actionButtonBase}
+
+  @media (max-width: 920px) {
+    display: none;
+  }
+`;
+
 export const MenuButton = styled.button`
   display: none;
 
@@ -391,5 +447,14 @@ export const MobileCtaLink = styled(Link)`
   &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px rgba(0, 140, 255, 0.36);
+  }
+`;
+
+export const MobileActionButton = styled.button`
+  ${actionButtonBase}
+  width: 100%;
+
+  @media (min-width: 921px) {
+    display: none;
   }
 `;

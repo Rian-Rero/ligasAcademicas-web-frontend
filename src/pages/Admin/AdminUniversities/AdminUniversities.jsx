@@ -240,7 +240,7 @@ export default function AdminUniversities() {
           <HeaderTitle>ADMINISTRACAO DE UNIVERSIDADES</HeaderTitle>
           <HeaderSubtitle>
             Cadastre, edite e remova universidades mantendo as ligas e os
-            vinculos organizados no mesmo padrao visual do sistema.
+            vínculos organizados no mesmo padrao visual do sistema.
           </HeaderSubtitle>
         </div>
 

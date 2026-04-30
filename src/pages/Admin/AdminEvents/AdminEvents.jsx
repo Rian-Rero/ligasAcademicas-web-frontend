@@ -459,7 +459,7 @@ export function AdminEvents() {
 
           <FormGrid>
             <Field>
-              <Label>Liga academica</Label>
+              <Label>Liga acadêmica</Label>
               <SelectInput {...register('academicLeague')}>
                 <option value="">Selecione uma liga</option>
                 {academicLeagues.map((league) => (
