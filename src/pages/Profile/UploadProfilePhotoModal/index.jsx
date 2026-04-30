@@ -83,7 +83,6 @@ export default function UploadProfilePhotoModal({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isLoading}
-              $variant="primary"
             >
               <FiCamera /> Selecionar foto
             </ModalButton>

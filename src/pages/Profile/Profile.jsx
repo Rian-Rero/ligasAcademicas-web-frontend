@@ -210,6 +210,7 @@ export default function Profile() {
         }
         setSelectedProfilePhoto(null);
         setProfilePhotoPreviewUrl('');
+        setIsUploadModalOpen(false);
         notifySuccess('Foto de perfil atualizada com sucesso!');
       },
       onError: (err) => {
