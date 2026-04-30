@@ -337,7 +337,7 @@ export default function AdminAcademicLeagues() {
             </Field>
 
             <Field $fullWidth>
-              <Label>Descricao</Label>
+              <Label>Descrição</Label>
               <TextArea
                 {...register('description')}
                 placeholder="Descreva a liga e seu proposito"

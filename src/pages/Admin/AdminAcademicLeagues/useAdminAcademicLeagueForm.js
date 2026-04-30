@@ -8,7 +8,7 @@ const adminAcademicLeagueSchema = z.object({
   description: z
     .string()
     .trim()
-    .min(3, 'Descricao deve ter pelo menos 3 caracteres'),
+    .min(3, 'Descrição deve ter pelo menos 3 caracteres'),
   area: z.string().trim().optional(),
 });
 

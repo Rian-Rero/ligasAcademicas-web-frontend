@@ -9,7 +9,7 @@ const adminSquadSchema = z.object({
   description: z
     .string()
     .trim()
-    .min(3, 'Descricao deve ter pelo menos 3 caracteres'),
+    .min(3, 'Descrição deve ter pelo menos 3 caracteres'),
   function: z.string().trim().optional(),
 });
 

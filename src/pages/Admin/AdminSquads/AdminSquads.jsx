@@ -444,7 +444,7 @@ export default function AdminSquads() {
             </Field>
 
             <Field $fullWidth>
-              <Label>Descricao</Label>
+              <Label>Descrição</Label>
               <TextArea
                 {...register('description')}
                 placeholder="Descreva foco e responsabilidade da subequipe"

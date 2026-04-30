@@ -1,185 +1,475 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FiCalendar, FiClock, FiMapPin, FiUsers } from 'react-icons/fi';
-import { toast } from 'react-toastify';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { FiCalendar, FiMapPin, FiSave, FiTrash2 } from 'react-icons/fi';
+import { GrAddCircle } from 'react-icons/gr';
+import { ClipLoader } from 'react-spinners';
+import { useTheme } from 'styled-components';
 
-import {
-  adminEventDefaultValues,
-  useAdminEventForm,
-} from './useAdminEventForm';
+import { adminEventDefaultValues, adminEventSchema } from './useAdminEventForm';
+import { ConfirmDialog } from '../../../components/common';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
+import {
+  useCreateEvent,
+  useDeleteEvent,
+  useGetEvents,
+  useUpdateEvent,
+} from '../../../hooks/query/event';
 import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
 import { useGetSquads } from '../../../hooks/query/squad';
-import { createEvent as createEventRequest } from '../../../services/api/endpoints';
+import {
+  notifyError,
+  notifySuccess,
+  notifyWarning,
+} from '../../../utils/toast';
 import {
   ActionButton,
   ActionsRow,
-  EmptyState,
+  Content,
   EditorCard,
+  EmptyState,
+  ErrorMessage,
+  EventBadge,
+  EventItem,
+  EventList,
+  EventMeta,
+  EventMetaItem,
+  EventTitle,
+  EventsCard,
   Field,
   FormGrid,
+  HeaderActions,
   HeaderSection,
   HeaderSubtitle,
   HeaderTitle,
   HelperText,
   Label,
   PanelGrid,
-  PreviewCard,
-  PreviewItem,
-  PreviewLabel,
-  PreviewList,
-  PreviewTitle,
-  PreviewValue,
-  ScopeBadge,
+  SectionTitle,
   SelectInput,
   TextArea,
   TextInput,
-} from '../../Manager/ManagerEvents/Styles';
-import { buildEventCreateErrorMessage } from '../../Manager/ManagerEvents/utils';
+} from '../../Manager/ManagerEventsList/Styles';
 
-function formatDateTime(value) {
-  if (!value) return 'Nao informado';
+function normalizeId(value) {
+  if (!value) return '';
+  if (typeof value === 'object') return String(value._id || value.id || '');
+  return String(value);
+}
 
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'Data invalida';
+function formatDateTimeInput(dateValue) {
+  if (!dateValue) return '';
 
-  return date.toLocaleString('pt-BR', {
-    dateStyle: 'full',
+  const parsedDate = new Date(dateValue);
+  if (Number.isNaN(parsedDate.getTime())) return '';
+
+  const offset = parsedDate.getTimezoneOffset();
+  const localDate = new Date(parsedDate.getTime() - offset * 60 * 1000);
+  return localDate.toISOString().slice(0, 16);
+}
+
+function formatDateTimeDisplay(dateValue) {
+  if (!dateValue) return 'Data a definir';
+
+  const parsedDate = new Date(dateValue);
+  if (Number.isNaN(parsedDate.getTime())) return 'Data a definir';
+
+  return parsedDate.toLocaleString('pt-BR', {
+    dateStyle: 'short',
     timeStyle: 'short',
   });
 }
 
+function buildRequestErrorMessage(err, fallback) {
+  const responseMessage = err?.response?.data?.message;
+
+  if (Array.isArray(responseMessage)) {
+    return responseMessage.join(' | ');
+  }
+
+  if (typeof responseMessage === 'string' && responseMessage.trim()) {
+    return responseMessage;
+  }
+
+  if (typeof err?.message === 'string' && err.message.trim()) {
+    return err.message;
+  }
+
+  return fallback;
+}
+
+function buildEventPayload(formData) {
+  return {
+    academicLeague: formData.academicLeague,
+    title: formData.title.trim(),
+    description: formData.description.trim(),
+    dateTime: formData.dateTime,
+    location: formData.location.trim(),
+    squad: formData.scope === 'squad' && formData.squad ? formData.squad : null,
+  };
+}
+
 export function AdminEvents() {
+  const theme = useTheme();
   const queryClient = useQueryClient();
+
+  const [eventsLeagueFilter, setEventsLeagueFilter] = useState('');
+  const [selectedEventId, setSelectedEventId] = useState('');
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+
   const {
     register,
     handleSubmit,
     watch,
     reset,
     setValue,
-    formState: { errors },
-  } = useAdminEventForm();
-
-  const selectedLeagueId = watch('academicLeague');
-  const selectedScope = watch('scope');
-  const selectedSquadId = watch('squad');
-  const watchedTitle = watch('title');
-  const watchedDescription = watch('description');
-  const watchedDateTime = watch('dateTime');
-  const watchedLocation = watch('location');
-
-  const { data: academicLeagues = [] } = useGetAcademicLeagues();
-  const { data: squads = [] } = useGetSquads();
-  const { data: memberships = [] } = useGetLeagueMemberships({
-    filters: selectedLeagueId
-      ? { academicLeague: selectedLeagueId, isActive: true }
-      : undefined,
-    enabled: Boolean(selectedLeagueId),
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(adminEventSchema),
+    defaultValues: adminEventDefaultValues,
   });
 
-  const filteredSquads = useMemo(() => {
-    if (!selectedLeagueId) return [];
+  const formLeagueId = watch('academicLeague');
+  const formScope = watch('scope');
+  const formSquadId = watch('squad');
+  const formTitle = watch('title');
+  const formDescription = watch('description');
+  const formDateTime = watch('dateTime');
+  const formLocation = watch('location');
 
-    return squads.filter(
-      (squad) =>
-        squad.academicLeague?._id === selectedLeagueId ||
-        squad.academicLeague === selectedLeagueId,
-    );
-  }, [squads, selectedLeagueId]);
+  const { data: academicLeagues = [] } = useGetAcademicLeagues();
+  const { data: squads = [] } = useGetSquads({
+    filters: formLeagueId ? { academicLeague: formLeagueId } : undefined,
+    enabled: Boolean(formLeagueId),
+  });
+  const { data: memberships = [] } = useGetLeagueMemberships({
+    filters: formLeagueId
+      ? { academicLeague: formLeagueId, isActive: true }
+      : undefined,
+    enabled: Boolean(formLeagueId),
+  });
+  const { data: eventsFromApi = [] } = useGetEvents({
+    filters: eventsLeagueFilter
+      ? { academicLeague: eventsLeagueFilter }
+      : undefined,
+    enabled: Boolean(eventsLeagueFilter),
+  });
+
+  const events = useMemo(
+    () =>
+      [...eventsFromApi].sort(
+        (left, right) =>
+          new Date(left.dateTime).getTime() -
+          new Date(right.dateTime).getTime(),
+      ),
+    [eventsFromApi],
+  );
+
+  const selectedEvent = useMemo(
+    () => events.find((event) => normalizeId(event._id) === selectedEventId),
+    [events, selectedEventId],
+  );
 
   const selectedLeague = academicLeagues.find(
-    (league) => league._id === selectedLeagueId,
+    (league) => normalizeId(league._id) === formLeagueId,
   );
-  const selectedSquad = filteredSquads.find(
-    (squad) => squad._id === selectedSquadId,
+  const selectedSquad = squads.find(
+    (squad) => normalizeId(squad._id) === formSquadId,
   );
 
   const attendeesCount = useMemo(() => {
-    if (!selectedLeagueId) return 0;
+    if (!formLeagueId) return 0;
 
-    if (selectedScope === 'squad') {
+    if (formScope === 'squad') {
       return memberships.filter((membership) => {
-        const membershipSquadId = membership.squad?._id || membership.squad;
-        return membershipSquadId === selectedSquadId;
+        const membershipSquadId = normalizeId(
+          membership.squad?._id || membership.squad,
+        );
+        return membershipSquadId === formSquadId;
       }).length;
     }
 
     return memberships.length;
-  }, [memberships, selectedLeagueId, selectedScope, selectedSquadId]);
+  }, [formLeagueId, formScope, formSquadId, memberships]);
 
   useEffect(() => {
-    if (selectedScope !== 'squad' && selectedSquadId) {
+    if (formScope !== 'squad' && formSquadId) {
       setValue('squad', '');
     }
-  }, [selectedScope, selectedSquadId, setValue]);
+  }, [formScope, formSquadId, setValue]);
 
   useEffect(() => {
-    if (!selectedSquadId) return;
+    if (!formSquadId) return;
 
-    const squadStillVisible = filteredSquads.some(
-      (squad) => squad._id === selectedSquadId,
+    const squadStillVisible = squads.some(
+      (squad) => normalizeId(squad._id) === formSquadId,
     );
 
     if (!squadStillVisible) {
       setValue('squad', '');
     }
-  }, [filteredSquads, selectedSquadId, setValue]);
+  }, [formSquadId, squads, setValue]);
 
-  const createEvent = useMutation({
-    mutationFn: createEventRequest,
-    onSuccess: () => {
-      toast.success('Evento criado com sucesso');
+  useEffect(() => {
+    if (!selectedEvent) {
+      reset(adminEventDefaultValues);
+      return;
+    }
+
+    reset({
+      academicLeague: normalizeId(
+        selectedEvent.academicLeague?._id || selectedEvent.academicLeague,
+      ),
+      title: selectedEvent.title || '',
+      description: selectedEvent.description || '',
+      dateTime: formatDateTimeInput(selectedEvent.dateTime),
+      location: selectedEvent.location || '',
+      scope: selectedEvent.squad ? 'squad' : 'global',
+      squad: selectedEvent.squad
+        ? normalizeId(selectedEvent.squad?._id || selectedEvent.squad)
+        : '',
+    });
+  }, [reset, selectedEvent]);
+
+  useEffect(() => {
+    if (!selectedEventId) {
+      setIsDeleteConfirmOpen(false);
+      return;
+    }
+
+    const selectedEventStillVisible = events.some(
+      (event) => normalizeId(event._id) === selectedEventId,
+    );
+
+    if (!selectedEventStillVisible) {
+      setSelectedEventId('');
+      setIsDeleteConfirmOpen(false);
+    }
+  }, [events, selectedEventId]);
+
+  const createEvent = useCreateEvent({
+    onSuccess: (_, variables) => {
+      notifySuccess('Evento criado com sucesso');
+      setEventsLeagueFilter(variables?.academicLeague || '');
+      setSelectedEventId('');
       reset(adminEventDefaultValues);
       queryClient.invalidateQueries(['events']);
     },
     onError: (error) => {
-      toast.error(buildEventCreateErrorMessage(error));
+      notifyError(
+        buildRequestErrorMessage(error, 'Nao foi possivel criar o evento'),
+      );
     },
   });
 
-  const onSubmit = (formData) => {
-    const { scope, ...eventData } = formData;
+  const updateEvent = useUpdateEvent({
+    onSuccess: (_, variables) => {
+      notifySuccess('Evento atualizado com sucesso');
+      setEventsLeagueFilter(
+        variables?.inputData?.academicLeague || eventsLeagueFilter,
+      );
+      queryClient.invalidateQueries(['events']);
+    },
+    onError: (error) => {
+      notifyError(
+        buildRequestErrorMessage(error, 'Nao foi possivel atualizar o evento'),
+      );
+    },
+  });
 
-    createEvent.mutate({
-      ...eventData,
-      squad: scope === 'squad' ? formData.squad : null,
-    });
+  const deleteEvent = useDeleteEvent({
+    onSuccess: () => {
+      notifySuccess('Evento removido com sucesso');
+      setSelectedEventId('');
+      setIsDeleteConfirmOpen(false);
+      reset(adminEventDefaultValues);
+      queryClient.invalidateQueries(['events']);
+    },
+    onError: (error) => {
+      notifyError(
+        buildRequestErrorMessage(error, 'Nao foi possivel remover o evento'),
+      );
+    },
+  });
+
+  const isSaving =
+    isSubmitting || createEvent.isPending || updateEvent.isPending;
+  const isDeleting = deleteEvent.isPending;
+  const isEditing = Boolean(selectedEventId);
+  const canSubmit = Boolean(formLeagueId);
+
+  const handleStartNewEvent = () => {
+    setSelectedEventId('');
+    reset(adminEventDefaultValues);
+  };
+
+  const handleRequestDelete = () => {
+    if (!selectedEvent?._id) {
+      notifyWarning('Selecione um evento para remover');
+      return;
+    }
+
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteConfirmOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedEvent?._id) {
+      notifyWarning('Selecione um evento para remover');
+      setIsDeleteConfirmOpen(false);
+      return;
+    }
+
+    await deleteEvent.mutateAsync(selectedEvent._id);
+  };
+
+  const onSubmit = async (formData) => {
+    if (!formData.academicLeague) {
+      notifyWarning('Selecione uma liga antes de salvar o evento');
+      return;
+    }
+
+    const payload = buildEventPayload(formData);
+
+    if (isEditing && selectedEvent?._id) {
+      await updateEvent.mutateAsync({
+        _id: selectedEvent._id,
+        inputData: payload,
+      });
+      return;
+    }
+
+    await createEvent.mutateAsync(payload);
   };
 
   return (
-    <div>
+    <Content>
       <HeaderSection>
         <div>
-          <HeaderTitle>Novo evento</HeaderTitle>
+          <HeaderTitle>EVENTOS</HeaderTitle>
           <HeaderSubtitle>
-            Crie eventos para toda a liga ou apenas para uma subequipe, com
-            sincronizacao na agenda dos participantes.
+            Crie, edite e remova eventos da liga. A lista fica separada do
+            formulario para evitar preenchimento automatico indevido.
           </HeaderSubtitle>
         </div>
-        <ScopeBadge $variant={selectedScope}>
-          <FiCalendar />
-          {selectedLeague
-            ? selectedLeague.name || selectedLeague.title
-            : 'Selecione uma liga'}
-        </ScopeBadge>
+
+        <HeaderActions>
+          <ActionButton type="button" onClick={handleStartNewEvent}>
+            <GrAddCircle /> Novo evento
+          </ActionButton>
+        </HeaderActions>
       </HeaderSection>
 
       <PanelGrid>
+        <EventsCard>
+          <SectionTitle>Lista de eventos</SectionTitle>
+
+          <Field $fullWidth>
+            <Label>Filtrar por liga</Label>
+            <SelectInput
+              value={eventsLeagueFilter}
+              onChange={(event) => {
+                setEventsLeagueFilter(event.target.value);
+                setSelectedEventId('');
+              }}
+            >
+              <option value="">Selecione uma liga para listar eventos</option>
+              {academicLeagues.map((league) => (
+                <option key={league._id} value={normalizeId(league._id)}>
+                  {league.name || league.title}
+                </option>
+              ))}
+            </SelectInput>
+          </Field>
+
+          {!eventsLeagueFilter && (
+            <EmptyState>
+              Selecione uma liga para visualizar, editar e excluir os eventos
+              cadastrados.
+            </EmptyState>
+          )}
+
+          {eventsLeagueFilter && !events.length && (
+            <EmptyState>
+              Nenhum evento encontrado para a liga selecionada.
+            </EmptyState>
+          )}
+
+          <EventList>
+            {events.map((event) => {
+              const eventLeagueId = normalizeId(
+                event.academicLeague?._id || event.academicLeague,
+              );
+              const eventSquadId = normalizeId(event.squad?._id || event.squad);
+              const eventSquad = squads.find(
+                (squad) => normalizeId(squad._id) === eventSquadId,
+              );
+
+              return (
+                <EventItem
+                  key={event._id}
+                  type="button"
+                  $active={normalizeId(event._id) === selectedEventId}
+                  onClick={() => setSelectedEventId(normalizeId(event._id))}
+                >
+                  <EventTitle>
+                    <strong>{event.title}</strong>
+                    <EventBadge $variant={event.squad ? 'squad' : 'global'}>
+                      {event.squad ? 'Subequipe' : 'Global'}
+                    </EventBadge>
+                  </EventTitle>
+
+                  <EventMeta>
+                    <EventMetaItem>
+                      <FiCalendar /> {formatDateTimeDisplay(event.dateTime)}
+                    </EventMetaItem>
+                    <EventMetaItem>
+                      <FiMapPin /> {event.location || 'Sem local definido'}
+                    </EventMetaItem>
+                    <EventMetaItem>
+                      Liga{' '}
+                      {academicLeagues.find(
+                        (league) => normalizeId(league._id) === eventLeagueId,
+                      )?.name || 'selecionada'}
+                    </EventMetaItem>
+                    {eventSquad && (
+                      <EventMetaItem>Subequipe {eventSquad.name}</EventMetaItem>
+                    )}
+                  </EventMeta>
+                </EventItem>
+              );
+            })}
+          </EventList>
+        </EventsCard>
+
         <EditorCard onSubmit={handleSubmit(onSubmit)}>
+          <SectionTitle>
+            {isEditing ? 'Editar evento' : 'Criar novo evento'}
+          </SectionTitle>
+          <HelperText>
+            {isEditing
+              ? 'O formulario foi preenchido manualmente com o evento selecionado.'
+              : 'Escolha os dados abaixo para cadastrar um novo evento.'}
+          </HelperText>
+
           <FormGrid>
             <Field>
               <Label>Liga academica</Label>
               <SelectInput {...register('academicLeague')}>
                 <option value="">Selecione uma liga</option>
                 {academicLeagues.map((league) => (
-                  <option key={league._id} value={league._id}>
+                  <option key={league._id} value={normalizeId(league._id)}>
                     {league.name || league.title}
                   </option>
                 ))}
               </SelectInput>
               {errors.academicLeague && (
-                <HelperText>{errors.academicLeague.message}</HelperText>
+                <ErrorMessage>{errors.academicLeague.message}</ErrorMessage>
               )}
             </Field>
 
@@ -189,24 +479,28 @@ export function AdminEvents() {
                 <option value="global">Toda a liga</option>
                 <option value="squad">Apenas uma subequipe</option>
               </SelectInput>
-              {errors.scope && <HelperText>{errors.scope.message}</HelperText>}
+              {errors.scope && (
+                <ErrorMessage>{errors.scope.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field>
-              <Label>Titulo</Label>
+              <Label>Título</Label>
               <TextInput
                 type="text"
-                placeholder="Ex.: Reuniao de alinhamento"
+                placeholder="Ex.: Reunião de alinhamento"
                 {...register('title')}
               />
-              {errors.title && <HelperText>{errors.title.message}</HelperText>}
+              {errors.title && (
+                <ErrorMessage>{errors.title.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field>
               <Label>Data e horario</Label>
               <TextInput type="datetime-local" {...register('dateTime')} />
               {errors.dateTime && (
-                <HelperText>{errors.dateTime.message}</HelperText>
+                <ErrorMessage>{errors.dateTime.message}</ErrorMessage>
               )}
             </Field>
 
@@ -218,7 +512,7 @@ export function AdminEvents() {
                 {...register('location')}
               />
               {errors.location && (
-                <HelperText>{errors.location.message}</HelperText>
+                <ErrorMessage>{errors.location.message}</ErrorMessage>
               )}
             </Field>
 
@@ -226,89 +520,117 @@ export function AdminEvents() {
               <Label>Subequipe</Label>
               <SelectInput
                 {...register('squad')}
-                disabled={selectedScope !== 'squad' || !selectedLeagueId}
+                disabled={formScope !== 'squad' || !formLeagueId}
               >
                 <option value="">
-                  {selectedScope === 'squad'
+                  {formScope === 'squad'
                     ? 'Selecione uma subequipe'
                     : 'Nao necessario neste escopo'}
                 </option>
-                {filteredSquads.map((squad) => (
-                  <option key={squad._id} value={squad._id}>
+                {squads.map((squad) => (
+                  <option key={squad._id} value={normalizeId(squad._id)}>
                     {squad.name}
                   </option>
                 ))}
               </SelectInput>
-              {errors.squad && <HelperText>{errors.squad.message}</HelperText>}
+              {errors.squad && (
+                <ErrorMessage>{errors.squad.message}</ErrorMessage>
+              )}
             </Field>
 
-            <Field style={{ gridColumn: '1 / -1' }}>
-              <Label>Descricao</Label>
+            <Field $fullWidth>
+              <Label>Descrição</Label>
               <TextArea
                 rows={5}
-                placeholder="Explique o conteudo, o objetivo e os detalhes do evento"
+                placeholder="Explique o conteúdo, o objetivo e os detalhes do evento"
                 {...register('description')}
               />
               {errors.description && (
-                <HelperText>{errors.description.message}</HelperText>
+                <ErrorMessage>{errors.description.message}</ErrorMessage>
               )}
+            </Field>
+
+            <Field $fullWidth>
+              <HelperText>
+                {formLeagueId
+                  ? `${attendeesCount} pessoa(s) devem receber a agenda deste evento.`
+                  : 'Selecione uma liga para calcular os participantes.'}
+              </HelperText>
+              {formLeagueId && selectedLeague && (
+                <HelperText>
+                  Liga atual: {selectedLeague.name || selectedLeague.title}
+                  {formScope === 'squad' && selectedSquad
+                    ? ` • Subequipe: ${selectedSquad.name}`
+                    : ''}
+                </HelperText>
+              )}
+              <HelperText>
+                Data: {formDateTime || 'Nao definida'} • Local:{' '}
+                {formLocation || 'Nao definido'} • Título:{' '}
+                {formTitle || 'Novo evento'}
+              </HelperText>
+              {formDescription && <HelperText>{formDescription}</HelperText>}
             </Field>
           </FormGrid>
 
           <ActionsRow>
-            <ActionButton type="submit" disabled={createEvent.isLoading}>
-              {createEvent.isLoading ? 'Criando...' : 'Criar evento'}
+            {isEditing && (
+              <ActionButton
+                type="button"
+                $variant="warning"
+                onClick={handleRequestDelete}
+                disabled={isSaving || isDeleting}
+              >
+                <FiTrash2 /> Excluir evento
+              </ActionButton>
+            )}
+
+            <ActionButton
+              type="button"
+              onClick={handleStartNewEvent}
+              disabled={isSaving || isDeleting}
+            >
+              Nova criação
+            </ActionButton>
+
+            <ActionButton
+              type="submit"
+              disabled={isSaving || isDeleting || !canSubmit}
+            >
+              {isSaving ? (
+                <>
+                  <ClipLoader
+                    size={18}
+                    color={theme.colors.white}
+                    speedMultiplier={0.9}
+                  />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <FiSave /> {isEditing ? 'Salvar alterações' : 'Criar evento'}
+                </>
+              )}
             </ActionButton>
           </ActionsRow>
         </EditorCard>
-
-        <PreviewCard>
-          <PreviewTitle>Previsualizacao</PreviewTitle>
-          <PreviewList>
-            <PreviewItem>
-              <PreviewLabel>
-                <FiUsers /> Participantes
-              </PreviewLabel>
-              <PreviewValue>{attendeesCount}</PreviewValue>
-            </PreviewItem>
-            <PreviewItem>
-              <PreviewLabel>
-                <FiClock /> Data
-              </PreviewLabel>
-              <PreviewValue>{formatDateTime(watchedDateTime)}</PreviewValue>
-            </PreviewItem>
-            <PreviewItem>
-              <PreviewLabel>
-                <FiMapPin /> Local
-              </PreviewLabel>
-              <PreviewValue>{watchedLocation || 'Nao informado'}</PreviewValue>
-            </PreviewItem>
-            <PreviewItem>
-              <PreviewLabel>Titulo</PreviewLabel>
-              <PreviewValue>{watchedTitle || 'Novo evento'}</PreviewValue>
-            </PreviewItem>
-          </PreviewList>
-
-          <div>
-            <PreviewTitle>Destino</PreviewTitle>
-            <HelperText>
-              {selectedScope === 'squad'
-                ? `Subequipe ${selectedSquad?.name || 'nao selecionada'} dentro da liga ${selectedLeague?.name || selectedLeague?.title || 'nao selecionada'}.`
-                : `Toda a liga ${selectedLeague?.name || selectedLeague?.title || 'nao selecionada'}.`}
-            </HelperText>
-          </div>
-
-          <div>
-            <PreviewTitle>Descricao</PreviewTitle>
-            {watchedDescription ? (
-              <HelperText>{watchedDescription}</HelperText>
-            ) : (
-              <EmptyState>Sem descricao ainda.</EmptyState>
-            )}
-          </div>
-        </PreviewCard>
       </PanelGrid>
-    </div>
+
+      <ConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        title="Excluir evento"
+        description={
+          selectedEvent
+            ? `Tem certeza que deseja excluir ${selectedEvent.title}? Essa ação nao pode ser desfeita.`
+            : 'Tem certeza que deseja excluir este evento?'
+        }
+        confirmLabel={isDeleting ? 'Excluindo...' : 'Excluir'}
+        cancelLabel="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isLoading={isDeleting}
+      />
+    </Content>
   );
 }
 
