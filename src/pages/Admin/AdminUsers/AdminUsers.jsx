@@ -100,7 +100,7 @@ export default function AdminUsers() {
   const [selectedLeagueId, setSelectedLeagueId] = useState(
     searchParams.get('league') || '',
   );
-  const [membershipMode, setMembershipMode] = useState('university');
+  const [membershipMode, setMembershipMode] = useState('league');
   const [isDeleteUserConfirmOpen, setIsDeleteUserConfirmOpen] = useState(false);
   const [isDeleteMembershipConfirmOpen, setIsDeleteMembershipConfirmOpen] =
     useState(false);
@@ -263,7 +263,7 @@ export default function AdminUsers() {
 
   useEffect(() => {
     if (!selectedMembership?._id) {
-      setMembershipMode('university');
+      setMembershipMode('league');
       return;
     }
 
@@ -404,7 +404,7 @@ export default function AdminUsers() {
   const handleStartNewUser = () => {
     setSelectedUserId('');
     setSelectedMembershipId('');
-    setMembershipMode('university');
+    setMembershipMode('league');
     reset(adminUserDefaultValues);
   };
 
