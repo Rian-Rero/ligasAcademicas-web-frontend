@@ -254,6 +254,11 @@ export const HelperText = styled.span`
   font-size: 1.15rem;
 `;
 
+export const ErrorMessage = styled.span`
+  color: #ff8d8d;
+  font-size: 1.2rem;
+`;
+
 export const EmptyState = styled.div`
   padding: 1.4rem;
   border-radius: 1.2rem;

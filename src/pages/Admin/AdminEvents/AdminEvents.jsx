@@ -8,7 +8,11 @@ import { GrAddCircle } from 'react-icons/gr';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
-import { adminEventDefaultValues, adminEventSchema } from './useAdminEventForm';
+import {
+  adminEventDefaultValues,
+  adminEventSchema,
+  buildAdminEventErrorMessage,
+} from './utils';
 import { ConfirmDialog } from '../../../components/common';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
 import {
@@ -80,24 +84,6 @@ function formatDateTimeDisplay(dateValue) {
     dateStyle: 'short',
     timeStyle: 'short',
   });
-}
-
-function buildRequestErrorMessage(err, fallback) {
-  const responseMessage = err?.response?.data?.message;
-
-  if (Array.isArray(responseMessage)) {
-    return responseMessage.join(' | ');
-  }
-
-  if (typeof responseMessage === 'string' && responseMessage.trim()) {
-    return responseMessage;
-  }
-
-  if (typeof err?.message === 'string' && err.message.trim()) {
-    return err.message;
-  }
-
-  return fallback;
 }
 
 function buildEventPayload(formData) {
@@ -258,9 +244,7 @@ export function AdminEvents() {
       queryClient.invalidateQueries(['events']);
     },
     onError: (error) => {
-      notifyError(
-        buildRequestErrorMessage(error, 'Nao foi possivel criar o evento'),
-      );
+      notifyError(buildAdminEventErrorMessage(error));
     },
   });
 
@@ -273,9 +257,7 @@ export function AdminEvents() {
       queryClient.invalidateQueries(['events']);
     },
     onError: (error) => {
-      notifyError(
-        buildRequestErrorMessage(error, 'Nao foi possivel atualizar o evento'),
-      );
+      notifyError(buildAdminEventErrorMessage(error));
     },
   });
 
@@ -288,9 +270,7 @@ export function AdminEvents() {
       queryClient.invalidateQueries(['events']);
     },
     onError: (error) => {
-      notifyError(
-        buildRequestErrorMessage(error, 'Nao foi possivel remover o evento'),
-      );
+      notifyError(buildAdminEventErrorMessage(error));
     },
   });
 

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import {
   FiPlus,
   FiRefreshCw,
@@ -11,6 +13,11 @@ import { createSearchParams, useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
+import {
+  adminSquadDefaultValues,
+  adminSquadSchema,
+  buildAdminSquadErrorMessage,
+} from './utils';
 import { ConfirmDialog } from '../../../components/common';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
 import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
@@ -26,12 +33,7 @@ import {
   notifySuccess,
   notifyWarning,
 } from '../../../utils/toast';
-import {
-  buildRequestErrorMessage,
-  filterBySearch,
-  isSameId,
-  normalizeId,
-} from '../../Manager/utils';
+import { filterBySearch, isSameId, normalizeId } from '../../Manager/utils';
 import {
   ActionButton,
   ActionRow,
@@ -42,6 +44,7 @@ import {
   EntityList,
   EntityMeta,
   EntityTitle,
+  ErrorMessage,
   Field,
   FormCard,
   FormGrid,
@@ -61,10 +64,6 @@ import {
   TextArea,
   TextInput,
 } from '../Styles';
-import {
-  adminSquadDefaultValues,
-  useAdminSquadForm,
-} from './useAdminSquadForm';
 
 export default function AdminSquads() {
   const theme = useTheme();
@@ -96,7 +95,10 @@ export default function AdminSquads() {
     setValue,
     getValues,
     formState: { errors },
-  } = useAdminSquadForm();
+  } = useForm({
+    resolver: zodResolver(adminSquadSchema),
+    defaultValues: adminSquadDefaultValues,
+  });
 
   const formUniversity = watch('university');
   const formAcademicLeague = watch('academicLeague');
@@ -233,9 +235,7 @@ export default function AdminSquads() {
 
       handleCreateNew();
     } catch (err) {
-      notifyError(
-        buildRequestErrorMessage(err, 'Nao foi possivel salvar a subequipe'),
-      );
+      notifyError(buildAdminSquadErrorMessage(err));
     }
   });
 
@@ -281,9 +281,7 @@ export default function AdminSquads() {
       handleCreateNew();
       setIsDeleteConfirmOpen(false);
     } catch (err) {
-      notifyError(
-        buildRequestErrorMessage(err, 'Nao foi possivel remover a subequipe'),
-      );
+      notifyError(buildAdminSquadErrorMessage(err));
     }
   };
 
@@ -421,6 +419,9 @@ export default function AdminSquads() {
                   </option>
                 ))}
               </SelectInput>
+              {errors.university && (
+                <ErrorMessage>{errors.university.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field>
@@ -433,6 +434,9 @@ export default function AdminSquads() {
                   </option>
                 ))}
               </SelectInput>
+              {errors.academicLeague && (
+                <ErrorMessage>{errors.academicLeague.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field $fullWidth>
@@ -441,6 +445,9 @@ export default function AdminSquads() {
                 {...register('name')}
                 placeholder="Nome da subequipe"
               />
+              {errors.name && (
+                <ErrorMessage>{errors.name.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field $fullWidth>
@@ -449,6 +456,9 @@ export default function AdminSquads() {
                 {...register('description')}
                 placeholder="Descreva foco e responsabilidade da subequipe"
               />
+              {errors.description && (
+                <ErrorMessage>{errors.description.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field $fullWidth>

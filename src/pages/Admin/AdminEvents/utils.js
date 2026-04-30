@@ -1,6 +1,7 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import { ERROR_CODES } from '../../../utils/constants';
+import { buildAdminRequestErrorMessage } from '../utils';
 
 export const adminEventSchema = z
   .object({
@@ -51,9 +52,18 @@ export const adminEventDefaultValues = {
   squad: '',
 };
 
-export function useAdminEventForm() {
-  return useForm({
-    resolver: zodResolver(adminEventSchema),
-    defaultValues: adminEventDefaultValues,
-  });
+const adminEventErrorMessages = {
+  [ERROR_CODES.BAD_REQUEST]: 'Dados inválidos',
+  [ERROR_CODES.UNAUTHORIZED]: 'Acesso não autorizado',
+  [ERROR_CODES.FORBIDDEN]: 'Você não tem permissão para esta ação',
+  [ERROR_CODES.NOT_FOUND]: 'Evento não encontrado',
+  [ERROR_CODES.CONFLICT]: 'Já existe um evento com esses dados',
+};
+
+export function buildAdminEventErrorMessage(err) {
+  return buildAdminRequestErrorMessage(
+    err,
+    'Nao foi possivel salvar o evento',
+    adminEventErrorMessages,
+  );
 }

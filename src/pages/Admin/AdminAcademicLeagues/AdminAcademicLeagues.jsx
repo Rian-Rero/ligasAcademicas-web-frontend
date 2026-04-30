@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import {
   FiPlus,
   FiRefreshCw,
@@ -11,6 +13,11 @@ import { createSearchParams, useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
+import {
+  adminAcademicLeagueDefaultValues,
+  adminAcademicLeagueSchema,
+  buildAdminAcademicLeagueErrorMessage,
+} from './utils';
 import { ConfirmDialog } from '../../../components/common';
 import {
   useCreateAcademicLeague,
@@ -25,12 +32,7 @@ import {
   notifySuccess,
   notifyWarning,
 } from '../../../utils/toast';
-import {
-  buildRequestErrorMessage,
-  filterBySearch,
-  isSameId,
-  normalizeId,
-} from '../../Manager/utils';
+import { filterBySearch, isSameId, normalizeId } from '../../Manager/utils';
 import {
   ActionButton,
   ActionRow,
@@ -41,6 +43,7 @@ import {
   EntityList,
   EntityMeta,
   EntityTitle,
+  ErrorMessage,
   Field,
   FormCard,
   FormGrid,
@@ -60,10 +63,6 @@ import {
   TextArea,
   TextInput,
 } from '../Styles';
-import {
-  adminAcademicLeagueDefaultValues,
-  useAdminAcademicLeagueForm,
-} from './useAdminAcademicLeagueForm';
 
 export default function AdminAcademicLeagues() {
   const theme = useTheme();
@@ -91,7 +90,10 @@ export default function AdminAcademicLeagues() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useAdminAcademicLeagueForm();
+  } = useForm({
+    resolver: zodResolver(adminAcademicLeagueSchema),
+    defaultValues: adminAcademicLeagueDefaultValues,
+  });
 
   const filteredLeagues = useMemo(
     () =>
@@ -178,12 +180,7 @@ export default function AdminAcademicLeagues() {
 
       handleCreateNew();
     } catch (err) {
-      notifyError(
-        buildRequestErrorMessage(
-          err,
-          'Nao foi possivel salvar a liga acadêmica',
-        ),
-      );
+      notifyError(buildAdminAcademicLeagueErrorMessage(err));
     }
   });
 
@@ -226,12 +223,7 @@ export default function AdminAcademicLeagues() {
       handleCreateNew();
       setIsDeleteConfirmOpen(false);
     } catch (err) {
-      notifyError(
-        buildRequestErrorMessage(
-          err,
-          'Nao foi possivel remover a liga acadêmica',
-        ),
-      );
+      notifyError(buildAdminAcademicLeagueErrorMessage(err));
     }
   };
 
@@ -329,11 +321,17 @@ export default function AdminAcademicLeagues() {
                   </option>
                 ))}
               </SelectInput>
+              {errors.university && (
+                <ErrorMessage>{errors.university.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field $fullWidth>
               <Label>Nome</Label>
               <TextInput {...register('name')} placeholder="Nome da liga" />
+              {errors.name && (
+                <ErrorMessage>{errors.name.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field $fullWidth>
@@ -342,6 +340,9 @@ export default function AdminAcademicLeagues() {
                 {...register('description')}
                 placeholder="Descreva a liga e seu propósito"
               />
+              {errors.description && (
+                <ErrorMessage>{errors.description.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field $fullWidth>

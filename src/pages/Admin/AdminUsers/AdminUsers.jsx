@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import {
   FiPlus,
   FiRefreshCw,
@@ -12,6 +14,11 @@ import { useSearchParams } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
+import {
+  adminUserDefaultValues,
+  adminUserSchema,
+  buildAdminUserErrorMessage,
+} from './utils';
 import { ConfirmDialog } from '../../../components/common';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
 import {
@@ -34,7 +41,6 @@ import {
   notifyWarning,
 } from '../../../utils/toast';
 import {
-  buildRequestErrorMessage,
   filterBySearch,
   formatRole,
   isSameId,
@@ -50,6 +56,7 @@ import {
   EntityList,
   EntityMeta,
   EntityTitle,
+  ErrorMessage,
   Field,
   FormCard,
   FormGrid,
@@ -68,7 +75,6 @@ import {
   SelectInput,
   TextInput,
 } from '../Styles';
-import { adminUserDefaultValues, useAdminUserForm } from './useAdminUserForm';
 
 export default function AdminUsers() {
   const theme = useTheme();
@@ -116,7 +122,10 @@ export default function AdminUsers() {
     setValue,
     getValues,
     formState: { errors },
-  } = useAdminUserForm();
+  } = useForm({
+    resolver: zodResolver(adminUserSchema),
+    defaultValues: adminUserDefaultValues,
+  });
 
   const membershipUniversity = watch('membershipUniversity');
   const academicLeague = watch('academicLeague');
@@ -347,9 +356,7 @@ export default function AdminUsers() {
       setSelectedMembershipId(normalizeId(createdMembership?._id));
       notifySuccess('Vinculo criado com sucesso');
     } catch (err) {
-      notifyError(
-        buildRequestErrorMessage(err, 'Nao foi possivel criar o vinculo'),
-      );
+      notifyError(buildAdminUserErrorMessage(err));
     }
   };
 
@@ -363,9 +370,7 @@ export default function AdminUsers() {
       setIsDeleteMembershipConfirmOpen(false);
       notifySuccess('Vinculo removido com sucesso');
     } catch (err) {
-      notifyError(
-        buildRequestErrorMessage(err, 'Nao foi possivel remover o vinculo'),
-      );
+      notifyError(buildAdminUserErrorMessage(err));
     }
   };
 
@@ -379,9 +384,7 @@ export default function AdminUsers() {
       setIsDeleteUserConfirmOpen(false);
       notifySuccess('Usuario removido com sucesso');
     } catch (err) {
-      notifyError(
-        buildRequestErrorMessage(err, 'Nao foi possivel remover o usuario'),
-      );
+      notifyError(buildAdminUserErrorMessage(err));
     }
   };
 
@@ -456,9 +459,7 @@ export default function AdminUsers() {
       setSelectedUserId(normalizeId(createdUser._id));
       notifySuccess('Usuario criado com sucesso');
     } catch (err) {
-      notifyError(
-        buildRequestErrorMessage(err, 'Nao foi possivel salvar o usuario'),
-      );
+      notifyError(buildAdminUserErrorMessage(err));
     }
   });
 
@@ -586,6 +587,9 @@ export default function AdminUsers() {
                 <FiUser /> Nome
               </Label>
               <TextInput {...register('name')} placeholder="Nome do usuario" />
+              {errors.name && (
+                <ErrorMessage>{errors.name.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field $fullWidth>
@@ -595,6 +599,9 @@ export default function AdminUsers() {
                 {...register('email')}
                 placeholder="E-mail do usuario"
               />
+              {errors.email && (
+                <ErrorMessage>{errors.email.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field>
@@ -604,6 +611,9 @@ export default function AdminUsers() {
                 <option value="manager">Gestor</option>
                 <option value="league-member">Membro de liga</option>
               </SelectInput>
+              {errors.globalRole && (
+                <ErrorMessage>{errors.globalRole.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field>
@@ -643,6 +653,9 @@ export default function AdminUsers() {
                 <option value="true">Sim</option>
                 <option value="false">Nao</option>
               </SelectInput>
+              {errors.emailVerified && (
+                <ErrorMessage>{errors.emailVerified.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field>
@@ -651,6 +664,9 @@ export default function AdminUsers() {
                 {...register('role')}
                 placeholder="Ex.: presidente, membro..."
               />
+              {errors.role && (
+                <ErrorMessage>{errors.role.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field>
@@ -666,6 +682,11 @@ export default function AdminUsers() {
                   </option>
                 ))}
               </SelectInput>
+              {errors.membershipUniversity && (
+                <ErrorMessage>
+                  {errors.membershipUniversity.message}
+                </ErrorMessage>
+              )}
             </Field>
 
             <Field>
@@ -678,6 +699,9 @@ export default function AdminUsers() {
                   </option>
                 ))}
               </SelectInput>
+              {errors.academicLeague && (
+                <ErrorMessage>{errors.academicLeague.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field>
@@ -690,6 +714,9 @@ export default function AdminUsers() {
                   </option>
                 ))}
               </SelectInput>
+              {errors.squad && (
+                <ErrorMessage>{errors.squad.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field>
@@ -698,6 +725,9 @@ export default function AdminUsers() {
                 <option value="true">Sim</option>
                 <option value="false">Nao</option>
               </SelectInput>
+              {errors.isActive && (
+                <ErrorMessage>{errors.isActive.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field $fullWidth>

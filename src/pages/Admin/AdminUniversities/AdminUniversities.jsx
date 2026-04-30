@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import {
   FiPlus,
   FiRefreshCw,
@@ -11,6 +13,11 @@ import { LuBuilding } from 'react-icons/lu';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
+import {
+  adminUniversityDefaultValues,
+  adminUniversitySchema,
+  buildAdminUniversityErrorMessage,
+} from './utils';
 import { ConfirmDialog } from '../../../components/common';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
 import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
@@ -25,12 +32,7 @@ import {
   notifySuccess,
   notifyWarning,
 } from '../../../utils/toast';
-import {
-  buildRequestErrorMessage,
-  filterBySearch,
-  isSameId,
-  normalizeId,
-} from '../../Manager/utils';
+import { filterBySearch, isSameId, normalizeId } from '../../Manager/utils';
 import {
   ActionButton,
   ActionRow,
@@ -41,6 +43,7 @@ import {
   EntityList,
   EntityMeta,
   EntityTitle,
+  ErrorMessage,
   Field,
   FormCard,
   FormGrid,
@@ -58,10 +61,6 @@ import {
   SectionTitle,
   TextInput,
 } from '../Styles';
-import {
-  adminUniversityDefaultValues,
-  useAdminUniversityForm,
-} from './useAdminUniversityForm';
 
 export default function AdminUniversities() {
   const theme = useTheme();
@@ -88,7 +87,10 @@ export default function AdminUniversities() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useAdminUniversityForm();
+  } = useForm({
+    resolver: zodResolver(adminUniversitySchema),
+    defaultValues: adminUniversityDefaultValues,
+  });
 
   const filteredUniversities = useMemo(
     () =>
@@ -190,9 +192,7 @@ export default function AdminUniversities() {
 
       handleCreateNew();
     } catch (err) {
-      notifyError(
-        buildRequestErrorMessage(err, 'Nao foi possivel salvar a universidade'),
-      );
+      notifyError(buildAdminUniversityErrorMessage(err));
     }
   });
 
@@ -219,12 +219,7 @@ export default function AdminUniversities() {
       handleCreateNew();
       setIsDeleteConfirmOpen(false);
     } catch (err) {
-      notifyError(
-        buildRequestErrorMessage(
-          err,
-          'Nao foi possivel remover a universidade',
-        ),
-      );
+      notifyError(buildAdminUniversityErrorMessage(err));
     }
   };
 
@@ -327,6 +322,9 @@ export default function AdminUniversities() {
                 {...register('name')}
                 placeholder="Nome da universidade"
               />
+              {errors.name && (
+                <ErrorMessage>{errors.name.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field $fullWidth>
@@ -335,6 +333,9 @@ export default function AdminUniversities() {
                 {...register('street')}
                 placeholder="Rua, avenida ou campus"
               />
+              {errors.street && (
+                <ErrorMessage>{errors.street.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field>
@@ -344,6 +345,9 @@ export default function AdminUniversities() {
                 {...register('number')}
                 placeholder="Numero"
               />
+              {errors.number && (
+                <ErrorMessage>{errors.number.message}</ErrorMessage>
+              )}
             </Field>
 
             <Field>
