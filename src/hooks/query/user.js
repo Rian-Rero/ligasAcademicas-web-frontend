@@ -8,6 +8,7 @@ import {
   getUserById,
   getUsers,
   redefinePassword,
+  changeUserPassword,
   resetUserPasswordByManagement,
   updateUser,
   updateUserByManagement,
@@ -144,6 +145,17 @@ export function useResetUserPasswordByManagement({
 } = {}) {
   return useMutation({
     mutationFn: resetUserPasswordByManagement,
+    onSuccess,
+    onError,
+  });
+}
+
+export function useChangeUserPassword({
+  onSuccess = () => {},
+  onError = (err) => console.log(err),
+} = {}) {
+  return useMutation({
+    mutationFn: changeUserPassword,
     onSuccess,
     onError,
   });

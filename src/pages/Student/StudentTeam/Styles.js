@@ -140,7 +140,7 @@ export const SummaryCard = styled.div`
 export const TeamList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 1rem;
   max-height: 30rem;
   overflow-y: auto;
   padding-right: 0.4rem;
@@ -160,9 +160,13 @@ export const TeamMember = styled.div`
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0);
+  background:
+    linear-gradient(rgb(26, 49, 104), rgba(18, 22, 31, 1)) padding-box,
+    linear-gradient(135deg, #008cff 0%, #f6a04f 100%) border-box;
   color: #fff;
-  font-size: 1.4rem;
+  font-size: 1.7rem;
+  border: 1px solid transparent;
+  border-radius: 1.2rem;
 `;
 
 export const TeamAvatar = styled.div`
@@ -178,13 +182,15 @@ export const TeamAvatar = styled.div`
 `;
 
 export const ViewMemberProfileButton = styled.button`
+  width: 15rem;
+  height: 4rem;
   margin-left: auto;
   background: linear-gradient(135deg, #196481, #4ebec6);
   border: none;
-  border-radius: 0.6rem;
+  border-radius: 999px;
   padding: 0.5rem 1rem;
   color: #fff;
-  font-size: 0.9rem;
+  font-size: 1.4rem;
   cursor: pointer;
   transition: all 0.3s ease;
 
