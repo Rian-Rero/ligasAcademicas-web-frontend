@@ -311,3 +311,48 @@ export const ActionButton = styled.button`
     transform: none;
   }
 `;
+
+export const MembershipsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+`;
+
+export const MembershipItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.8rem 1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+`;
+
+export const MembershipMeta = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.15rem;
+`;
+
+export const MembershipActions = styled.div`
+  display: flex;
+  gap: 0.5rem;
+`;
+
+export const SmallActionButton = styled.button`
+  min-height: 3.4rem;
+  padding: 0 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(120deg, #008cff, #2b66ff 58%, #0b9de8);
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+`;

@@ -74,6 +74,11 @@ import {
   SectionTitle,
   SelectInput,
   TextInput,
+  MembershipsList,
+  MembershipItem,
+  MembershipMeta,
+  MembershipActions,
+  SmallActionButton,
 } from '../Styles';
 
 export default function AdminUsers() {
@@ -616,15 +621,19 @@ export default function AdminUsers() {
               )}
             </Field>
 
-            <Field>
-              <Label>Vinculo selecionado</Label>
-              <SelectInput
-                value={selectedMembershipId}
-                onChange={(event) =>
-                  setSelectedMembershipId(event.target.value)
-                }
-              >
-                <option value="">Sem vinculo selecionado</option>
+            <Field $fullWidth>
+              <Label>Vínculos atuais</Label>
+              <MembershipsList>
+                {!selectedUser?._id && (
+                  <HelperText>
+                    Selecione um usuário para ver vínculos.
+                  </HelperText>
+                )}
+
+                {selectedUser?._id && selectedUserMemberships.length === 0 && (
+                  <EmptyState>Usuário não possui vínculos.</EmptyState>
+                )}
+
                 {selectedUserMemberships.map((membership) => {
                   const league = leagues.find((item) =>
                     isSameId(item._id, membership.academicLeague),
@@ -634,17 +643,59 @@ export default function AdminUsers() {
                   );
 
                   return (
-                    <option
-                      key={membership._id}
-                      value={normalizeId(membership._id)}
-                    >
-                      {league?.name || 'Liga'} -{' '}
-                      {squad?.name || 'Sem subequipe'} -{' '}
-                      {formatRole(membership.role)}
-                    </option>
+                    <MembershipItem key={membership._id}>
+                      <MembershipMeta>
+                        <strong>{league?.name || 'Liga'}</strong>
+                        <span>
+                          {squad?.name || 'Sem subequipe'} —{' '}
+                          {formatRole(membership.role)}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '1rem',
+                            color: 'rgba(255,255,255,0.6)',
+                          }}
+                        >
+                          {membership.isActive ? 'Ativo' : 'Inativo'}
+                        </span>
+                      </MembershipMeta>
+
+                      <MembershipActions>
+                        <SmallActionButton
+                          type="button"
+                          onClick={() =>
+                            setSelectedMembershipId(normalizeId(membership._id))
+                          }
+                        >
+                          Editar
+                        </SmallActionButton>
+
+                        <SmallActionButton
+                          type="button"
+                          onClick={async () => {
+                            const ok = window.confirm('Remover este vínculo?');
+                            if (!ok) return;
+                            try {
+                              await deleteMembership(membership._id);
+                              await handleRefresh();
+                              if (
+                                isSameId(selectedMembershipId, membership._id)
+                              ) {
+                                setSelectedMembershipId('');
+                              }
+                              notifySuccess('Vínculo removido');
+                            } catch (err) {
+                              notifyError(buildAdminUserErrorMessage(err));
+                            }
+                          }}
+                        >
+                          Remover
+                        </SmallActionButton>
+                      </MembershipActions>
+                    </MembershipItem>
                   );
                 })}
-              </SelectInput>
+              </MembershipsList>
             </Field>
 
             <Field>
