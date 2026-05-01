@@ -22,22 +22,24 @@ export const Header = styled.div`
 
 export const Title = styled.h2`
   margin: 0;
-  color: #1a1a1a;
+  color: #f3f4f7;
   font-size: 1.5rem;
 `;
 
 export const SearchBox = styled.input`
   padding: 0.75rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
   font-size: 1rem;
   width: 100%;
   max-width: 300px;
+  color: #f3f4f7;
+  background: rgba(255, 255, 255, 0.05);
 
   &:focus {
     outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: rgba(246, 160, 79, 0.7);
+    box-shadow: 0 0 0 3px rgba(246, 160, 79, 0.12);
   }
 
   @media (max-width: 768px) {
@@ -57,32 +59,45 @@ export const PermissionList = styled.div`
 
 export const PermissionCard = styled.div`
   padding: 1.5rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  background: white;
-  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  border-radius: 1.35rem;
+  background:
+    linear-gradient(160deg, rgba(11, 22, 42, 0.95), rgba(8, 18, 34, 0.95))
+      padding-box,
+    linear-gradient(120deg, rgba(47, 143, 255, 0.42), rgba(246, 160, 79, 0.32))
+      border-box;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    filter 0.3s ease;
   cursor: pointer;
+  box-shadow:
+    0 1rem 2rem rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
   &:hover {
-    border-color: #6366f1;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+    transform: translateY(-3px);
+    filter: brightness(1.04);
   }
 
   &.selected {
-    border-color: #6366f1;
-    background: #f0f4ff;
+    border-color: rgba(125, 194, 255, 0.7);
+    box-shadow:
+      0 1rem 2rem rgba(0, 0, 0, 0.34),
+      0 0 0 1px rgba(125, 194, 255, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 `;
 
 export const PermissionTitle = styled.h3`
   margin: 0 0 0.5rem 0;
-  color: #1a1a1a;
+  color: #ffffff;
   font-size: 1.1rem;
 `;
 
 export const PermissionKey = styled.p`
   margin: 0.25rem 0;
-  color: #6366f1;
+  color: #7dc2ff;
   font-family: monospace;
   font-size: 0.9rem;
   font-weight: 500;
@@ -90,13 +105,13 @@ export const PermissionKey = styled.p`
 
 export const PermissionModule = styled.p`
   margin: 0.25rem 0;
-  color: #999;
+  color: rgba(241, 245, 255, 0.68);
   font-size: 0.9rem;
 `;
 
 export const PermissionDescription = styled.p`
   margin: 0.75rem 0 0 0;
-  color: #666;
+  color: rgba(241, 245, 255, 0.78);
   font-size: 0.9rem;
   line-height: 1.4;
 `;
@@ -104,7 +119,7 @@ export const PermissionDescription = styled.p`
 export const EmptyState = styled.div`
   text-align: center;
   padding: 3rem 1rem;
-  color: #999;
+  color: rgba(241, 245, 255, 0.68);
 
   svg {
     width: 48px;

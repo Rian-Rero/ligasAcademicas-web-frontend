@@ -22,22 +22,24 @@ export const Header = styled.div`
 
 export const Title = styled.h2`
   margin: 0;
-  color: #1a1a1a;
+  color: #f3f4f7;
   font-size: 1.5rem;
 `;
 
 export const SearchBox = styled.input`
   padding: 0.75rem 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
   font-size: 1rem;
   width: 100%;
   max-width: 300px;
+  color: #f3f4f7;
+  background: rgba(255, 255, 255, 0.05);
 
   &:focus {
     outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: rgba(246, 160, 79, 0.7);
+    box-shadow: 0 0 0 3px rgba(246, 160, 79, 0.12);
   }
 
   @media (max-width: 768px) {
@@ -56,23 +58,33 @@ export const RoleList = styled.div`
 `;
 
 export const RoleCard = styled.div`
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  background: white;
+  border-radius: 1.35rem;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(160deg, rgba(11, 22, 42, 0.95), rgba(8, 18, 34, 0.95))
+      padding-box,
+    linear-gradient(120deg, rgba(47, 143, 255, 0.42), rgba(246, 160, 79, 0.32))
+      border-box;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    filter 0.3s ease;
   display: flex;
   flex-direction: column;
+  box-shadow:
+    0 1rem 2rem rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
   &:hover {
-    border-color: #6366f1;
-    box-shadow: 0 8px 16px rgba(99, 102, 241, 0.15);
+    transform: translateY(-3px);
+    filter: brightness(1.04);
   }
 `;
 
 export const RoleHeader = styled.div`
   padding: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -92,13 +104,13 @@ export const RoleInfo = styled.div`
 
 export const RoleTitle = styled.h3`
   margin: 0;
-  color: #1a1a1a;
+  color: #ffffff;
   font-size: 1.1rem;
 `;
 
 export const RoleKey = styled.p`
   margin: 0.25rem 0 0 0;
-  color: #999;
+  color: rgba(241, 245, 255, 0.68);
   font-size: 0.9rem;
   font-family: monospace;
 `;
@@ -113,7 +125,7 @@ export const RoleBody = styled.div`
 
 export const RoleDescription = styled.p`
   margin: 0;
-  color: #666;
+  color: rgba(241, 245, 255, 0.78);
   font-size: 0.95rem;
   line-height: 1.4;
 `;
@@ -123,13 +135,14 @@ export const PermissionsCount = styled.div`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem;
-  background: #f5f5f5;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
   font-size: 0.9rem;
-  color: #666;
+  color: rgba(241, 245, 255, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 
   strong {
-    color: #6366f1;
+    color: #7dc2ff;
   }
 `;
 
@@ -143,7 +156,7 @@ export const Button = styled.button`
   flex: 1;
   padding: 0.75rem 1rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -155,7 +168,7 @@ export const Button = styled.button`
 `;
 
 export const EditButton = styled(Button)`
-  background: #6366f1;
+  background: linear-gradient(120deg, #2f8fff, #4f8ef2);
   color: white;
 
   &:hover {
@@ -164,18 +177,18 @@ export const EditButton = styled(Button)`
 `;
 
 export const DeleteButton = styled(Button)`
-  background: #fee2e2;
-  color: #dc2626;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffb3b3;
 
   &:hover {
-    background: #fecaca;
+    background: rgba(255, 255, 255, 0.14);
   }
 `;
 
 export const EmptyState = styled.div`
   text-align: center;
   padding: 3rem 1rem;
-  color: #999;
+  color: rgba(241, 245, 255, 0.68);
   grid-column: 1 / -1;
 
   p {
