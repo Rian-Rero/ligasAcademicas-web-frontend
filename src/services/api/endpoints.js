@@ -337,3 +337,167 @@ export const markAttendance = async ({ _id, hasAttended = true }) => {
 
   return data;
 };
+
+// Permissions
+export const getPermissions = async (filters = {}) => {
+  const { data } = await api.get('/permissions/permissions', {
+    params: filters,
+  });
+
+  return data;
+};
+
+export const getPermissionById = async (permissionId) => {
+  const { data } = await api.get(`/permissions/permissions/${permissionId}`);
+
+  return data;
+};
+
+export const createPermission = async (permissionData) => {
+  const { data } = await api.post('/permissions/permissions', permissionData);
+
+  return data;
+};
+
+export const updatePermission = async ({
+  permissionId,
+  data: permissionData,
+}) => {
+  const { data } = await api.patch(
+    `/permissions/permissions/${permissionId}`,
+    permissionData,
+  );
+
+  return data;
+};
+
+export const deletePermission = async (permissionId) => {
+  const { data } = await api.delete(`/permissions/permissions/${permissionId}`);
+
+  return data;
+};
+
+// Roles
+export const getRoles = async (filters = {}) => {
+  const { data } = await api.get('/permissions/roles', { params: filters });
+
+  return data;
+};
+
+export const getRoleById = async (roleId) => {
+  const { data } = await api.get(`/permissions/roles/${roleId}`);
+
+  return data;
+};
+
+export const createRole = async (roleData) => {
+  const { data } = await api.post('/permissions/roles', roleData);
+
+  return data;
+};
+
+export const updateRole = async ({ roleId, data: roleData }) => {
+  const { data } = await api.patch(`/permissions/roles/${roleId}`, roleData);
+
+  return data;
+};
+
+export const deleteRole = async (roleId) => {
+  const { data } = await api.delete(`/permissions/roles/${roleId}`);
+
+  return data;
+};
+
+export const addPermissionToRole = async ({ roleId, permissionId }) => {
+  const { data } = await api.post(`/permissions/roles/${roleId}/permissions`, {
+    permissionId,
+  });
+
+  return data;
+};
+
+export const removePermissionFromRole = async ({ roleId, permissionId }) => {
+  const { data } = await api.delete(
+    `/permissions/roles/${roleId}/permissions`,
+    { data: { permissionId } },
+  );
+
+  return data;
+};
+
+// User permissions
+export const getUserPermissions = async (userId, academicLeague = null) => {
+  const params = {};
+
+  if (academicLeague) {
+    params.academicLeague = academicLeague;
+  }
+
+  const { data } = await api.get(`/permissions/users/${userId}/permissions`, {
+    params,
+  });
+
+  return data;
+};
+
+export const updateUserPermissions = async ({ userId, data: userData }) => {
+  const { data } = await api.patch(
+    `/permissions/users/${userId}/permissions`,
+    userData,
+  );
+
+  return data;
+};
+
+export const addRoleToUser = async ({
+  userId,
+  roleId,
+  academicLeague = null,
+}) => {
+  const { data } = await api.post(`/permissions/users/${userId}/roles`, {
+    roleId,
+    academicLeague,
+  });
+
+  return data;
+};
+
+export const removeRoleFromUser = async ({
+  userId,
+  roleId,
+  academicLeague = null,
+}) => {
+  const { data } = await api.delete(`/permissions/users/${userId}/roles`, {
+    data: { roleId, academicLeague },
+  });
+
+  return data;
+};
+
+export const addPermissionToUser = async ({
+  userId,
+  permissionId,
+  academicLeague = null,
+}) => {
+  const { data } = await api.post(
+    `/permissions/users/${userId}/permissions-direct`,
+    { permissionId, academicLeague },
+  );
+
+  return data;
+};
+
+export const removePermissionFromUser = async ({
+  userId,
+  permissionId,
+  academicLeague = null,
+}) => {
+  const { data } = await api.delete(
+    `/permissions/users/${userId}/permissions-direct`,
+    {
+      data: { permissionId, academicLeague },
+    },
+  );
+
+  return data;
+};

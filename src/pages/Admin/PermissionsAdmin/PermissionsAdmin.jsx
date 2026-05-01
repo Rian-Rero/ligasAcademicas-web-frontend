@@ -1,169 +1,60 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Plus } from 'lucide-react';
-import styled from 'styled-components';
 
-import AddToast from '../../../components/common/AddToast/AddToast';
+import {
+  Container,
+  ContentArea,
+  CreateButton,
+  InfoBox,
+  PageTitle,
+  PermissionCard,
+  PermissionDescription,
+  PermissionKey,
+  PermissionsGrid,
+  PermissionModule,
+  PermissionTitle,
+  SectionHeader,
+  Tab,
+  TabContainer,
+} from './Styles';
+import { ConfirmDialog } from '../../../components/common';
 import { EditRoleModal } from '../../../components/features/EditRoleModal/EditRoleModal';
 import { RolesList } from '../../../components/features/RolesList/RolesList';
+import { useGetPermissions } from '../../../hooks/query/permissions';
 import {
-  useGetRoles,
-  useCreateRole,
-  useUpdateRole,
   useDeleteRole,
-  useGetPermissions,
-} from '../../../hooks/query/permissions';
+  useCreateRole,
+  useGetRoles,
+  useUpdateRole,
+} from '../../../hooks/query/roles';
+import { notifyError, notifySuccess } from '../../../utils/toast';
 
-const Container = styled.div`
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-`;
-
-const PageTitle = styled.h1`
-  margin: 0 0 2rem 0;
-  color: #1a1a1a;
-  font-size: 2rem;
-
-  @media (max-width: 768px) {
-    font-size: 1.5rem;
-  }
-`;
-
-const TabContainer = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #e0e0e0;
-  overflow-x: auto;
-
-  @media (max-width: 768px) {
-    gap: 0.5rem;
-  }
-`;
-
-const Tab = styled.button`
-  padding: 1rem 1.5rem;
-  background: none;
-  border: none;
-  border-bottom: 3px solid transparent;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #999;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-
-  &:hover {
-    color: #6366f1;
-  }
-
-  &.active {
-    color: #6366f1;
-    border-bottom-color: #6366f1;
-  }
-
-  @media (max-width: 768px) {
-    padding: 0.75rem 1rem;
-    font-size: 0.9rem;
-  }
-`;
-
-const ContentArea = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-`;
-
-const SectionHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-`;
-
-const CreateButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: #6366f1;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: #4f46e5;
-    transform: translateY(-2px);
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    justify-content: center;
-  }
-`;
-
-const InfoBox = styled.div`
-  padding: 1.5rem;
-  background: #f0f4ff;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  color: #333;
-  line-height: 1.6;
-
-  h3 {
-    margin-top: 0;
-    color: #6366f1;
-  }
-
-  ul {
-    margin: 1rem 0;
-    padding-left: 1.5rem;
-  }
-
-  li {
-    margin-bottom: 0.5rem;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 0.95rem;
-  }
-`;
-
-/**
- * Página de Gerenciamento de Permissões
- */
 export default function PermissionsAdmin() {
   const [activeTab, setActiveTab] = useState('roles');
   const [editingRole, setEditingRole] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [roleToDelete, setRoleToDelete] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Queries
   const { data: roles = [], isLoading: rolesLoading } = useGetRoles({
-    isGlobal: true,
+    filters: { isGlobal: true },
   });
   const { data: permissions = [], isLoading: permissionsLoading } =
     useGetPermissions();
 
-  // Mutations
   const createRole = useCreateRole();
   const updateRole = useUpdateRole();
   const deleteRole = useDeleteRole();
+
+  const permissionsByModule = useMemo(() => {
+    return permissions.reduce((accumulator, permission) => {
+      const key = permission.module || 'outros';
+      if (!accumulator[key]) accumulator[key] = [];
+      accumulator[key].push(permission);
+      return accumulator;
+    }, {});
+  }, [permissions]);
 
   const handleEditRole = (role) => {
     setEditingRole(role);
@@ -177,34 +68,40 @@ export default function PermissionsAdmin() {
           roleId: editingRole._id,
           data: formData,
         });
-        AddToast({ type: 'success', message: 'Papel atualizado com sucesso!' });
+        notifySuccess('Papel atualizado com sucesso!');
       } else {
         await createRole.mutateAsync(formData);
-        AddToast({ type: 'success', message: 'Papel criado com sucesso!' });
+        notifySuccess('Papel criado com sucesso!');
       }
       setShowEditModal(false);
       setEditingRole(null);
     } catch (error) {
-      AddToast({
-        type: 'error',
-        message: error.response?.data?.message || 'Erro ao salvar papel',
-      });
+      notifyError(error.response?.data?.message || 'Erro ao salvar papel');
     }
   };
 
-  const handleDeleteRole = async (roleId) => {
-    if (window.confirm('Tem certeza que deseja deletar este papel?')) {
-      try {
-        await deleteRole.mutateAsync(roleId);
-        AddToast({ type: 'success', message: 'Papel deletado com sucesso!' });
-      } catch (error) {
-        AddToast({
-          type: 'error',
-          message: error.response?.data?.message || 'Erro ao deletar papel',
-        });
-      }
+  const handleRequestDeleteRole = (role) => {
+    setRoleToDelete(role);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDeleteRole = async () => {
+    if (!roleToDelete?._id) return;
+
+    try {
+      await deleteRole.mutateAsync(roleToDelete._id);
+      notifySuccess('Papel deletado com sucesso!');
+    } catch (error) {
+      notifyError(error.response?.data?.message || 'Erro ao deletar papel');
+    } finally {
+      setShowDeleteConfirm(false);
+      setRoleToDelete(null);
     }
   };
+
+  const deleteRoleDescription = roleToDelete
+    ? `Tem certeza que deseja deletar o papel ${roleToDelete.name}?`
+    : 'Tem certeza que deseja deletar este papel?';
 
   let permissionsContent;
 
@@ -214,60 +111,24 @@ export default function PermissionsAdmin() {
     permissionsContent = <p>Nenhuma permissão disponível</p>;
   } else {
     permissionsContent = (
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '1rem',
-        }}
-      >
-        {permissions.map((permission) => (
-          <div
-            key={permission._id}
-            style={{
-              padding: '1rem',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              background: 'white',
-            }}
-          >
-            <h4 style={{ margin: '0 0 0.5rem 0', color: '#1a1a1a' }}>
-              {permission.name}
-            </h4>
-            <p
-              style={{
-                margin: '0.25rem 0',
-                color: '#6366f1',
-                fontFamily: 'monospace',
-                fontSize: '0.85rem',
-              }}
-            >
-              {permission.key}
-            </p>
-            <p
-              style={{
-                margin: '0.25rem 0',
-                color: '#999',
-                fontSize: '0.85rem',
-              }}
-            >
-              Módulo: {permission.module}
-            </p>
-            {permission.description && (
-              <p
-                style={{
-                  margin: '0.75rem 0 0 0',
-                  color: '#666',
-                  fontSize: '0.9rem',
-                  lineHeight: '1.4',
-                }}
-              >
-                {permission.description}
-              </p>
-            )}
-          </div>
+      <PermissionsGrid>
+        {Object.entries(permissionsByModule).map(([module, list]) => (
+          <PermissionCard key={module}>
+            <PermissionTitle>{module}</PermissionTitle>
+            {list.map((permission) => (
+              <div key={permission._id}>
+                <PermissionKey>{permission.key}</PermissionKey>
+                {permission.description && (
+                  <PermissionDescription>
+                    {permission.description}
+                  </PermissionDescription>
+                )}
+                <PermissionModule>{permission.name}</PermissionModule>
+              </div>
+            ))}
+          </PermissionCard>
         ))}
-      </div>
+      </PermissionsGrid>
     );
   }
 
@@ -323,7 +184,7 @@ export default function PermissionsAdmin() {
               roles={roles}
               isLoading={rolesLoading}
               onEdit={handleEditRole}
-              onDelete={handleDeleteRole}
+              onDelete={handleRequestDeleteRole}
             />
           </>
         )}
@@ -354,19 +215,19 @@ export default function PermissionsAdmin() {
             </p>
             <ul>
               <li>
-                <strong>Papéis:</strong> Agrupamentos de permissões que definem
+                <strong>Papéis:</strong> agrupamentos de permissões que definem
                 o que um usuário pode fazer
               </li>
               <li>
-                <strong>Permissões:</strong> Ações específicas como criar,
+                <strong>Permissões:</strong> ações específicas como criar,
                 editar ou deletar recursos
               </li>
               <li>
-                <strong>Admin:</strong> Tem acesso irrestrito a todas as
+                <strong>Admin:</strong> tem acesso irrestrito a todas as
                 funcionalidades
               </li>
               <li>
-                <strong>Customização:</strong> Admin pode conceder papéis a
+                <strong>Customização:</strong> admin pode conceder papéis a
                 qualquer usuário dinamicamente
               </li>
             </ul>
@@ -374,11 +235,11 @@ export default function PermissionsAdmin() {
             <h3>Papéis do Sistema (pré-configurados)</h3>
             <ul>
               <li>
-                <strong>Administrador:</strong> Acesso total ao sistema e
+                <strong>Administrador:</strong> acesso total ao sistema e
                 gerenciamento de permissões
               </li>
               <li>
-                <strong>Gerenciador:</strong> Pode gerenciar eventos, presença,
+                <strong>Gerenciador:</strong> pode gerenciar eventos, presença,
                 squads e membros da liga
               </li>
             </ul>
@@ -387,7 +248,7 @@ export default function PermissionsAdmin() {
             <ul>
               <li>Use permissões granulares para maior controle</li>
               <li>Agrupe permissões relacionadas em um único papel</li>
-              <li>Revise regularmente quem tem acesso à quais recursos</li>
+              <li>Revise regularmente quem tem acesso a quais recursos</li>
               <li>
                 Mantenha o princípio do menor privilégio (least privilege)
               </li>
@@ -396,7 +257,6 @@ export default function PermissionsAdmin() {
         )}
       </ContentArea>
 
-      {/* Modals */}
       <EditRoleModal
         role={editingRole}
         isOpen={showEditModal}
@@ -406,6 +266,20 @@ export default function PermissionsAdmin() {
         }}
         onSave={handleSaveRole}
         isLoading={createRole.isPending || updateRole.isPending}
+      />
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Remover papel"
+        description={deleteRoleDescription}
+        confirmLabel="Remover"
+        cancelLabel="Cancelar"
+        onConfirm={handleConfirmDeleteRole}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setRoleToDelete(null);
+        }}
+        isLoading={deleteRole.isPending}
       />
     </Container>
   );
