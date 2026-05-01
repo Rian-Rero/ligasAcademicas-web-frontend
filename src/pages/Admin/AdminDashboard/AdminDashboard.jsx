@@ -1,13 +1,20 @@
 import { useMemo } from 'react';
 
-import { CgFileDocument } from 'react-icons/cg';
+import { BsBuildingAdd } from 'react-icons/bs';
 import { FiCalendar, FiUsers } from 'react-icons/fi';
-import { GrAddCircle } from 'react-icons/gr';
-import { TbBuildingCommunity, TbSchool, TbUsersGroup } from 'react-icons/tb';
+import { HiLink } from 'react-icons/hi';
+import { LiaUsersCogSolid } from 'react-icons/lia';
+import {
+  TbBuildingCommunity,
+  TbSchool,
+  TbUsersGroup,
+  TbCalendarPlus,
+} from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 
 import {
   BottomCard,
+  BottomShortcutBoxes,
   Box,
   Card,
   CardHeader,
@@ -28,6 +35,7 @@ import {
   ShortcutBox,
   ShortcutBoxes,
   TopCards,
+  FeaturedRightContent,
 } from './Styles';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
 import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
@@ -79,7 +87,7 @@ export default function AdminDashboard() {
     {
       label: 'Vínculos ativos',
       value: activeMemberships.length,
-      icon: <TbUsersGroup />,
+      icon: <HiLink />,
     },
   ];
 
@@ -120,28 +128,30 @@ export default function AdminDashboard() {
 
       <MiddleSection>
         <Box>
-          <SectionHeading>Visão geral da operação</SectionHeading>
+          <SectionHeading>Visão Geral da Operação</SectionHeading>
           <div>
             {highlights.map((item, index) => (
               <FeaturedTeamRow key={item.name}>
                 <FeaturedTeamName>{item.name}</FeaturedTeamName>
-                <FeaturedBars aria-hidden="true">
-                  {Array.from({ length: 9 }, (_, barIndex) => (
-                    <FeaturedBar
-                      key={`${item.name}-${barIndex}`}
-                      $active={barIndex <= index + 5}
-                      $index={barIndex}
-                    />
-                  ))}
-                </FeaturedBars>
-                <FeaturedTeamTotal>{index + 1}</FeaturedTeamTotal>
+                <FeaturedRightContent>
+                  <FeaturedBars aria-hidden="true">
+                    {Array.from({ length: 9 }, (_, barIndex) => (
+                      <FeaturedBar
+                        key={`${item.name}-${barIndex}`}
+                        $active={barIndex <= index + 5}
+                        $index={barIndex}
+                      />
+                    ))}
+                  </FeaturedBars>
+                  <FeaturedTeamTotal>{index + 1}</FeaturedTeamTotal>
+                </FeaturedRightContent>
               </FeaturedTeamRow>
             ))}
           </div>
         </Box>
 
         <FeaturedTeamsCard>
-          <FeaturedTeamsTitle>Acessos rápidos</FeaturedTeamsTitle>
+          <FeaturedTeamsTitle>Acessos Rápidos</FeaturedTeamsTitle>
           <ShortcutBoxes>
             <ShortcutBox
               type="button"
@@ -183,34 +193,34 @@ export default function AdminDashboard() {
       </MiddleSection>
 
       <BottomCard>
-        <SectionHeading>Próximas ações</SectionHeading>
-        <ShortcutBoxes>
+        <SectionHeading>Próximas Ações</SectionHeading>
+        <BottomShortcutBoxes>
           <ShortcutBox
             type="button"
             onClick={() => navigate('/admin/universidades')}
           >
-            <GrAddCircle />
-            Nova universidade
+            <BsBuildingAdd />
+            Nova Universidade
           </ShortcutBox>
           <ShortcutBox
             type="button"
             onClick={() => navigate('/admin/ligas-academicas')}
           >
-            <CgFileDocument />
-            Nova liga
+            <TbSchool />
+            Nova Liga
           </ShortcutBox>
           <ShortcutBox type="button" onClick={() => navigate('/admin/eventos')}>
-            <FiCalendar />
-            Criar evento
+            <TbCalendarPlus />
+            Criar Evento
           </ShortcutBox>
           <ShortcutBox
             type="button"
             onClick={() => navigate('/admin/usuários')}
           >
-            <TbUsersGroup />
-            Gerenciar usuários
+            <LiaUsersCogSolid />
+            Gerenciar Usuários
           </ShortcutBox>
-        </ShortcutBoxes>
+        </BottomShortcutBoxes>
       </BottomCard>
     </Content>
   );

@@ -409,7 +409,7 @@ export default function AdminUsers() {
 
   const handleAddMembership = async () => {
     if (!selectedUser?._id) {
-      notifyWarning('Selecione um usuario para criar um novo vinculo');
+      notifyWarning('Selecione um usuario para criar um novo vínculo');
       return;
     }
 
@@ -444,7 +444,7 @@ export default function AdminUsers() {
       await handleRefresh();
       setSelectedMembershipId('');
       setIsDeleteMembershipConfirmOpen(false);
-      notifySuccess('Vinculo removido com sucesso');
+      notifySuccess('vínculo removido com sucesso');
     } catch (err) {
       notifyError(buildAdminUserErrorMessage(err));
     }
@@ -547,7 +547,7 @@ export default function AdminUsers() {
           <HeaderTitle>GERENCIAMENTO DE USUARIOS</HeaderTitle>
           <HeaderSubtitle>
             Filtre por universidade e liga para editar o perfil do usuario, o
-            vinculo com a liga e o status de ativacao.
+            vínculo com a liga e o status de ativacao.
           </HeaderSubtitle>
         </div>
 
@@ -960,7 +960,7 @@ export default function AdminUsers() {
               onClick={() => setIsDeleteMembershipConfirmOpen(true)}
               disabled={isSaving || !selectedMembership?._id}
             >
-              <FiTrash2 /> Remover vinculo
+              <FiTrash2 /> Remover vínculo
             </ActionButton>
             <ActionButton
               type="button"
@@ -988,8 +988,8 @@ export default function AdminUsers() {
 
       <ConfirmDialog
         isOpen={isDeleteMembershipConfirmOpen}
-        title="Remover vinculo"
-        description="Essa acao remove o vinculo selecionado do usuario com a liga e subequipe."
+        title="Remover vínculo"
+        description="Essa acao remove o vínculo selecionado do usuario com a liga e subequipe."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDeleteMembership}
