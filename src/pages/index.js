@@ -20,3 +20,4 @@ export { default as AdminAcademicLeagues } from './Admin/AdminAcademicLeagues/Ad
 export { default as AdminSquads } from './Admin/AdminSquads/AdminSquads';
 export { default as AdminUsers } from './Admin/AdminUsers/AdminUsers';
 export { default as AdminEvents } from './Admin/AdminEvents/AdminEvents';
+export { default as PermissionsAdmin } from './Admin/PermissionsAdmin/PermissionsAdmin';
