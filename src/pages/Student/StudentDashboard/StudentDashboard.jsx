@@ -47,6 +47,7 @@ import { useGetSquads } from '../../../hooks/query/squad';
 import { useGetUniversities } from '../../../hooks/query/university';
 import { useGetUsersByIds } from '../../../hooks/query/user';
 import useAuthStore from '../../../stores/auth';
+import { resolveMediaUrl } from '../../../utils/media';
 
 const fallbackAgenda = [
   {
@@ -311,7 +312,7 @@ export default function StudentDashboard() {
             {team.map((member) => (
               <TeamMember key={member.id}>
                 <TeamAvatar
-                  $imageUrl={member?.imageURL}
+                  $imageUrl={resolveMediaUrl(member?.imageURL)}
                   role="img"
                   aria-label={`Foto de ${member.name}`}
                 />

@@ -16,6 +16,7 @@ import { useGetLeagueMemberships } from '../../hooks/query/leagueMembership';
 import { useLogout } from '../../hooks/query/sessions';
 import { useGetUniversities } from '../../hooks/query/university';
 import useAuthStore from '../../stores/auth';
+import { resolveMediaUrl } from '../../utils/media';
 
 const navigation = [
   {
@@ -80,7 +81,7 @@ export default function StudentSideBarLayout() {
       <SideBar>
         <ProfileCard>
           <Avatar
-            $imageUrl={authUser?.imageURL}
+            $imageUrl={resolveMediaUrl(authUser?.imageURL)}
             role="img"
             aria-label={
               authUser?.name ? `Foto de ${authUser.name}` : 'Foto do aluno'

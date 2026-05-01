@@ -11,6 +11,7 @@ import {
   AvatarMenuContent,
   AvatarMenuItem,
 } from './Styles';
+import { resolveMediaUrl } from '../../../../utils/media';
 
 export default function AvatarMenu({
   imageUrl,
@@ -68,12 +69,12 @@ export default function AvatarMenu({
       <AvatarMenuButton
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        $imageUrl={imageUrl}
+        $imageUrl={resolveMediaUrl(imageUrl)}
         aria-expanded={isOpen}
         aria-haspopup="menu"
         aria-label="Menu do usuário"
       >
-        {!imageUrl && initials}
+        {!resolveMediaUrl(imageUrl) && initials}
       </AvatarMenuButton>
 
       {isOpen && (

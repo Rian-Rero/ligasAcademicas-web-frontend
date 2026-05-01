@@ -43,6 +43,7 @@ import { useGetSquads } from '../../../hooks/query/squad';
 import { useGetUniversities } from '../../../hooks/query/university';
 import { useGetUsersByIds } from '../../../hooks/query/user';
 import useAuthStore from '../../../stores/auth';
+import { resolveMediaUrl } from '../../../utils/media';
 import { notifyError, notifySuccess } from '../../../utils/toast';
 
 const fallbackTeam = [];
@@ -300,7 +301,7 @@ export default function StudentTeam() {
           {filteredTeam.map((member) => (
             <TeamMember key={member.id}>
               <TeamAvatar
-                $imageUrl={member?.imageURL}
+                $imageUrl={resolveMediaUrl(member?.imageURL)}
                 role="img"
                 aria-label={`Foto de ${member.name}`}
               />
@@ -342,7 +343,7 @@ export default function StudentTeam() {
 
             <MemberModalBody>
               <MemberModalAvatar
-                $imageUrl={selectedMember.user?.imageURL}
+                $imageUrl={resolveMediaUrl(selectedMember.user?.imageURL)}
                 role="img"
                 aria-label={
                   selectedMember.user?.name
@@ -350,7 +351,7 @@ export default function StudentTeam() {
                     : 'Foto do membro'
                 }
               >
-                {!selectedMember.user?.imageURL &&
+                {!resolveMediaUrl(selectedMember.user?.imageURL) &&
                   getInitials(selectedMember.user?.name)}
               </MemberModalAvatar>
 

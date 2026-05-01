@@ -63,6 +63,7 @@ import {
 } from '../../hooks/query/user';
 import { getUserById } from '../../services/api/endpoints';
 import useAuthStore from '../../stores/auth';
+import { resolveMediaUrl } from '../../utils/media';
 import { notifyError, notifySuccess } from '../../utils/toast';
 
 function formatRole(role) {
@@ -342,14 +343,16 @@ export default function Profile() {
 
           <IdentityBlock>
             <Avatar
-              $imageUrl={profilePhotoPreviewUrl || authUser?.imageURL}
+              $imageUrl={
+                profilePhotoPreviewUrl || resolveMediaUrl(authUser?.imageURL)
+              }
               role="img"
               aria-label={
                 authUser?.name ? `Foto de ${authUser.name}` : 'Foto do usuário'
               }
             >
               {!profilePhotoPreviewUrl &&
-                !authUser?.imageURL &&
+                !resolveMediaUrl(authUser?.imageURL) &&
                 getInitials(authUser?.name)}
             </Avatar>
 
