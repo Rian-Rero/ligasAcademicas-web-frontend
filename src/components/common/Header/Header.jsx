@@ -101,7 +101,6 @@ export default function Header() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const authUser = useAuthStore((state) => state.auth?.user);
-  console.log('oi', resolveMediaUrl(authUser?.imageURL));
 
   const { mutate: logout } = useLogout({
     onSettled: () => navigate('/login', { replace: true }),
