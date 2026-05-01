@@ -4,6 +4,7 @@ import {
   addPermissionToUser,
   addRoleToUser,
   getUserPermissions,
+  getUserPermissionDetails,
   removePermissionFromUser,
   removeRoleFromUser,
   updateUserPermissions,
@@ -26,6 +27,23 @@ export function useGetUserPermissions({
   });
 }
 
+export function useGetUserPermissionDetails({
+  userId,
+  academicLeague = null,
+  enabled = true,
+  queryKey = ['userPermissionDetails', userId, academicLeague],
+  onSuccess = () => {},
+  onError = () => {},
+} = {}) {
+  return useQuery({
+    queryKey,
+    queryFn: () => getUserPermissionDetails(userId, academicLeague),
+    enabled: Boolean(userId) && enabled,
+    onSuccess,
+    onError,
+  });
+}
+
 export function useUpdateUserPermissions({
   onSuccess = () => {},
   onError = () => {},
@@ -37,6 +55,9 @@ export function useUpdateUserPermissions({
     onSuccess: async (data, variables, context) => {
       await queryClient.invalidateQueries({
         queryKey: ['userPermissions', variables.userId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ['userPermissionDetails', variables.userId],
       });
       onSuccess(data, variables, context);
     },
@@ -56,6 +77,9 @@ export function useAddRoleToUser({
       await queryClient.invalidateQueries({
         queryKey: ['userPermissions', variables.userId],
       });
+      await queryClient.invalidateQueries({
+        queryKey: ['userPermissionDetails', variables.userId],
+      });
       onSuccess(data, variables, context);
     },
     onError,
@@ -73,6 +97,9 @@ export function useRemoveRoleFromUser({
     onSuccess: async (data, variables, context) => {
       await queryClient.invalidateQueries({
         queryKey: ['userPermissions', variables.userId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ['userPermissionDetails', variables.userId],
       });
       onSuccess(data, variables, context);
     },
@@ -92,6 +119,9 @@ export function useAddPermissionToUser({
       await queryClient.invalidateQueries({
         queryKey: ['userPermissions', variables.userId],
       });
+      await queryClient.invalidateQueries({
+        queryKey: ['userPermissionDetails', variables.userId],
+      });
       onSuccess(data, variables, context);
     },
     onError,
@@ -109,6 +139,9 @@ export function useRemovePermissionFromUser({
     onSuccess: async (data, variables, context) => {
       await queryClient.invalidateQueries({
         queryKey: ['userPermissions', variables.userId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ['userPermissionDetails', variables.userId],
       });
       onSuccess(data, variables, context);
     },

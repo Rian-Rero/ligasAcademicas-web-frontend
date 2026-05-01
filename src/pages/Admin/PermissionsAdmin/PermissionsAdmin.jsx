@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Plus } from 'lucide-react';
 
@@ -6,28 +6,57 @@ import {
   Container,
   ContentArea,
   CreateButton,
+  EmptySelection,
   InfoBox,
   PageTitle,
   PermissionCard,
   PermissionDescription,
   PermissionKey,
+  PermissionActions,
+  PermissionHelper,
   PermissionsGrid,
   PermissionModule,
   PermissionTitle,
   SectionHeader,
+  SectionDescription,
+  SectionTitle,
+  SecondaryButton,
+  StatBadge,
   Tab,
   TabContainer,
+  UserCard,
+  UserCardBadge,
+  UserCardMeta,
+  UserCardName,
+  UserCardTitle,
+  UserChips,
+  UserDetailsHeader,
+  UserDetailsPanel,
+  UserList,
+  UserPanel,
+  UserPanelHeader,
+  UserSearchBox,
+  UserStats,
+  UserWorkspace,
+  UserChip,
 } from './Styles';
 import { ConfirmDialog } from '../../../components/common';
 import { EditRoleModal } from '../../../components/features/EditRoleModal/EditRoleModal';
+import { PermissionSelector } from '../../../components/features/PermissionSelector/PermissionSelector';
 import { RolesList } from '../../../components/features/RolesList/RolesList';
 import { useGetPermissions } from '../../../hooks/query/permissions';
 import {
-  useDeleteRole,
   useCreateRole,
+  useDeleteRole,
   useGetRoles,
   useUpdateRole,
 } from '../../../hooks/query/roles';
+import { useGetUsers } from '../../../hooks/query/user';
+import {
+  useGetUserPermissionDetails,
+  useGetUserPermissions,
+  useUpdateUserPermissions,
+} from '../../../hooks/query/userPermissions';
 import { notifyError, notifySuccess } from '../../../utils/toast';
 
 export default function PermissionsAdmin() {
@@ -36,16 +65,35 @@ export default function PermissionsAdmin() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+  const [selectedDirectPermissionIds, setSelectedDirectPermissionIds] =
+    useState([]);
 
   const { data: roles = [], isLoading: rolesLoading } = useGetRoles({
     filters: { isGlobal: true },
   });
   const { data: permissions = [], isLoading: permissionsLoading } =
     useGetPermissions();
+  const { data: users = [], isLoading: usersLoading } = useGetUsers();
+  const {
+    data: userPermissionDetails,
+    isLoading: userPermissionDetailsLoading,
+  } = useGetUserPermissionDetails({
+    userId: selectedUserId,
+  });
+  const {
+    data: effectiveUserPermissions = [],
+    isLoading: effectivePermissionsLoading,
+  } = useGetUserPermissions({
+    userId: selectedUserId,
+    enabled: Boolean(selectedUserId),
+  });
 
   const createRole = useCreateRole();
   const updateRole = useUpdateRole();
   const deleteRole = useDeleteRole();
+  const updateUserPermissions = useUpdateUserPermissions();
 
   const permissionsByModule = useMemo(() => {
     return permissions.reduce((accumulator, permission) => {
@@ -55,6 +103,53 @@ export default function PermissionsAdmin() {
       return accumulator;
     }, {});
   }, [permissions]);
+
+  const filteredUsers = useMemo(() => {
+    const search = userSearchTerm.trim().toLowerCase();
+
+    return users.filter((user) => {
+      if (!search) return true;
+
+      return [user.name, user.email, user.globalRole]
+        .filter(Boolean)
+        .some((value) => value.toLowerCase().includes(search));
+    });
+  }, [userSearchTerm, users]);
+
+  const selectedUser = useMemo(
+    () => users.find((user) => user._id === selectedUserId) || null,
+    [selectedUserId, users],
+  );
+
+  const selectedUserRoles = userPermissionDetails?.roles || [];
+  const selectedUserDirectPermissions = useMemo(
+    () => userPermissionDetails?.permissions || [],
+    [userPermissionDetails?.permissions],
+  );
+
+  useEffect(() => {
+    if (filteredUsers.length === 0) {
+      if (selectedUserId) {
+        setSelectedUserId('');
+      }
+
+      return;
+    }
+
+    const hasSelectedUser = filteredUsers.some(
+      (user) => user._id === selectedUserId,
+    );
+
+    if (!hasSelectedUser) {
+      setSelectedUserId(filteredUsers[0]._id);
+    }
+  }, [filteredUsers, selectedUserId]);
+
+  useEffect(() => {
+    setSelectedDirectPermissionIds(
+      selectedUserDirectPermissions.map((permission) => permission._id),
+    );
+  }, [selectedUserDirectPermissions]);
 
   const handleEditRole = (role) => {
     setEditingRole(role);
@@ -99,9 +194,197 @@ export default function PermissionsAdmin() {
     }
   };
 
+  const handleSaveDirectPermissions = async () => {
+    if (!selectedUserId || selectedUser?.globalRole === 'admin') {
+      return;
+    }
+
+    try {
+      await updateUserPermissions.mutateAsync({
+        userId: selectedUserId,
+        data: {
+          roles: selectedUserRoles.map((role) => role._id),
+          permissions: selectedDirectPermissionIds,
+          academicLeague: null,
+        },
+      });
+
+      notifySuccess('Permissões diretas atualizadas com sucesso!');
+    } catch (error) {
+      notifyError(
+        error.response?.data?.message || 'Erro ao salvar permissões do usuário',
+      );
+    }
+  };
+
   const deleteRoleDescription = roleToDelete
     ? `Tem certeza que deseja deletar o papel ${roleToDelete.name}?`
     : 'Tem certeza que deseja deletar este papel?';
+
+  let userListContent;
+
+  if (usersLoading) {
+    userListContent = <p>Carregando usuários...</p>;
+  } else if (filteredUsers.length === 0) {
+    userListContent = (
+      <EmptySelection>
+        <p>Nenhum usuário encontrado.</p>
+      </EmptySelection>
+    );
+  } else {
+    userListContent = (
+      <UserList>
+        {filteredUsers.map((user) => (
+          <UserCard
+            key={user._id}
+            type="button"
+            className={selectedUserId === user._id ? 'selected' : ''}
+            onClick={() => setSelectedUserId(user._id)}
+          >
+            <UserCardTitle>
+              <UserCardName>{user.name}</UserCardName>
+              <UserCardBadge>{user.globalRole}</UserCardBadge>
+            </UserCardTitle>
+            <UserCardMeta>{user.email}</UserCardMeta>
+          </UserCard>
+        ))}
+      </UserList>
+    );
+  }
+
+  let selectedUserContent;
+
+  if (!selectedUser) {
+    selectedUserContent = (
+      <EmptySelection>
+        <p>Selecione um usuário para editar as permissões.</p>
+      </EmptySelection>
+    );
+  } else if (selectedUser.globalRole === 'admin') {
+    selectedUserContent = (
+      <>
+        <UserDetailsHeader>
+          <div>
+            <SectionTitle>{selectedUser.name}</SectionTitle>
+            <SectionDescription>{selectedUser.email}</SectionDescription>
+
+            <UserChips>
+              <UserChip>{selectedUser.globalRole}</UserChip>
+              <UserChip>
+                {selectedUserDirectPermissions.length} permissões diretas
+              </UserChip>
+            </UserChips>
+          </div>
+
+          <UserStats>
+            <StatBadge>
+              <strong>{effectiveUserPermissions.length}</strong>
+              permissões efetivas
+            </StatBadge>
+            <StatBadge>
+              <strong>{selectedUserRoles.length}</strong>
+              papéis vinculados
+            </StatBadge>
+          </UserStats>
+        </UserDetailsHeader>
+
+        <InfoBox>
+          <h3>Usuário administrador</h3>
+          <p>
+            Administradores já possuem acesso global. As permissões diretas não
+            precisam ser editadas aqui.
+          </p>
+        </InfoBox>
+      </>
+    );
+  } else {
+    selectedUserContent = (
+      <>
+        <UserDetailsHeader>
+          <div>
+            <SectionTitle>{selectedUser.name}</SectionTitle>
+            <SectionDescription>{selectedUser.email}</SectionDescription>
+
+            <UserChips>
+              <UserChip>{selectedUser.globalRole}</UserChip>
+              <UserChip>
+                {selectedUserDirectPermissions.length} permissões diretas
+              </UserChip>
+            </UserChips>
+          </div>
+
+          <UserStats>
+            <StatBadge>
+              <strong>{effectiveUserPermissions.length}</strong>
+              permissões efetivas
+            </StatBadge>
+            <StatBadge>
+              <strong>{selectedUserRoles.length}</strong>
+              papéis vinculados
+            </StatBadge>
+          </UserStats>
+        </UserDetailsHeader>
+
+        <SectionTitle>Permissões diretas</SectionTitle>
+        <SectionDescription>
+          Esses itens são salvos diretamente no usuário e são independentes dos
+          papéis atribuídos.
+        </SectionDescription>
+
+        <PermissionSelector
+          permissions={permissions}
+          selectedPermissions={selectedDirectPermissionIds}
+          onPermissionsChange={setSelectedDirectPermissionIds}
+          isLoading={permissionsLoading || userPermissionDetailsLoading}
+          searchPlaceholder="Buscar permissões diretas..."
+        />
+
+        <PermissionHelper>
+          O salvamento mantém os papéis atuais e atualiza apenas o conjunto de
+          permissões diretas.
+        </PermissionHelper>
+
+        {selectedUserDirectPermissions.length > 0 && (
+          <>
+            <SectionTitle>Permissões diretas atuais</SectionTitle>
+            <UserChips>
+              {selectedUserDirectPermissions.map((permission) => (
+                <UserChip key={permission._id}>{permission.name}</UserChip>
+              ))}
+            </UserChips>
+          </>
+        )}
+
+        <PermissionActions>
+          <SecondaryButton
+            type="button"
+            onClick={() =>
+              setSelectedDirectPermissionIds(
+                selectedUserDirectPermissions.map(
+                  (permission) => permission._id,
+                ),
+              )
+            }
+          >
+            Reverter alterações
+          </SecondaryButton>
+          <CreateButton
+            type="button"
+            onClick={handleSaveDirectPermissions}
+            disabled={
+              updateUserPermissions.isPending ||
+              userPermissionDetailsLoading ||
+              effectivePermissionsLoading
+            }
+          >
+            {updateUserPermissions.isPending
+              ? 'Salvando...'
+              : 'Salvar permissões'}
+          </CreateButton>
+        </PermissionActions>
+      </>
+    );
+  }
 
   let permissionsContent;
 
@@ -155,6 +438,12 @@ export default function PermissionsAdmin() {
         >
           Informações
         </Tab>
+        <Tab
+          className={activeTab === 'users' ? 'active' : ''}
+          onClick={() => setActiveTab('users')}
+        >
+          Usuários
+        </Tab>
       </TabContainer>
 
       <ContentArea>
@@ -162,12 +451,10 @@ export default function PermissionsAdmin() {
           <>
             <SectionHeader>
               <div>
-                <h2 style={{ margin: 0, color: '#1a1a1a' }}>
-                  Papéis do Sistema
-                </h2>
-                <p style={{ margin: '0.5rem 0 0 0', color: '#999' }}>
+                <SectionTitle>Papéis do Sistema</SectionTitle>
+                <SectionDescription>
                   Gerencie os papéis e suas permissões
-                </p>
+                </SectionDescription>
               </div>
               <CreateButton
                 onClick={() => {
@@ -193,12 +480,10 @@ export default function PermissionsAdmin() {
           <>
             <SectionHeader>
               <div>
-                <h2 style={{ margin: 0, color: '#1a1a1a' }}>
-                  Permissões Disponíveis
-                </h2>
-                <p style={{ margin: '0.5rem 0 0 0', color: '#999' }}>
+                <SectionTitle>Permissões Disponíveis</SectionTitle>
+                <SectionDescription>
                   Todas as permissões que podem ser atribuídas aos papéis
-                </p>
+                </SectionDescription>
               </div>
             </SectionHeader>
 
@@ -254,6 +539,36 @@ export default function PermissionsAdmin() {
               </li>
             </ul>
           </InfoBox>
+        )}
+
+        {activeTab === 'users' && (
+          <>
+            <SectionHeader>
+              <div>
+                <SectionTitle>Permissões por Usuário</SectionTitle>
+                <SectionDescription>
+                  Ajuste permissões diretas sem alterar os papéis globais.
+                </SectionDescription>
+              </div>
+            </SectionHeader>
+
+            <UserWorkspace>
+              <UserPanel>
+                <UserPanelHeader>
+                  <UserSearchBox
+                    type="text"
+                    placeholder="Buscar usuário por nome, e-mail ou cargo"
+                    value={userSearchTerm}
+                    onChange={(event) => setUserSearchTerm(event.target.value)}
+                  />
+                </UserPanelHeader>
+
+                {userListContent}
+              </UserPanel>
+
+              <UserDetailsPanel>{selectedUserContent}</UserDetailsPanel>
+            </UserWorkspace>
+          </>
         )}
       </ContentArea>
 

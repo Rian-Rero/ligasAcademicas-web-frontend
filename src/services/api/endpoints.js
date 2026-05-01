@@ -440,6 +440,26 @@ export const getUserPermissions = async (userId, academicLeague = null) => {
   return data;
 };
 
+export const getUserPermissionDetails = async (
+  userId,
+  academicLeague = null,
+) => {
+  const params = {};
+
+  if (academicLeague) {
+    params.academicLeague = academicLeague;
+  }
+
+  const { data } = await api.get(
+    `/permissions/users/${userId}/permissions/details`,
+    {
+      params,
+    },
+  );
+
+  return data;
+};
+
 export const updateUserPermissions = async ({ userId, data: userData }) => {
   const { data } = await api.patch(
     `/permissions/users/${userId}/permissions`,
