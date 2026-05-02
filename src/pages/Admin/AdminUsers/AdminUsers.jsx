@@ -193,7 +193,6 @@ export default function AdminUsers() {
     return filterBySearch(usersInScope, searchTerm, (user) => [
       user.name,
       user.email,
-      user.globalRole,
     ]);
   }, [
     scopedMemberships,
@@ -288,7 +287,6 @@ export default function AdminUsers() {
     reset({
       name: selectedUser.name || '',
       email: selectedUser.email || '',
-      globalRole: selectedUser.globalRole || 'league-member',
       emailVerified: selectedUser.emailVerified ? 'true' : 'false',
       membershipUniversity: normalizeId(membershipUniversityId),
       academicLeague: normalizeId(selectedMembership?.academicLeague),
@@ -467,7 +465,6 @@ export default function AdminUsers() {
   const onSubmit = handleSubmit(async (values) => {
     const name = values.name.trim();
     const email = values.email.trim().toLocaleLowerCase('pt-BR');
-    const globalRole = values.globalRole.trim() || 'league-member';
     const role = values.role.trim();
     const hasMembershipInput = Boolean(
       values.membershipUniversity ||
@@ -487,7 +484,6 @@ export default function AdminUsers() {
           newUserData: {
             name,
             email,
-            globalRole,
             emailVerified: values.emailVerified === 'true',
           },
         });
@@ -512,7 +508,6 @@ export default function AdminUsers() {
       const createdUser = await createUser({
         name,
         email,
-        globalRole,
         emailVerified: values.emailVerified === 'true',
       });
 
@@ -529,8 +524,7 @@ export default function AdminUsers() {
     }
   });
 
-  const formErrorMessage =
-    errors.name?.message || errors.email?.message || errors.globalRole?.message;
+  const formErrorMessage = errors.name?.message || errors.email?.message;
 
   const isSaving =
     isCreatingUser ||
@@ -632,7 +626,7 @@ export default function AdminUsers() {
                   </EntityTitle>
                   <EntityMeta>
                     <span>{user.email}</span>
-                    <span>{formatRole(user.globalRole)}</span>
+                    <span>{formatRole(user.roleKeys?.[0])}</span>
                   </EntityMeta>
                 </EntityItem>
               );
@@ -667,18 +661,6 @@ export default function AdminUsers() {
               />
               {errors.email && (
                 <ErrorMessage>{errors.email.message}</ErrorMessage>
-              )}
-            </Field>
-
-            <Field>
-              <Label>Perfil global</Label>
-              <SelectInput {...register('globalRole')}>
-                <option value="admin">Administrador</option>
-                <option value="manager">Gestor</option>
-                <option value="league-member">Membro de liga</option>
-              </SelectInput>
-              {errors.globalRole && (
-                <ErrorMessage>{errors.globalRole.message}</ErrorMessage>
               )}
             </Field>
 

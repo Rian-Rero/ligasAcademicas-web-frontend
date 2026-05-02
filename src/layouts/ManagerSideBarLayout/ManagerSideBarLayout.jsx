@@ -96,7 +96,7 @@ export default function ManagerSideBarLayout() {
       <SideBar>
         <ProfileCard>
           <Avatar
-            $imageUrl={resolveMediaUrl(authUser?.imageURL)}
+            $imageUrl={resolveMediaUrl(authUser?.image?.url)}
             role="img"
             aria-label="Foto do gestor"
           />

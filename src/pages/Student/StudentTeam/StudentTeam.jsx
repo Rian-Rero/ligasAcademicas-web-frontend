@@ -139,7 +139,7 @@ export default function StudentTeam() {
             {
               id: String(authUser._id || 'auth-user'),
               name: authUser.name,
-              imageURL: authUser?.imageURL || null,
+              imageURL: authUser?.image?.url || null,
             },
           ]
         : fallbackTeam;
@@ -153,7 +153,7 @@ export default function StudentTeam() {
       .map((user) => ({
         id: String(user._id),
         name: user.name,
-        imageURL: user?.imageURL || null,
+        imageURL: user?.image?.url || null,
       }));
 
     if (!names.length) {
@@ -162,7 +162,7 @@ export default function StudentTeam() {
             {
               id: String(authUser._id || 'auth-user'),
               name: authUser.name,
-              imageURL: authUser?.imageURL || null,
+              imageURL: authUser?.image?.url || null,
             },
           ]
         : fallbackTeam;
@@ -172,7 +172,7 @@ export default function StudentTeam() {
   }, [
     authUser?._id,
     authUser?.name,
-    authUser?.imageURL,
+    authUser?.image?.url,
     squadMemberUserIds,
     squadUsers,
   ]).sort((left, right) =>
@@ -343,7 +343,7 @@ export default function StudentTeam() {
 
             <MemberModalBody>
               <MemberModalAvatar
-                $imageUrl={resolveMediaUrl(selectedMember.user?.imageURL)}
+                $imageUrl={resolveMediaUrl(selectedMember.user?.image?.url)}
                 role="img"
                 aria-label={
                   selectedMember.user?.name
@@ -351,7 +351,7 @@ export default function StudentTeam() {
                     : 'Foto do membro'
                 }
               >
-                {!resolveMediaUrl(selectedMember.user?.imageURL) &&
+                {!resolveMediaUrl(selectedMember.user?.image?.url) &&
                   getInitials(selectedMember.user?.name)}
               </MemberModalAvatar>
 

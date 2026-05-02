@@ -1,4 +1,4 @@
-import { FiCalendar, FiShield, FiUser, FiUsers } from 'react-icons/fi';
+import { FiCalendar, FiShield, FiUser, FiUsers, FiLock } from 'react-icons/fi';
 import {
   TbBuildingCommunity,
   TbLayoutDashboard,
@@ -55,6 +55,11 @@ const navigation = [
     path: '/admin/usuários',
   },
   {
+    label: 'Permissões',
+    icon: <FiLock />,
+    path: '/admin/permissões',
+  },
+  {
     label: 'Meu Perfil',
     icon: <FiUser />,
     path: '/admin/perfil',
@@ -77,7 +82,7 @@ export default function AdminSideBarLayout() {
       <SideBar>
         <ProfileCard>
           <Avatar
-            $imageUrl={resolveMediaUrl(authUser?.imageURL)}
+            $imageUrl={resolveMediaUrl(authUser?.image?.url)}
             role="img"
             aria-label="Foto do administrador"
           />
@@ -86,8 +91,8 @@ export default function AdminSideBarLayout() {
             <span>
               <FiShield />
               <em>
-                {authUser?.globalRole || 'Admin absoluto'} •{' '}
-                {universities.length} universidades • {leagues.length} ligas
+                {authUser?.roleKeys?.[0] || 'admin'} • {universities.length}{' '}
+                universidades • {leagues.length} ligas
               </em>
             </span>
           </div>

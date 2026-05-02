@@ -7,9 +7,6 @@ export const adminUserSchema = z
   .object({
     name: z.string().trim().min(3, 'Nome deve ter pelo menos 3 caracteres'),
     email: z.email('E-mail invalido').trim(),
-    globalRole: z.enum(['admin', 'manager', 'league-member'], {
-      error: 'Selecione o perfil global',
-    }),
     emailVerified: z.enum(['true', 'false']),
     membershipUniversity: z.string().trim().optional(),
     academicLeague: z.string().trim().optional(),
@@ -60,7 +57,6 @@ export const adminUserSchema = z
 export const adminUserDefaultValues = {
   name: '',
   email: '',
-  globalRole: 'league-member',
   emailVerified: 'false',
   membershipUniversity: '',
   academicLeague: '',
