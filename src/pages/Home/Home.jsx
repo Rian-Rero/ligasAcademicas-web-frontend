@@ -29,12 +29,43 @@ import {
   FeatureDescription,
 } from './Styles';
 import coreSystemImage from '../../assets/coreSystem.png';
+import { useGetLeagueMemberships } from '../../hooks/query/leagueMembership';
+import useAuthStore from '../../stores/auth';
+import { hasAdminRole, hasManagerRole } from '../../utils/roles';
+
+function getDashboardPath(authUser, memberships = []) {
+  const hasManagementMembership = memberships.some((membership) =>
+    hasManagerRole(membership?.role),
+  );
+
+  if (hasAdminRole(authUser?.roleKeys)) {
+    return '/admin/dashboard';
+  }
+
+  if (hasManagerRole(authUser?.roleKeys) || hasManagementMembership) {
+    return '/manager/dashboard';
+  }
+
+  return '/student/dashboard';
+}
 
 export default function Home() {
   const navigate = useNavigate();
+  const authUser = useAuthStore((state) => state.auth?.user);
+  const isAuthenticated = Boolean(authUser?._id);
+
+  const { data: memberships = [] } = useGetLeagueMemberships({
+    filters: { user: authUser?._id, isActive: true },
+    enabled: isAuthenticated,
+  });
 
   const handleAccessSystem = () => {
-    navigate('/login');
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    navigate(getDashboardPath(authUser, memberships));
   };
 
   return (
