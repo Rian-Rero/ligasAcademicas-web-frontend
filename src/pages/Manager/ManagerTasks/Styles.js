@@ -1,12 +1,13 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const Content = styled.div`
-  padding: 24px;
+  padding: clamp(1.6rem, 2vw, 2.4rem);
   max-width: 1200px;
   margin: 0 auto;
+  color: #ffffff;
 
   @media (max-width: 768px) {
-    padding: 16px;
+    padding: 1.6rem;
   }
 `;
 
@@ -23,16 +24,18 @@ export const HeaderSection = styled.div`
 `;
 
 export const HeaderTitle = styled.h1`
-  font-size: 28px;
-  font-weight: 700;
-  color: #0f172a;
+  font-size: clamp(2.2rem, 2.6vw, 3rem);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #ffffff;
   margin: 0 0 8px 0;
 `;
 
 export const HeaderSubtitle = styled.p`
-  font-size: 14px;
-  color: #64748b;
+  font-size: 1.45rem;
+  color: rgba(255, 255, 255, 0.72);
   margin: 0;
+  max-width: 64rem;
 `;
 
 export const HeaderActions = styled.div`
@@ -52,22 +55,37 @@ export const AddButton = styled.button`
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 20px;
-  background: #3b82f6;
+  padding: 1rem 2rem;
+  background: linear-gradient(120deg, #008cff, #2b66ff 58%, #0b9de8);
   color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  font-size: 1.35rem;
+  font-weight: 800;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
   white-space: nowrap;
 
   &:hover {
-    background: #2563eb;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    filter: brightness(1.05);
+    box-shadow: 0 1rem 2.4rem rgba(0, 140, 255, 0.32);
   }
+`;
+
+const panelSurface = css`
+  background:
+    linear-gradient(165deg, rgba(26, 49, 104, 0.95), rgba(13, 22, 45, 0.92))
+      padding-box,
+    linear-gradient(135deg, rgba(0, 140, 255, 0.72), rgba(255, 160, 90, 0.72))
+      border-box;
+  border: 1px solid transparent;
+  box-shadow:
+    0 1.4rem 3.6rem rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 `;
 
 export const EmptyState = styled.div`
@@ -75,59 +93,62 @@ export const EmptyState = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 24px;
+  padding: 5.6rem 2.4rem;
   text-align: center;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 2px dashed #e2e8f0;
+  ${panelSurface};
+  border-radius: 2rem;
 
   h3 {
-    margin: 16px 0 8px 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #0f172a;
+    margin: 1.6rem 0 0.8rem 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
   }
 
   p {
     margin: 0;
-    font-size: 14px;
-    color: #64748b;
+    font-size: 1.4rem;
+    color: rgba(255, 255, 255, 0.72);
   }
 `;
 
 export const TasksContainer = styled.div`
   display: grid;
-  gap: 16px;
+  gap: 1.6rem;
 `;
 
 export const TaskCard = styled.div`
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 16px;
-  transition: all 0.2s ease;
+  ${panelSurface};
+  border-radius: 1.8rem;
+  padding: 1.6rem;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 
   ${(props) =>
     props.completed &&
     `
-    opacity: 0.7;
-    border-color: #d1d5db;
-    background: #f9fafb;
+    opacity: 0.9;
+    background:
+      linear-gradient(165deg, rgba(20, 30, 46, 0.96), rgba(12, 18, 30, 0.92)) padding-box,
+      linear-gradient(135deg, rgba(148, 163, 184, 0.42), rgba(255, 255, 255, 0.08)) border-box;
   `}
 
   ${(props) =>
     props.overdue &&
     `
-    border-left: 4px solid #ef4444;
-    background: #fef2f2;
+    background:
+      linear-gradient(165deg, rgba(72, 16, 34, 0.95), rgba(25, 11, 20, 0.95)) padding-box,
+      linear-gradient(135deg, rgba(255, 99, 99, 0.7), rgba(255, 184, 107, 0.55)) border-box;
   `}
   
   &:hover {
     ${(props) =>
       !props.completed &&
       `
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      border-color: #cbd5e1;
+      transform: translateY(-2px);
+      box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.32);
     `}
   }
 `;
@@ -142,15 +163,15 @@ export const TaskCardHeader = styled.div`
 
 export const TaskCardTitle = styled.h3`
   margin: 0 0 6px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #0f172a;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #ffffff;
 `;
 
 export const TaskCardDescription = styled.p`
   margin: 0;
-  font-size: 13px;
-  color: #64748b;
+  font-size: 1.35rem;
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -162,8 +183,8 @@ export const TaskCardMeta = styled.div`
   display: flex;
   gap: 12px;
   margin-bottom: 12px;
-  font-size: 13px;
-  color: #64748b;
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.72);
   flex-wrap: wrap;
 
   div {
@@ -177,19 +198,23 @@ export const TaskCardActions = styled.div`
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
 `;
 
 export const EditButton = styled.button`
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
-  background: #f3f4f6;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 0.85rem 1.2rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  font-size: 1.25rem;
+  font-weight: 700;
   cursor: not-allowed;
   transition: all 0.2s ease;
 
@@ -202,47 +227,50 @@ export const DeleteButton = styled.button`
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 12px;
-  background: #f3f4f6;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 0.85rem 1.2rem;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  font-size: 1.25rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
-    background: #ef4444;
+    background: linear-gradient(120deg, #ef4444, #dc2626);
     color: white;
-    border-color: #ef4444;
+    border-color: transparent;
+    transform: translateY(-1px);
   }
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.55;
     cursor: not-allowed;
   }
 `;
 
 export const PriorityBadge = styled.span`
   display: inline-block;
-  padding: 4px 10px;
-  background: ${(props) => props.color}20;
+  padding: 0.45rem 1rem;
+  background: ${(props) => props.color}22;
   color: ${(props) => props.color};
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  border: 1px solid ${(props) => props.color}40;
+  border-radius: 999px;
+  font-size: 1.15rem;
+  font-weight: 800;
   white-space: nowrap;
 `;
 
 export const UserBadge = styled.span`
   display: inline-block;
-  padding: 4px 10px;
-  background: #e0e7ff;
-  color: #3730a3;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 0.45rem 1rem;
+  background: rgba(0, 140, 255, 0.16);
+  color: #cfe8ff;
+  border: 1px solid rgba(0, 140, 255, 0.22);
+  border-radius: 999px;
+  font-size: 1.15rem;
+  font-weight: 800;
   white-space: nowrap;
 `;
 
@@ -250,14 +278,21 @@ export const DueDateWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-  ${(props) => props.overdue && `color: #ef4444; font-weight: 600;`}
+  color: rgba(255, 255, 255, 0.78);
+
+  ${(props) => props.overdue && `color: #ff9d9d; font-weight: 700;`}
 `;
 
 export const ConfirmDialog = styled.div`
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
-  max-width: 400px;
+  width: min(92vw, 42rem);
+  background:
+    linear-gradient(165deg, rgba(12, 20, 38, 0.98), rgba(9, 15, 28, 0.94))
+      padding-box,
+    linear-gradient(135deg, rgba(0, 140, 255, 0.7), rgba(255, 160, 90, 0.72))
+      border-box;
+  border: 1px solid transparent;
+  border-radius: 2rem;
+  box-shadow: 0 2.2rem 5rem rgba(0, 0, 0, 0.42);
   overflow: hidden;
   z-index: 1000;
 `;
@@ -268,7 +303,8 @@ export const DialogOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(3, 7, 18, 0.72);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -277,19 +313,19 @@ export const DialogOverlay = styled.div`
 `;
 
 export const DialogContent = styled.div`
-  padding: 24px;
+  padding: 2.4rem;
 
   h2 {
     margin: 0 0 12px 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #0f172a;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #ffffff;
   }
 
   p {
     margin: 0;
-    font-size: 14px;
-    color: #64748b;
+    font-size: 1.35rem;
+    color: rgba(255, 255, 255, 0.72);
     line-height: 1.5;
   }
 `;
@@ -297,37 +333,42 @@ export const DialogContent = styled.div`
 export const DialogButtons = styled.div`
   display: flex;
   gap: 8px;
-  padding: 16px 24px;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
+  padding: 1.6rem 2.4rem 2.4rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   justify-content: flex-end;
+
+  @media (max-width: 640px) {
+    flex-direction: column-reverse;
+  }
 `;
 
 export const DialogButton = styled.button`
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 0.95rem 1.6rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 1.3rem;
+  font-weight: 800;
   cursor: pointer;
   transition: all 0.2s ease;
 
   ${(props) => {
     if (props.variant === 'danger') {
       return `
-        background: #ef4444;
+        background: linear-gradient(120deg, #ef4444, #dc2626);
         color: white;
         &:hover:not(:disabled) {
-          background: #dc2626;
+          transform: translateY(-1px);
         }
       `;
     }
     return `
-      background: white;
-      color: #0f172a;
-      border: 1px solid #e2e8f0;
-      &:hover {
-        background: #f1f5f9;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-1px);
       }
     `;
   }}
