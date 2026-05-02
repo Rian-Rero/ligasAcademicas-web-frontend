@@ -1,4 +1,4 @@
-import { FiCalendar, FiUsers, FiUser } from 'react-icons/fi';
+import { FiCalendar, FiCheckSquare, FiUsers, FiUser } from 'react-icons/fi';
 import { TbCertificate, TbLayoutDashboard, TbLogout2 } from 'react-icons/tb';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
@@ -43,6 +43,11 @@ const navigation = [
     label: 'Meu Perfil',
     icon: <FiUser />,
     path: '/student/profile',
+  },
+  {
+    label: 'Minhas Tarefas',
+    icon: <FiCheckSquare />,
+    path: '/student/tasks',
   },
 ];
 

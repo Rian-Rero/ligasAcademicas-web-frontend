@@ -521,3 +521,35 @@ export const removePermissionFromUser = async ({
 
   return data;
 };
+
+// Tasks
+export const getTasks = async (filters = {}) => {
+  const { data } = await api.get('/tasks', { params: filters });
+
+  return data;
+};
+export const getTaskById = async (_id) => {
+  const { data } = await api.get(`/tasks/${_id}`);
+
+  return data;
+};
+export const createTask = async (newTask) => {
+  const { data } = await api.post('/tasks', newTask);
+
+  return data;
+};
+export const updateTask = async ({ _id, inputData }) => {
+  const { data } = await api.patch(`/tasks/${_id}`, inputData);
+
+  return data;
+};
+export const completeTask = async (_id) => {
+  const { data } = await api.patch(`/tasks/${_id}/complete`);
+
+  return data;
+};
+export const deleteTask = async (_id) => {
+  const { data } = await api.delete(`/tasks/${_id}`);
+
+  return data;
+};

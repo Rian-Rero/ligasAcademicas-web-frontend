@@ -41,6 +41,8 @@ import {
 } from './pages';
 import AdminSquads from './pages/Admin/AdminSquads/AdminSquads';
 import PermissionsAdmin from './pages/Admin/PermissionsAdmin/PermissionsAdmin';
+import ManagerTasks from './pages/Manager/ManagerTasks/ManagerTasks';
+import StudentTasks from './pages/Student/StudentTasks/StudentTasks';
 import useAuthStore from './stores/auth';
 import { hasAdminRole, hasManagerRole } from './utils/roles';
 
@@ -115,6 +117,7 @@ const router = createBrowserRouter(
               <Route path="subequipes" element={<AdminSquads />} />
               <Route path="usuários" element={<AdminUsers />} />
               <Route path="permissões" element={<PermissionsAdmin />} />
+              <Route path="tasks" element={<ManagerTasks />} />
               <Route path="perfil" element={<Profile />} />
               <Route path="profile" element={<Profile />} />
               <Route path="*" element={<AdminDashboard />} />
@@ -127,6 +130,7 @@ const router = createBrowserRouter(
             <Route path="events" element={<StudentEvents />} />
             <Route path="certificates" element={<StudentCertificates />} />
             <Route path="team" element={<StudentTeam />} />
+            <Route path="tasks" element={<StudentTasks />} />
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<StudentDashboard />} />
           </Route>
@@ -139,6 +143,7 @@ const router = createBrowserRouter(
               <Route path="membros" element={<ManagerMembers />} />
               <Route path="subequipes" element={<ManagerSquads />} />
               <Route path="cadastrar-membro" element={<Register />} />
+              <Route path="tasks" element={<ManagerTasks />} />
               <Route path="perfil" element={<Profile />} />
               <Route path="profile" element={<Profile />} />
               <Route path="*" element={<ManagerDashboard />} />
