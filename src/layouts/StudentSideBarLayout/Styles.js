@@ -4,7 +4,8 @@ export const Container = styled.main`
   display: grid;
   grid-template-columns: minmax(18rem, 25rem) 1fr;
   gap: 2rem;
-  min-height: calc(100dvh - 7rem);
+
+  height: 100%;
   padding: clamp(2rem, 3vw, 3.2rem);
   width: min(100%, 160rem);
   margin: 0 auto;
