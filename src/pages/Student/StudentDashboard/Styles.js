@@ -138,13 +138,22 @@ export const AgendaList = styled.div`
 
 export const AgendaItem = styled.div`
   display: grid;
-  grid-template-columns: 12rem minmax(0, 1fr) auto;
+  grid-template-columns: ${({ $isEmpty }) =>
+    $isEmpty ? '1fr' : '12rem minmax(0, 1fr) auto'};
   gap: 1.5rem;
   align-items: center;
   padding: 1.8rem;
   border-radius: 1.6rem;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
+
+  ${({ $isEmpty }) =>
+    $isEmpty &&
+    `
+      min-height: 8.5rem;
+      text-align: center;
+      justify-items: center;
+    `}
 
   strong {
     font-size: 1.6rem;

@@ -41,6 +41,7 @@ import {
   TopCards,
 } from './Styles';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
+import { useGetCertificates } from '../../../hooks/query/certificate';
 import { useGetEvents } from '../../../hooks/query/event';
 import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
 import { useGetSquads } from '../../../hooks/query/squad';
@@ -48,30 +49,6 @@ import { useGetUniversities } from '../../../hooks/query/university';
 import { useGetUsersByIds } from '../../../hooks/query/user';
 import useAuthStore from '../../../stores/auth';
 import { resolveMediaUrl } from '../../../utils/media';
-
-const fallbackAgenda = [
-  {
-    id: 'fallback-1',
-    date: 'DD/MM',
-    title: 'Título do Evento 1',
-    location: 'Local do Evento 1',
-    action: 'Inscrever-se',
-    variant: 'primary',
-  },
-  {
-    id: 'fallback-2',
-    date: 'DD/MM',
-    title: 'Título do Evento 2',
-    location: 'Local do Evento 2',
-    action: 'Confirmar Inscrição',
-    variant: 'secondary',
-  },
-];
-
-const certificates = [
-  { title: 'Nome do Certificado 1', date: 'Mês/Ano' },
-  { title: 'Nome do Certificado 2', date: 'Mês/Ano' },
-];
 
 const fallbackTeam = [];
 
@@ -82,6 +59,16 @@ function formatDate(dateString) {
   return parsedDate.toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
+  });
+}
+
+function formatMonthYear(dateString) {
+  const parsedDate = new Date(dateString);
+  if (Number.isNaN(parsedDate.getTime())) return 'Data inválida';
+
+  return parsedDate.toLocaleDateString('pt-BR', {
+    month: '2-digit',
+    year: 'numeric',
   });
 }
 
@@ -148,6 +135,12 @@ export default function StudentDashboard() {
     onError: () => {},
   });
 
+  const { data: certificatesFromApi = [] } = useGetCertificates({
+    filters: { leagueMembership: activeMembership?._id },
+    enabled: Boolean(activeMembership?._id),
+    onError: () => {},
+  });
+
   const team = useMemo(() => {
     if (!squadMemberUserIds.length || !squadUsers.length) {
       return authUser?.name
@@ -194,17 +187,28 @@ export default function StudentDashboard() {
   ]);
 
   const agenda = useMemo(() => {
-    if (!eventsFromApi.length) return fallbackAgenda;
+    if (!eventsFromApi.length) return [];
 
     return eventsFromApi.map((event, index) => ({
       id: String(event._id || `event-${index + 1}`),
       date: formatDate(event.dateTime),
-      title: event.title || `Evento ${index + 1}`,
-      location: event.location || 'Local a definir',
+      title: event.title || 'Sem título',
+      location: event.location || 'Sem local informado',
       action: 'Ver detalhes',
       variant: index % 2 === 0 ? 'primary' : 'secondary',
     }));
   }, [eventsFromApi]);
+
+  const certificates = useMemo(
+    () =>
+      certificatesFromApi.map((certificate, index) => ({
+        id: String(certificate._id || `certificate-${index + 1}`),
+        title: `Certificado ${index + 1}`,
+        date: formatMonthYear(certificate.issueDate),
+        pdfUrl: certificate.pdfUrl,
+      })),
+    [certificatesFromApi],
+  );
 
   const nextEvent = agenda[0];
   const totalMembersCount = team.length;
@@ -233,7 +237,9 @@ export default function StudentDashboard() {
             <FiUsers />
           </CardIcon>
           <CardHeader>Subequipe:</CardHeader>
-          <CardTitle>{activeSquad?.name || 'Nome da Equipe'}</CardTitle>
+          <CardTitle>
+            {activeSquad?.name || 'Não pertence a nenhuma subequipe'}
+          </CardTitle>
         </Card>
 
         <Card>
@@ -241,7 +247,7 @@ export default function StudentDashboard() {
             <TbCertificate />
           </CardIcon>
           <CardHeader>Certificados disponíveis:</CardHeader>
-          <CardValue>0</CardValue>
+          <CardValue>{certificates.length}</CardValue>
         </Card>
 
         <Card>
@@ -249,8 +255,8 @@ export default function StudentDashboard() {
             <FiCalendar />
           </CardIcon>
           <CardHeader>Próximo evento:</CardHeader>
-          <CardTitle>{nextEvent?.title || 'Nome do Evento'}</CardTitle>
-          <CardDate>{nextEvent?.date || 'DD/MM'}</CardDate>
+          <CardTitle>{nextEvent?.title || 'Não tem'}</CardTitle>
+          <CardDate>{nextEvent?.date || '--/--'}</CardDate>
         </Card>
       </TopCards>
 
@@ -258,40 +264,66 @@ export default function StudentDashboard() {
         <Box>
           <SectionHeading>Eventos e Reuniões</SectionHeading>
           <AgendaList>
-            {agenda.map((item) => (
-              <AgendaItem key={item.id}>
-                <AgendaInfo>
-                  <strong>Data</strong>
-                  <span>{item.date}</span>
-                </AgendaInfo>
+            {!agenda.length ? (
+              <AgendaItem $isEmpty>
                 <div>
-                  <strong>{item.title}</strong>
-                  <span>{item.location}</span>
+                  <strong>Não tem eventos e reuniões.</strong>
                 </div>
-                <AgendaAction $variant={item.variant}>
-                  {item.action}
-                </AgendaAction>
               </AgendaItem>
-            ))}
+            ) : (
+              agenda.map((item) => (
+                <AgendaItem key={item.id}>
+                  <AgendaInfo>
+                    <strong>Data</strong>
+                    <span>{item.date}</span>
+                  </AgendaInfo>
+                  <div>
+                    <strong>{item.title}</strong>
+                    <span>{item.location}</span>
+                  </div>
+                  <AgendaAction $variant={item.variant}>
+                    {item.action}
+                  </AgendaAction>
+                </AgendaItem>
+              ))
+            )}
           </AgendaList>
         </Box>
 
         <SummaryCard>
           <SectionHeading>Meus Certificados</SectionHeading>
-          {certificates.map((certificate) => (
-            <SummaryItem key={certificate.title}>
+          {!certificates.length ? (
+            <SummaryItem>
               <div>
-                <strong>{certificate.title}</strong>
-                <span>{certificate.date}</span>
+                <strong>Nenhum certificado disponível no momento.</strong>
               </div>
-              <button
-                type="button"
-                aria-label={`Baixar certificado ${certificate.title}`}
-              >
-                <FiDownload />
-              </button>
             </SummaryItem>
-          ))}
+          ) : (
+            certificates.map((certificate) => (
+              <SummaryItem key={certificate.id}>
+                <div>
+                  <strong>{certificate.title}</strong>
+                  <span>{certificate.date}</span>
+                </div>
+                <button
+                  type="button"
+                  aria-label={`Baixar certificado ${certificate.title}`}
+                  onClick={() => {
+                    if (certificate.pdfUrl) {
+                      window.open(
+                        certificate.pdfUrl,
+                        '_blank',
+                        'noopener,noreferrer',
+                      );
+                    }
+                  }}
+                  disabled={!certificate.pdfUrl}
+                >
+                  <FiDownload />
+                </button>
+              </SummaryItem>
+            ))
+          )}
         </SummaryCard>
       </MiddleSection>
 
