@@ -155,7 +155,7 @@ export default function StudentDashboard() {
             {
               id: String(authUser._id || 'auth-user'),
               name: authUser.name,
-              imageURL: authUser?.imageURL || null,
+              imageURL: authUser?.image?.url || null,
             },
           ]
         : fallbackTeam;
@@ -169,7 +169,7 @@ export default function StudentDashboard() {
       .map((user) => ({
         id: String(user._id),
         name: user.name,
-        imageURL: user?.imageURL || null,
+        imageURL: user?.image?.url || null,
       }));
 
     if (!names.length) {
@@ -178,7 +178,7 @@ export default function StudentDashboard() {
             {
               id: String(authUser._id || 'auth-user'),
               name: authUser.name,
-              imageURL: authUser?.imageURL || null,
+              imageURL: authUser?.image?.url || null,
             },
           ]
         : fallbackTeam;
@@ -188,7 +188,7 @@ export default function StudentDashboard() {
   }, [
     authUser?._id,
     authUser?.name,
-    authUser?.imageURL,
+    authUser?.image?.url,
     squadMemberUserIds,
     squadUsers,
   ]);

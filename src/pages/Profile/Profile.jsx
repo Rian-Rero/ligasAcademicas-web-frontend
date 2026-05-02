@@ -344,7 +344,7 @@ export default function Profile() {
           <IdentityBlock>
             <Avatar
               $imageUrl={
-                profilePhotoPreviewUrl || resolveMediaUrl(authUser?.imageURL)
+                profilePhotoPreviewUrl || resolveMediaUrl(authUser?.image?.url)
               }
               role="img"
               aria-label={
@@ -352,7 +352,7 @@ export default function Profile() {
               }
             >
               {!profilePhotoPreviewUrl &&
-                !resolveMediaUrl(authUser?.imageURL) &&
+                !resolveMediaUrl(authUser?.image?.url) &&
                 getInitials(authUser?.name)}
             </Avatar>
 

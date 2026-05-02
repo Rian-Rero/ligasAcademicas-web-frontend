@@ -30,7 +30,6 @@ import {
 import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
 import { useLogout } from '../../../hooks/query/sessions';
 import useAuthStore from '../../../stores/auth';
-import { resolveMediaUrl } from '../../../utils/media';
 import { hasAdminRole, hasManagerRole } from '../../../utils/roles';
 import OnlyLogo from '../OnlyLogo/OnlyLogo';
 
@@ -183,7 +182,7 @@ export default function Header() {
 
             {isAuthenticated ? (
               <AvatarMenu
-                imageUrl={resolveMediaUrl(authUser?.imageURL)}
+                imageUrl={authUser?.image?.url}
                 initials={getInitials(authUser?.name)}
                 profileTo={authenticatedContext.profileTo}
                 onLogout={() => logout()}
