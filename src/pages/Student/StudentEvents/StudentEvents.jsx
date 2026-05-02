@@ -195,7 +195,7 @@ export default function StudentEvents() {
 
       {!isLoading && !activeLeague && (
         <EmptyState>
-          Nenhuma liga ativa foi encontrada para o seu usuario.
+          Nenhuma liga ativa foi encontrada para o seu usuário.
         </EmptyState>
       )}
 

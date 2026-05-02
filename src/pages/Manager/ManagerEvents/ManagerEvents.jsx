@@ -177,7 +177,7 @@ export default function ManagerEvents() {
 
       {!isLoadingLeague && !activeLeague && (
         <EmptyState>
-          Nenhuma liga ativa foi encontrada para o seu usuario. Verifique o
+          Nenhuma liga ativa foi encontrada para o seu usuário. Verifique o
           vínculo antes de criar eventos.
         </EmptyState>
       )}

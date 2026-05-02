@@ -98,14 +98,17 @@ export default function AdminDashboard() {
       {
         name: universities[0]?.name || 'Universidade principal',
         value: `${universities.length} instituições em operação`,
+        length: universities.length,
       },
       {
         name: leagues[0]?.name || 'Liga em destaque',
         value: `${leagues.length} ligas com gestão centralizada`,
+        length: leagues.length,
       },
       {
         name: 'Gestão de usuários',
         value: `${users.length} perfis disponíveis para administração`,
+        length: users.length,
       },
     ];
   }, [leagues, universities, users.length]);
@@ -143,7 +146,7 @@ export default function AdminDashboard() {
                       />
                     ))}
                   </FeaturedBars>
-                  <FeaturedTeamTotal>{index + 1}</FeaturedTeamTotal>
+                  <FeaturedTeamTotal>{item?.length}</FeaturedTeamTotal>
                 </FeaturedRightContent>
               </FeaturedTeamRow>
             ))}

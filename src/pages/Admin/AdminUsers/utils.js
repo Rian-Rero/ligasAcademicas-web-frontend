@@ -76,7 +76,7 @@ const adminUserErrorMessages = {
 export function buildAdminUserErrorMessage(err) {
   return buildAdminRequestErrorMessage(
     err,
-    'Nao foi possivel salvar o usuario',
+    'Nao foi possivel salvar o usuário',
     adminUserErrorMessages,
   );
 }

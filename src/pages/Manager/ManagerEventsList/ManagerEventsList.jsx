@@ -333,7 +333,7 @@ export default function ManagerEventsList() {
 
       {!isLoadingLeague && !activeLeague && (
         <EmptyState>
-          Nenhuma liga ativa foi encontrada para o seu usuario.
+          Nenhuma liga ativa foi encontrada para o seu usuário.
         </EmptyState>
       )}
 

@@ -407,7 +407,7 @@ export default function AdminUsers() {
 
   const handleAddMembership = async () => {
     if (!selectedUser?._id) {
-      notifyWarning('Selecione um usuario para criar um novo vínculo');
+      notifyWarning('Selecione um usuário para criar um novo vínculo');
       return;
     }
 
@@ -456,7 +456,7 @@ export default function AdminUsers() {
       await handleRefresh();
       handleStartNewUser();
       setIsDeleteUserConfirmOpen(false);
-      notifySuccess('Usuario removido com sucesso');
+      notifySuccess('Usuário removido com sucesso');
     } catch (err) {
       notifyError(buildAdminUserErrorMessage(err));
     }
@@ -501,7 +501,7 @@ export default function AdminUsers() {
         }
 
         await handleRefresh();
-        notifySuccess('Usuario atualizado com sucesso');
+        notifySuccess('Usuário atualizado com sucesso');
         return;
       }
 
@@ -518,7 +518,7 @@ export default function AdminUsers() {
 
       await handleRefresh();
       setSelectedUserId(normalizeId(createdUser._id));
-      notifySuccess('Usuario criado com sucesso');
+      notifySuccess('Usuário criado com sucesso');
     } catch (err) {
       notifyError(buildAdminUserErrorMessage(err));
     }
@@ -540,7 +540,7 @@ export default function AdminUsers() {
         <div>
           <HeaderTitle>GERENCIAMENTO DE USUARIOS</HeaderTitle>
           <HeaderSubtitle>
-            Filtre por universidade e liga para editar o perfil do usuario, o
+            Filtre por universidade e liga para editar o perfil do usuário, o
             vínculo com a liga e o status de ativacao.
           </HeaderSubtitle>
         </div>
@@ -552,7 +552,7 @@ export default function AdminUsers() {
             </SearchIcon>
             <SearchInput
               type="search"
-              placeholder="Buscar usuario"
+              placeholder="Buscar usuário"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
             />
@@ -606,7 +606,7 @@ export default function AdminUsers() {
 
           <EntityList>
             {!filteredUsers.length && (
-              <EmptyState>Nenhum usuario encontrado.</EmptyState>
+              <EmptyState>Nenhum usuário encontrado.</EmptyState>
             )}
 
             {filteredUsers.map((user) => {
@@ -637,8 +637,8 @@ export default function AdminUsers() {
         <FormCard onSubmit={onSubmit}>
           <SectionTitle>
             {selectedUser?._id
-              ? 'Editar usuario e vínculos'
-              : 'Criar novo usuario (ou selecione um existente)'}
+              ? 'Editar usuário e vínculos'
+              : 'Criar novo usuário (ou selecione um existente)'}
           </SectionTitle>
 
           <FormGrid>
@@ -646,7 +646,7 @@ export default function AdminUsers() {
               <Label>
                 <FiUser /> Nome
               </Label>
-              <TextInput {...register('name')} placeholder="Nome do usuario" />
+              <TextInput {...register('name')} placeholder="Nome do usuário" />
               {errors.name && (
                 <ErrorMessage>{errors.name.message}</ErrorMessage>
               )}
@@ -657,7 +657,7 @@ export default function AdminUsers() {
               <TextInput
                 type="email"
                 {...register('email')}
-                placeholder="E-mail do usuario"
+                placeholder="E-mail do usuário"
               />
               {errors.email && (
                 <ErrorMessage>{errors.email.message}</ErrorMessage>
@@ -927,7 +927,7 @@ export default function AdminUsers() {
 
           <ActionRow>
             <ActionButton type="button" onClick={handleStartNewUser}>
-              <FiPlus /> Novo usuario
+              <FiPlus /> Novo usuário
             </ActionButton>
             <ActionButton
               type="button"
@@ -950,7 +950,7 @@ export default function AdminUsers() {
               onClick={() => setIsDeleteUserConfirmOpen(true)}
               disabled={isSaving || !selectedUser?._id}
             >
-              <FiTrash2 /> Remover usuario
+              <FiTrash2 /> Remover usuário
             </ActionButton>
             <ActionButton type="submit" disabled={isSaving}>
               {isSaving ? (
@@ -971,7 +971,7 @@ export default function AdminUsers() {
       <ConfirmDialog
         isOpen={isDeleteMembershipConfirmOpen}
         title="Remover vínculo"
-        description="Essa acao remove o vínculo selecionado do usuario com a liga e subequipe."
+        description="Essa acao remove o vínculo selecionado do usuário com a liga e subequipe."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDeleteMembership}
@@ -981,8 +981,8 @@ export default function AdminUsers() {
 
       <ConfirmDialog
         isOpen={isDeleteUserConfirmOpen}
-        title="Remover usuario"
-        description="Essa acao remove o usuario selecionado. Verifique dependencias antes de confirmar."
+        title="Remover usuário"
+        description="Essa acao remove o usuário selecionado. Verifique dependencias antes de confirmar."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDeleteUser}
