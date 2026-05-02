@@ -13,6 +13,7 @@ export { default as ManagerSquads } from './Manager/ManagerSquads/ManagerSquads'
 export { default as StudentEvents } from './Student/StudentEvents/StudentEvents';
 export { default as StudentDashboard } from './Student/StudentDashboard/StudentDashboard';
 export { default as StudentTeam } from './Student/StudentTeam/StudentTeam';
+export { default as StudentCertificates } from './Student/StudentCertificates/StudentCertificates';
 export { default as ChangePassword } from './ChangePassword/ChangePassword';
 export { default as AdminDashboard } from './Admin/AdminDashboard/AdminDashboard';
 export { default as AdminUniversities } from './Admin/AdminUniversities/AdminUniversities';

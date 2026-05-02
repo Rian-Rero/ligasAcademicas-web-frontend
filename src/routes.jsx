@@ -29,6 +29,7 @@ import {
   StudentEvents,
   StudentDashboard,
   StudentTeam,
+  StudentCertificates,
   EmailConfirmation,
   ForgotPassword,
   RedefinePassword,
@@ -122,7 +123,7 @@ const router = createBrowserRouter(
             <Route index element={<StudentDashboard />} />
             <Route path="dashboard" element={<StudentDashboard />} />
             <Route path="events" element={<StudentEvents />} />
-            <Route path="certificates" element={<StudentDashboard />} />
+            <Route path="certificates" element={<StudentCertificates />} />
             <Route path="team" element={<StudentTeam />} />
             <Route path="profile" element={<Profile />} />
             <Route path="*" element={<StudentDashboard />} />
