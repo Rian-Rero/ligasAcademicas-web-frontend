@@ -29,59 +29,17 @@ import {
   DialogButtons,
   DialogButton,
 } from './Styles';
+import {
+  buildRequestErrorMessage,
+  formatTaskDate,
+  getPriorityColor,
+  getPriorityLabel,
+  isTaskOverdue,
+} from './utils';
 import { DelegateTaskModal } from '../../../components/features';
 import { useGetTasks, useDeleteTask } from '../../../hooks/query/task';
 import { useGetUsers } from '../../../hooks/query/user';
 import { notifyError, notifySuccess } from '../../../utils/toast';
-
-function buildRequestErrorMessage(err, fallback) {
-  const responseMessage = err?.response?.data?.message;
-  if (Array.isArray(responseMessage)) {
-    return responseMessage.join(', ');
-  }
-  return responseMessage || fallback;
-}
-
-function getPriorityColor(priority) {
-  switch (priority) {
-    case 'HIGH':
-      return '#ef4444';
-    case 'MEDIUM':
-      return '#f59e0b';
-    case 'LOW':
-      return '#10b981';
-    default:
-      return '#6b7280';
-  }
-}
-
-function getPriorityLabel(priority) {
-  switch (priority) {
-    case 'HIGH':
-      return 'Alta';
-    case 'MEDIUM':
-      return 'Média';
-    case 'LOW':
-      return 'Baixa';
-    default:
-      return priority;
-  }
-}
-
-function formatDate(dateString) {
-  return new Date(dateString).toLocaleDateString('pt-BR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
-function isOverdue(dueDate, completed) {
-  if (completed) return false;
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  return new Date(dueDate) < now;
-}
 
 export default function ManagerTasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -187,7 +145,7 @@ export default function ManagerTasks() {
                 <TasksContainer>
                   {pendingTasks.map((task) => {
                     const assignedToUser = userMap[task.assignedTo];
-                    const overdue = isOverdue(task.dueDate, task.completed);
+                    const overdue = isTaskOverdue(task.dueDate, task.completed);
 
                     return (
                       <TaskCard key={task._id} overdue={overdue}>
@@ -215,7 +173,7 @@ export default function ManagerTasks() {
 
                         <TaskCardMeta>
                           <DueDateWrapper overdue={overdue}>
-                            📅 Prazo: {formatDate(task.dueDate)}
+                            📅 Prazo: {formatTaskDate(task.dueDate)}
                             {overdue && ' (ATRASADO)'}
                           </DueDateWrapper>
                           {assignedToUser && (
@@ -270,7 +228,7 @@ export default function ManagerTasks() {
 
                         <TaskCardMeta>
                           <div>
-                            📅 Concluída em: {formatDate(task.completedAt)}
+                            📅 Concluída em: {formatTaskDate(task.completedAt)}
                           </div>
                           {assignedToUser && (
                             <UserBadge>👤 {assignedToUser.name}</UserBadge>

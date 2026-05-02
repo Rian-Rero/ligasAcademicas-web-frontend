@@ -22,57 +22,16 @@ import {
   StatusBadge,
   DueDateWrapper,
 } from './Styles';
+import {
+  buildRequestErrorMessage,
+  formatTaskDate,
+  getPriorityColor,
+  getPriorityLabel,
+  isTaskOverdue,
+} from './utils';
 import { useGetTasks, useCompleteTask } from '../../../hooks/query/task';
 import useAuthStore from '../../../stores/auth';
 import { notifyError, notifySuccess } from '../../../utils/toast';
-
-function buildRequestErrorMessage(err, fallback) {
-  const responseMessage = err?.response?.data?.message;
-  if (Array.isArray(responseMessage)) {
-    return responseMessage.join(', ');
-  }
-  return responseMessage || fallback;
-}
-
-function getPriorityColor(priority) {
-  switch (priority) {
-    case 'HIGH':
-      return '#ef4444';
-    case 'MEDIUM':
-      return '#f59e0b';
-    case 'LOW':
-      return '#10b981';
-    default:
-      return '#6b7280';
-  }
-}
-
-function getPriorityLabel(priority) {
-  switch (priority) {
-    case 'HIGH':
-      return 'Alta';
-    case 'MEDIUM':
-      return 'Média';
-    case 'LOW':
-      return 'Baixa';
-    default:
-      return priority;
-  }
-}
-
-function formatDate(dateString) {
-  return new Date(dateString).toLocaleDateString('pt-BR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
-function isOverdue(dueDate) {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  return new Date(dueDate) < now;
-}
 
 function isToday(dueDate) {
   const today = new Date();
@@ -175,7 +134,7 @@ export default function StudentTasks() {
               </HeaderTitle>
               <TasksContainer>
                 {sortedPendingTasks.map((task) => {
-                  const overdue = isOverdue(task.dueDate);
+                  const overdue = isTaskOverdue(task.dueDate);
                   const today = isToday(task.dueDate);
 
                   return (
@@ -195,7 +154,7 @@ export default function StudentTasks() {
                       <TaskCardMeta>
                         <DueDateWrapper overdue={overdue}>
                           {overdue && <FiAlertCircle size={16} />}
-                          📅 Prazo: {formatDate(task.dueDate)}
+                          📅 Prazo: {formatTaskDate(task.dueDate)}
                           {today && ' (Hoje)'}
                           {overdue && ' (ATRASADO)'}
                         </DueDateWrapper>
@@ -249,7 +208,9 @@ export default function StudentTasks() {
                     </TaskCardHeader>
 
                     <TaskCardMeta>
-                      <div>📅 Concluída em: {formatDate(task.completedAt)}</div>
+                      <div>
+                        📅 Concluída em: {formatTaskDate(task.completedAt)}
+                      </div>
                     </TaskCardMeta>
                   </TaskCard>
                 ))}
