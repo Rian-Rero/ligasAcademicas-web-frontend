@@ -58,64 +58,23 @@ export default function StudentCertificates() {
 
   const isLoading = isLoadingMemberships || isLoadingCertificates;
 
-  const groupedLeagues = useMemo(() => {
-    const map = {};
-
-    allMemberships.forEach((membership) => {
-      const { _id } = membership;
-      const leagueId = normalizeId(
-        membership.league?._id || membership.league || 'unica_liga',
+  const membershipsWithCertificates = useMemo(() => {
+    return allMemberships.map((membership) => {
+      const matchedCertificate = certificates.find(
+        (cert) =>
+          normalizeId(cert.leagueMembership) === normalizeId(membership._id),
       );
 
-      if (!map[leagueId]) {
-        map[leagueId] = {
-          id: leagueId,
-          certificate: null,
-          membershipsHistory: [],
-        };
-      }
-
-      map[leagueId].membershipsHistory.push(membership);
-
-      if (!map[leagueId].certificate) {
-        const cert = certificates.find((c) => {
-          const certMembershipId = normalizeId(
-            c.leagueMembership?._id || c.leagueMembership,
-          );
-          return certMembershipId === normalizeId(_id);
-        });
-
-        if (cert) {
-          map[leagueId].certificate = cert;
-        }
-      }
-    });
-
-    return Object.values(map).map((group) => {
-      const sortedHistory = [...group.membershipsHistory].sort((a, b) => {
-        return String(b._id).localeCompare(String(a._id));
-      });
-
-      const activeMembership = sortedHistory.find((m) => m.isActive);
-
-      let isLeagueActive = false;
-      if (!group.certificate && activeMembership) {
-        isLeagueActive = true;
-      }
-
-      let displayRole = 'N/A';
-      if (isLeagueActive) {
-        displayRole = activeMembership.role;
-      } else if (sortedHistory.length > 0) {
-        displayRole = sortedHistory[0].role;
-      }
-
       return {
-        ...group,
-        isActive: isLeagueActive,
-        currentRole: displayRole,
-        mainActiveMembershipId: isLeagueActive ? activeMembership._id : null,
-        membershipsHistory: sortedHistory,
+        ...membership,
+        certificate: matchedCertificate || null,
+        history: membership.roleHistory || [
+          {
+            _id: membership._id,
+            role: membership.role,
+            isActive: membership.isActive,
+          },
+        ],
       };
     });
   }, [allMemberships, certificates]);
@@ -144,7 +103,7 @@ export default function StudentCertificates() {
     } catch (err) {
       const message = buildRequestErrorMessage(
         err,
-        'Erro ao baixar o certificado.',
+        'Erro ao baixar o certificado. Tente novamente',
       );
       notifyError(message);
     }
@@ -158,29 +117,20 @@ export default function StudentCertificates() {
 
       {isLoading && <EmptyState>Carregando certificados...</EmptyState>}
 
-      {!isLoading && groupedLeagues.length === 0 && (
+      {!isLoading && membershipsWithCertificates.length === 0 && (
         <EmptyState>
-          Nenhum vínculo ou liga foi encontrada para o seu usuário.
+          <TbCertificate size={64} />
+          <h3>Nenhum vínculo ou certificado disponível</h3>
+          <p>
+            Você poderá acompanhar suas informações parciais ao entrar em uma
+            liga. O certificado final será emitido após a sua desvinculação.
+          </p>
         </EmptyState>
       )}
 
       {!isLoading &&
-        groupedLeagues.map((group) => {
-          const {
-            isActive,
-            currentRole,
-            certificate,
-            id,
-            membershipsHistory,
-            mainActiveMembershipId,
-          } = group;
-
-          let cardSubText = 'Seu vínculo com a liga está inativo';
-          let cardMainTitle = 'RESUMO DO MEU CERTIFICADO FINAL (SGLA)';
-          if (isActive) {
-            cardSubText = 'Seu vínculo com a liga está ativo';
-            cardMainTitle = 'RESUMO DO MEU CERTIFICADO PARCIAL (SGLA)';
-          }
+        membershipsWithCertificates.map((item) => {
+          const { isActive, role, certificate, _id, history } = item;
 
           let issueDateText = 'N/A';
           if (isActive) {
@@ -189,7 +139,7 @@ export default function StudentCertificates() {
             const date = new Date(certificate.issueDate);
             issueDateText = !Number.isNaN(date.getTime())
               ? date.toLocaleDateString('pt-BR')
-              : 'Data inválida';
+              : 'N/A';
           }
 
           let actionArea = null;
@@ -203,34 +153,44 @@ export default function StudentCertificates() {
           } else if (certificate?.pdfUrl) {
             actionArea = (
               <ActionButton onClick={() => handleDownload(certificate)}>
-                <FiDownload size={20} /> BAIXAR CERTIFICADO FINAL
+                <FiDownload size={20} />
+                BAIXAR CERTIFICADO FINAL
               </ActionButton>
             );
           } else {
             actionArea = (
               <InfoMessage $type="inactive">
-                Certificado final ainda não disponível para download.
+                Certificado final ainda não disponível para download
               </InfoMessage>
             );
           }
 
           return (
-            <Card key={id}>
+            <Card key={_id}>
               <CardHeader>
                 <CardIcon>
                   <TbCertificate />
                 </CardIcon>
                 <CardTitleGroup>
-                  <h2>{cardMainTitle}</h2>
-                  <p>{cardSubText}</p>
+                  <h2>
+                    {isActive
+                      ? 'RESUMO DO MEU CERTIFICADO PARCIAL (SGLA)'
+                      : 'RESUMO DO MEU CERTIFICADO FINAL (SGLA)'}
+                  </h2>
+                  <p>
+                    {isActive
+                      ? 'Seu vínculo com a liga está ativo'
+                      : 'Seu vínculo com a liga está inativo'}
+                  </p>
                 </CardTitleGroup>
               </CardHeader>
 
               <InfoGrid>
                 <InfoBlock>
-                  <span>{isActive ? 'Cargo Atual' : 'Último Cargo'}</span>
-                  <strong>{currentRole}</strong>
+                  <span>Cargo Atual / Último Cargo</span>
+                  <strong>{role || 'N/A'}</strong>
                 </InfoBlock>
+
                 <InfoBlock>
                   <span>Carga Horária Total</span>
                   <strong>
@@ -238,6 +198,7 @@ export default function StudentCertificates() {
                     {isActive && <small>(Acumulando)</small>}
                   </strong>
                 </InfoBlock>
+
                 <InfoBlock>
                   <span>Data de Emissão</span>
                   <strong>{issueDateText}</strong>
@@ -245,20 +206,15 @@ export default function StudentCertificates() {
               </InfoGrid>
 
               <HistoryContainer>
-                <HistoryTitle>Histórico de cargos na liga</HistoryTitle>
+                <HistoryTitle>Histórico de Cargos na Liga</HistoryTitle>
                 <HistoryList>
-                  {membershipsHistory.map((m) => {
-                    const { _id, role } = m;
-                    return (
-                      <HistoryItem key={_id}>
-                        <Bullet />
-                        {role || 'Cargo não especificado'}
-                        {_id === mainActiveMembershipId && (
-                          <ActiveBadge>Ativo</ActiveBadge>
-                        )}
-                      </HistoryItem>
-                    );
-                  })}
+                  {history.map((m, index) => (
+                    <HistoryItem key={m._id || index}>
+                      <Bullet />
+                      {m.role || 'Cargo não especificado'}
+                      {m.isActive && <ActiveBadge>Ativo</ActiveBadge>}
+                    </HistoryItem>
+                  ))}
                 </HistoryList>
               </HistoryContainer>
 
