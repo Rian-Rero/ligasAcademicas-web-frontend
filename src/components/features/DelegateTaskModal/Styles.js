@@ -179,6 +179,127 @@ export const SelectWrapper = styled.div`
   align-items: center;
 `;
 
+export const SearchInput = styled(Input)`
+  margin-bottom: 1rem;
+`;
+
+export const SelectedUserCard = styled.div`
+  display: grid;
+  gap: 0.2rem;
+  margin-bottom: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: 1.2rem;
+  border: 1px solid rgba(0, 140, 255, 0.18);
+  background: rgba(0, 140, 255, 0.08);
+
+  span {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+`;
+
+export const SelectedUserLabel = styled.span`
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(191, 219, 254, 0.8);
+`;
+
+export const SelectedUserValue = styled.strong`
+  font-size: 1.5rem;
+  color: #ffffff;
+`;
+
+export const SearchResultsMeta = styled.p`
+  margin: 0 0 0.8rem;
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.58);
+`;
+
+export const SearchResultsList = styled.div`
+  display: grid;
+  gap: 0.8rem;
+  max-height: 26rem;
+  overflow: auto;
+  padding-right: 0.2rem;
+`;
+
+export const SearchResultsEmpty = styled.div`
+  padding: 1.2rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.35rem;
+`;
+
+export const UserOption = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem 1.2rem;
+  border-radius: 1.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: ${(props) =>
+    props.$selected
+      ? 'linear-gradient(120deg, rgba(0, 140, 255, 0.24), rgba(43, 102, 255, 0.18))'
+      : 'rgba(255, 255, 255, 0.04)'};
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(0, 140, 255, 0.36);
+    box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.22);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+`;
+
+export const UserOptionAvatar = styled.span`
+  width: 3.6rem;
+  height: 3.6rem;
+  flex: 0 0 3.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #008cff, #2b66ff 58%, #0b9de8);
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 800;
+  box-shadow: 0 0.8rem 2rem rgba(0, 140, 255, 0.24);
+`;
+
+export const UserOptionText = styled.span`
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+`;
+
+export const UserOptionName = styled.span`
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #ffffff;
+`;
+
+export const UserOptionEmail = styled.span`
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.68);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 export const Select = styled.select`
   ${fieldBase};
   cursor: pointer;

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useDeferredValue, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -15,12 +15,22 @@ import {
   Header,
   Input,
   Label,
+  SearchInput,
+  SearchResultsMeta,
+  SearchResultsList,
+  SearchResultsEmpty,
+  UserOption,
+  UserOptionEmail,
+  UserOptionName,
+  UserOptionText,
+  UserOptionAvatar,
+  SelectedUserCard,
+  SelectedUserLabel,
+  SelectedUserValue,
   SaveButton,
   Textarea,
   Title,
   Overlay,
-  SelectWrapper,
-  Select,
   DateInput,
   PriorityGroup,
   PriorityOption,
@@ -31,8 +41,10 @@ import {
   taskFormDefaultValues,
   taskValidationSchema,
 } from './utils';
+import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
 import { useCreateTask } from '../../../hooks/query/task';
 import { useGetUsers } from '../../../hooks/query/user';
+import useAuthStore from '../../../stores/auth';
 import { notifyError, notifySuccess } from '../../../utils/toast';
 
 export default function DelegateTaskModal({
@@ -40,6 +52,10 @@ export default function DelegateTaskModal({
   onClose,
   onSuccess = () => {},
 }) {
+  const authUser = useAuthStore((state) => state.auth?.user);
+  const [searchTerm, setSearchTerm] = useState('');
+  const deferredSearchTerm = useDeferredValue(searchTerm);
+
   const {
     register,
     handleSubmit,
@@ -50,6 +66,26 @@ export default function DelegateTaskModal({
   } = useForm({
     resolver: zodResolver(taskValidationSchema),
     defaultValues: taskFormDefaultValues,
+  });
+
+  const { data: activeMemberships = [] } = useGetLeagueMemberships({
+    filters: { user: authUser?._id, isActive: true },
+    enabled: Boolean(isOpen && authUser?._id),
+    queryKey: ['manager-task-active-memberships', authUser?._id],
+  });
+
+  const activeMembership = activeMemberships[0];
+
+  const { data: leagueMemberships = [] } = useGetLeagueMemberships({
+    filters: {
+      academicLeague: activeMembership?.academicLeague,
+      isActive: true,
+    },
+    enabled: Boolean(isOpen && activeMembership?.academicLeague),
+    queryKey: [
+      'manager-task-league-memberships',
+      activeMembership?.academicLeague,
+    ],
   });
 
   const { data: users = [] } = useGetUsers({
@@ -63,10 +99,45 @@ export default function DelegateTaskModal({
     },
   });
 
+  const leagueUsers = useMemo(() => {
+    const leagueUserIds = new Set(
+      leagueMemberships
+        .map((membership) => String(membership.user || ''))
+        .filter(Boolean),
+    );
+
+    return users
+      .filter((user) => leagueUserIds.has(String(user?._id || '')))
+      .filter((user) => String(user?._id || '') !== String(authUser?._id || ''))
+      .sort((left, right) => {
+        const leftName = String(left?.name || '').toLocaleLowerCase('pt-BR');
+        const rightName = String(right?.name || '').toLocaleLowerCase('pt-BR');
+
+        return leftName.localeCompare(rightName, 'pt-BR');
+      });
+  }, [authUser?._id, leagueMemberships, users]);
+
   const filteredUsers = useMemo(() => {
-    // Filter out the current user and show only students or specific roles
-    return users.filter((u) => u._id); // Can add more filters here
-  }, [users]);
+    const normalizedSearch = deferredSearchTerm
+      .trim()
+      .toLocaleLowerCase('pt-BR');
+
+    if (!normalizedSearch) return leagueUsers;
+
+    return leagueUsers.filter((user) => {
+      const haystack = `${user?.name || ''} ${user?.email || ''}`
+        .toLocaleLowerCase('pt-BR')
+        .trim();
+
+      return haystack.includes(normalizedSearch);
+    });
+  }, [deferredSearchTerm, leagueUsers]);
+
+  const assignedTo = watch('assignedTo');
+
+  const selectedUser = useMemo(() => {
+    return leagueUsers.find((user) => String(user._id) === String(assignedTo));
+  }, [assignedTo, leagueUsers]);
 
   const createTaskMutation = useCreateTask({
     onSuccess: () => {
@@ -143,23 +214,71 @@ export default function DelegateTaskModal({
               </FormGroup>
 
               <FormGroup>
-                <Label htmlFor="assignedTo">Delegar para *</Label>
-                <SelectWrapper>
-                  <Select
-                    id="assignedTo"
-                    disabled={
-                      createTaskMutation.isPending || filteredUsers.length === 0
-                    }
-                    {...register('assignedTo')}
-                  >
-                    <option value="">Selecione um usuário...</option>
-                    {filteredUsers.map((user) => (
-                      <option key={user._id} value={user._id}>
-                        {user.name} ({user.email})
-                      </option>
-                    ))}
-                  </Select>
-                </SelectWrapper>
+                <Label htmlFor="assignedTo-search">Delegar para *</Label>
+                <SearchInput
+                  id="assignedTo-search"
+                  type="search"
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  placeholder="Pesquisar por nome ou e-mail"
+                  disabled={createTaskMutation.isPending}
+                />
+
+                {selectedUser && (
+                  <SelectedUserCard>
+                    <SelectedUserLabel>Selecionado</SelectedUserLabel>
+                    <SelectedUserValue>{selectedUser.name}</SelectedUserValue>
+                    <span>{selectedUser.email}</span>
+                  </SelectedUserCard>
+                )}
+
+                <input type="hidden" {...register('assignedTo')} />
+
+                <SearchResultsMeta>
+                  {filteredUsers.length} pessoa(s) encontrada(s) na sua liga
+                </SearchResultsMeta>
+
+                <SearchResultsList>
+                  {filteredUsers.length === 0 ? (
+                    <SearchResultsEmpty>
+                      {deferredSearchTerm.trim()
+                        ? 'Nenhum membro encontrado para esta busca.'
+                        : 'Nenhum membro ativo encontrado na sua liga.'}
+                    </SearchResultsEmpty>
+                  ) : (
+                    filteredUsers.map((user) => {
+                      const isSelected =
+                        String(user._id) === String(selectedUser?._id);
+
+                      return (
+                        <UserOption
+                          key={user._id}
+                          type="button"
+                          $selected={isSelected}
+                          onClick={() =>
+                            setValue('assignedTo', user._id, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            })
+                          }
+                          disabled={createTaskMutation.isPending}
+                        >
+                          <UserOptionAvatar>
+                            {String(user.name || '?')
+                              .trim()
+                              .charAt(0)
+                              .toUpperCase()}
+                          </UserOptionAvatar>
+                          <UserOptionText>
+                            <UserOptionName>{user.name}</UserOptionName>
+                            <UserOptionEmail>{user.email}</UserOptionEmail>
+                          </UserOptionText>
+                        </UserOption>
+                      );
+                    })
+                  )}
+                </SearchResultsList>
+
                 {errors.assignedTo && (
                   <ErrorMessage>{errors.assignedTo.message}</ErrorMessage>
                 )}
