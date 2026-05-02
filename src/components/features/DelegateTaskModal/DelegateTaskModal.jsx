@@ -45,6 +45,7 @@ import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
 import { useCreateTask } from '../../../hooks/query/task';
 import { useGetUsers } from '../../../hooks/query/user';
 import useAuthStore from '../../../stores/auth';
+import { hasAdminRole, hasManagerRole } from '../../../utils/roles';
 import { notifyError, notifySuccess } from '../../../utils/toast';
 
 export default function DelegateTaskModal({
@@ -53,6 +54,8 @@ export default function DelegateTaskModal({
   onSuccess = () => {},
 }) {
   const authUser = useAuthStore((state) => state.auth?.user);
+  const isAdmin = hasAdminRole(authUser?.roleKeys);
+  const isManager = !isAdmin && hasManagerRole(authUser?.roleKeys);
   const [searchTerm, setSearchTerm] = useState('');
   const deferredSearchTerm = useDeferredValue(searchTerm);
 
@@ -70,7 +73,7 @@ export default function DelegateTaskModal({
 
   const { data: activeMemberships = [] } = useGetLeagueMemberships({
     filters: { user: authUser?._id, isActive: true },
-    enabled: Boolean(isOpen && authUser?._id),
+    enabled: Boolean(isOpen && isManager && authUser?._id),
     queryKey: ['manager-task-active-memberships', authUser?._id],
   });
 
@@ -81,7 +84,7 @@ export default function DelegateTaskModal({
       academicLeague: activeMembership?.academicLeague,
       isActive: true,
     },
-    enabled: Boolean(isOpen && activeMembership?.academicLeague),
+    enabled: Boolean(isOpen && isManager && activeMembership?.academicLeague),
     queryKey: [
       'manager-task-league-memberships',
       activeMembership?.academicLeague,
@@ -99,7 +102,22 @@ export default function DelegateTaskModal({
     },
   });
 
-  const leagueUsers = useMemo(() => {
+  const candidateUsers = useMemo(() => {
+    if (isAdmin) {
+      return users
+        .filter(
+          (user) => String(user?._id || '') !== String(authUser?._id || ''),
+        )
+        .sort((left, right) => {
+          const leftName = String(left?.name || '').toLocaleLowerCase('pt-BR');
+          const rightName = String(right?.name || '').toLocaleLowerCase(
+            'pt-BR',
+          );
+
+          return leftName.localeCompare(rightName, 'pt-BR');
+        });
+    }
+
     const leagueUserIds = new Set(
       leagueMemberships
         .map((membership) => String(membership.user || ''))
@@ -115,29 +133,39 @@ export default function DelegateTaskModal({
 
         return leftName.localeCompare(rightName, 'pt-BR');
       });
-  }, [authUser?._id, leagueMemberships, users]);
+  }, [authUser?._id, isAdmin, leagueMemberships, users]);
 
   const filteredUsers = useMemo(() => {
     const normalizedSearch = deferredSearchTerm
       .trim()
       .toLocaleLowerCase('pt-BR');
 
-    if (!normalizedSearch) return leagueUsers;
+    if (!normalizedSearch) return candidateUsers;
 
-    return leagueUsers.filter((user) => {
+    return candidateUsers.filter((user) => {
       const haystack = `${user?.name || ''} ${user?.email || ''}`
         .toLocaleLowerCase('pt-BR')
         .trim();
 
       return haystack.includes(normalizedSearch);
     });
-  }, [deferredSearchTerm, leagueUsers]);
+  }, [candidateUsers, deferredSearchTerm]);
 
   const assignedTo = watch('assignedTo');
 
   const selectedUser = useMemo(() => {
-    return leagueUsers.find((user) => String(user._id) === String(assignedTo));
-  }, [assignedTo, leagueUsers]);
+    return candidateUsers.find(
+      (user) => String(user._id) === String(assignedTo),
+    );
+  }, [assignedTo, candidateUsers]);
+
+  let emptyResultsMessage = 'Nenhum membro ativo encontrado na sua liga.';
+  if (isAdmin) {
+    emptyResultsMessage = 'Nenhum usuário disponível no sistema.';
+  }
+  if (deferredSearchTerm.trim()) {
+    emptyResultsMessage = 'Nenhum usuário encontrado para esta busca.';
+  }
 
   const createTaskMutation = useCreateTask({
     onSuccess: () => {
@@ -220,7 +248,11 @@ export default function DelegateTaskModal({
                   type="search"
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
-                  placeholder="Pesquisar por nome ou e-mail"
+                  placeholder={
+                    isAdmin
+                      ? 'Pesquisar qualquer usuário por nome ou e-mail'
+                      : 'Pesquisar membros da sua liga por nome ou e-mail'
+                  }
                   disabled={createTaskMutation.isPending}
                 />
 
@@ -235,15 +267,16 @@ export default function DelegateTaskModal({
                 <input type="hidden" {...register('assignedTo')} />
 
                 <SearchResultsMeta>
-                  {filteredUsers.length} pessoa(s) encontrada(s) na sua liga
+                  {filteredUsers.length}{' '}
+                  {isAdmin
+                    ? 'pessoa(s) encontrada(s) no sistema'
+                    : 'pessoa(s) encontrada(s) na sua liga'}
                 </SearchResultsMeta>
 
                 <SearchResultsList>
                   {filteredUsers.length === 0 ? (
                     <SearchResultsEmpty>
-                      {deferredSearchTerm.trim()
-                        ? 'Nenhum membro encontrado para esta busca.'
-                        : 'Nenhum membro ativo encontrado na sua liga.'}
+                      {emptyResultsMessage}
                     </SearchResultsEmpty>
                   ) : (
                     filteredUsers.map((user) => {
