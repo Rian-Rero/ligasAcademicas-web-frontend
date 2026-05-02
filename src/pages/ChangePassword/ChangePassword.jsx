@@ -31,9 +31,9 @@ async function resolvePostChangePasswordRoute(getActiveMemberships) {
   const authUser = useAuthStore.getState().auth?.user;
   if (!authUser?._id) return '/student/dashboard';
 
-  if (hasAdminRole(authUser?.globalRole)) return '/admin/dashboard';
+  if (hasAdminRole(authUser?.roleKeys)) return '/admin/dashboard';
 
-  if (hasManagerRole(authUser?.globalRole)) return '/manager/dashboard';
+  if (hasManagerRole(authUser?.roleKeys)) return '/manager/dashboard';
 
   try {
     const activeMemberships = await getActiveMemberships({

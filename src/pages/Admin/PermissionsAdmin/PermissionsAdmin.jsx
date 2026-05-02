@@ -57,6 +57,7 @@ import {
   useGetUserPermissions,
   useUpdateUserPermissions,
 } from '../../../hooks/query/userPermissions';
+import { hasAdminRole } from '../../../utils/roles';
 import { notifyError, notifySuccess } from '../../../utils/toast';
 
 export default function PermissionsAdmin() {
@@ -110,7 +111,7 @@ export default function PermissionsAdmin() {
     return users.filter((user) => {
       if (!search) return true;
 
-      return [user.name, user.email, user.globalRole]
+      return [user.name, user.email, ...(user.roleKeys || [])]
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(search));
     });
@@ -121,10 +122,13 @@ export default function PermissionsAdmin() {
     [selectedUserId, users],
   );
 
-  const selectedUserRoles = userPermissionDetails?.roles || [];
+  const selectedUserRoles = useMemo(
+    () => userPermissionDetails?.roles || [],
+    [userPermissionDetails],
+  );
   const selectedUserDirectPermissions = useMemo(
     () => userPermissionDetails?.permissions || [],
-    [userPermissionDetails?.permissions],
+    [userPermissionDetails],
   );
 
   useEffect(() => {
@@ -194,8 +198,8 @@ export default function PermissionsAdmin() {
     }
   };
 
-  const handleSaveDirectPermissions = async () => {
-    if (!selectedUserId || selectedUser?.globalRole === 'admin') {
+  async function handleSaveDirectPermissions() {
+    if (!selectedUserId || hasAdminRole(selectedUser?.roleKeys)) {
       return;
     }
 
@@ -215,7 +219,7 @@ export default function PermissionsAdmin() {
         error.response?.data?.message || 'Erro ao salvar permissões do usuário',
       );
     }
-  };
+  }
 
   const deleteRoleDescription = roleToDelete
     ? `Tem certeza que deseja deletar o papel ${roleToDelete.name}?`
@@ -243,7 +247,7 @@ export default function PermissionsAdmin() {
           >
             <UserCardTitle>
               <UserCardName>{user.name}</UserCardName>
-              <UserCardBadge>{user.globalRole}</UserCardBadge>
+              <UserCardBadge>{user.roleKeys?.[0] || 'membro'}</UserCardBadge>
             </UserCardTitle>
             <UserCardMeta>{user.email}</UserCardMeta>
           </UserCard>
@@ -260,7 +264,7 @@ export default function PermissionsAdmin() {
         <p>Selecione um usuário para editar as permissões.</p>
       </EmptySelection>
     );
-  } else if (selectedUser.globalRole === 'admin') {
+  } else if (hasAdminRole(selectedUser?.roleKeys)) {
     selectedUserContent = (
       <>
         <UserDetailsHeader>
@@ -269,7 +273,7 @@ export default function PermissionsAdmin() {
             <SectionDescription>{selectedUser.email}</SectionDescription>
 
             <UserChips>
-              <UserChip>{selectedUser.globalRole}</UserChip>
+              <UserChip>{selectedUser.roleKeys?.[0] || 'membro'}</UserChip>
               <UserChip>
                 {selectedUserDirectPermissions.length} permissões diretas
               </UserChip>
@@ -306,7 +310,7 @@ export default function PermissionsAdmin() {
             <SectionDescription>{selectedUser.email}</SectionDescription>
 
             <UserChips>
-              <UserChip>{selectedUser.globalRole}</UserChip>
+              <UserChip>{selectedUser.roleKeys?.[0] || 'membro'}</UserChip>
               <UserChip>
                 {selectedUserDirectPermissions.length} permissões diretas
               </UserChip>

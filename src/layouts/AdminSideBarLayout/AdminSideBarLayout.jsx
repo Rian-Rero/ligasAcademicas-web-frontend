@@ -91,8 +91,8 @@ export default function AdminSideBarLayout() {
             <span>
               <FiShield />
               <em>
-                {authUser?.globalRole || 'Admin absoluto'} •{' '}
-                {universities.length} universidades • {leagues.length} ligas
+                {authUser?.roleKeys?.[0] || 'admin'} • {universities.length}{' '}
+                universidades • {leagues.length} ligas
               </em>
             </span>
           </div>

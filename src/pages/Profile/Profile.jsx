@@ -240,7 +240,7 @@ export default function Profile() {
   const isEmailVerified = Boolean(authUser?.emailVerified);
   const isGoogleLinked = Boolean(authUser?.googleCalendarLinked);
   const displayRole = formatRole(
-    activeMembership?.role || authUser?.globalRole,
+    activeMembership?.role || authUser?.roleKeys?.[0],
   );
 
   const handleSelectProfilePhoto = (event) => {

@@ -8,7 +8,6 @@ import {
   FiRefreshCw,
   FiSave,
   FiSearch,
-  FiShield,
   FiUser,
 } from 'react-icons/fi';
 import { ClipLoader } from 'react-spinners';
@@ -72,7 +71,6 @@ import {
 const initialFormState = {
   name: '',
   email: '',
-  globalRole: 'league-member',
   emailVerified: false,
   role: 'league-member',
   academicLeague: '',
@@ -191,7 +189,6 @@ export default function ManagerMembers() {
     setFormState({
       name: selectedMember.user.name || '',
       email: selectedMember.user.email || '',
-      globalRole: selectedMember.user.globalRole || 'league-member',
       emailVerified: Boolean(selectedMember.user.emailVerified),
       role: selectedMember.membership.role || 'league-member',
       academicLeague:
@@ -277,7 +274,6 @@ export default function ManagerMembers() {
 
     const normalizedName = formState.name.trim();
     const normalizedEmail = formState.email.trim().toLocaleLowerCase('pt-BR');
-    const normalizedGlobalRole = formState.globalRole.trim();
     const normalizedLeagueRole = formState.role.trim();
 
     if (!normalizedName || !normalizedEmail) {
@@ -297,7 +293,6 @@ export default function ManagerMembers() {
           newUserData: {
             name: normalizedName,
             email: normalizedEmail,
-            globalRole: normalizedGlobalRole || 'league-member',
             emailVerified: formState.emailVerified,
           },
         }),
@@ -490,20 +485,6 @@ export default function ManagerMembers() {
                   value={formState.email}
                   onChange={handleTextChange('email')}
                 />
-              </Field>
-
-              <Field>
-                <Label>
-                  <FiShield /> Papel global
-                </Label>
-                <SelectInput
-                  value={formState.globalRole}
-                  onChange={handleTextChange('globalRole')}
-                >
-                  <option value="league-member">Membro</option>
-                  <option value="manager">Gestor</option>
-                  <option value="admin">Administrador</option>
-                </SelectInput>
               </Field>
 
               <Field>

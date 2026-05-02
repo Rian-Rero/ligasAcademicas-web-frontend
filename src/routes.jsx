@@ -65,7 +65,7 @@ function ManagerPrivateRoutes() {
   );
 
   const canAccessManager =
-    hasManagerRole(authUser?.globalRole) || hasManagementMembership;
+    hasManagerRole(authUser?.roleKeys) || hasManagementMembership;
 
   if (isLoading) return null;
 
@@ -80,7 +80,7 @@ function AdminPrivateRoutes() {
   const authUser = useAuthStore((state) => state.auth?.user);
   const { pathname: from } = useLocation();
 
-  return hasAdminRole(authUser?.globalRole) ? (
+  return hasAdminRole(authUser?.roleKeys) ? (
     <Outlet />
   ) : (
     <Navigate to="/manager/dashboard" replace state={{ from }} />

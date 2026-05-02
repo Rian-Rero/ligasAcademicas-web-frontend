@@ -57,7 +57,7 @@ function getAuthenticatedContext(authUser, memberships = []) {
     hasManagerRole(membership?.role),
   );
 
-  if (hasAdminRole(authUser?.globalRole)) {
+  if (hasAdminRole(authUser?.roleKeys)) {
     return {
       badge: 'Painel administrativo',
       dashboardTo: '/admin/dashboard',
@@ -67,7 +67,7 @@ function getAuthenticatedContext(authUser, memberships = []) {
     };
   }
 
-  if (hasManagerRole(authUser?.globalRole) || hasManagementMembership) {
+  if (hasManagerRole(authUser?.roleKeys) || hasManagementMembership) {
     return {
       badge: 'Painel de gestão',
       dashboardTo: '/manager/dashboard',
