@@ -1,18 +1,29 @@
 const MANAGER_ROLE_KEYWORDS = ['manager', 'president', 'marketing'];
 
-export function hasManagerRole(role) {
-  if (!role) return false;
+function normalizeRoleKeys(roleKeys) {
+  if (!roleKeys) return [];
 
-  const normalizedRole = String(role).trim().toLocaleLowerCase('pt-BR');
-  return (
-    MANAGER_ROLE_KEYWORDS.some((keyword) => normalizedRole.includes(keyword)) ||
-    normalizedRole.includes('admin')
+  if (Array.isArray(roleKeys)) {
+    return roleKeys.map((roleKey) => String(roleKey).trim().toLowerCase());
+  }
+
+  return [String(roleKeys).trim().toLowerCase()];
+}
+
+export function hasManagerRole(roleKeys) {
+  const normalizedRoleKeys = normalizeRoleKeys(roleKeys);
+  if (normalizedRoleKeys.length === 0) return false;
+
+  return normalizedRoleKeys.some(
+    (roleKey) =>
+      roleKey.includes('admin') ||
+      MANAGER_ROLE_KEYWORDS.some((keyword) => roleKey.includes(keyword)),
   );
 }
 
-export function hasAdminRole(role) {
-  if (!role) return false;
+export function hasAdminRole(roleKeys) {
+  const normalizedRoleKeys = normalizeRoleKeys(roleKeys);
+  if (normalizedRoleKeys.length === 0) return false;
 
-  const normalizedRole = String(role).trim().toLocaleLowerCase('pt-BR');
-  return normalizedRole.includes('admin');
+  return normalizedRoleKeys.some((roleKey) => roleKey.includes('admin'));
 }

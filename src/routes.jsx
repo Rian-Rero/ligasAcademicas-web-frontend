@@ -40,6 +40,7 @@ import {
   Register,
 } from './pages';
 import AdminSquads from './pages/Admin/AdminSquads/AdminSquads';
+import PermissionsAdmin from './pages/Admin/PermissionsAdmin/PermissionsAdmin';
 import useAuthStore from './stores/auth';
 import { hasAdminRole, hasManagerRole } from './utils/roles';
 
@@ -65,7 +66,7 @@ function ManagerPrivateRoutes() {
   );
 
   const canAccessManager =
-    hasManagerRole(authUser?.globalRole) || hasManagementMembership;
+    hasManagerRole(authUser?.roleKeys) || hasManagementMembership;
 
   if (isLoading) return null;
 
@@ -80,7 +81,7 @@ function AdminPrivateRoutes() {
   const authUser = useAuthStore((state) => state.auth?.user);
   const { pathname: from } = useLocation();
 
-  return hasAdminRole(authUser?.globalRole) ? (
+  return hasAdminRole(authUser?.roleKeys) ? (
     <Outlet />
   ) : (
     <Navigate to="/manager/dashboard" replace state={{ from }} />
@@ -113,6 +114,7 @@ const router = createBrowserRouter(
               <Route path="eventos" element={<AdminEvents />} />
               <Route path="subequipes" element={<AdminSquads />} />
               <Route path="usuários" element={<AdminUsers />} />
+              <Route path="permissões" element={<PermissionsAdmin />} />
               <Route path="perfil" element={<Profile />} />
               <Route path="profile" element={<Profile />} />
               <Route path="*" element={<AdminDashboard />} />

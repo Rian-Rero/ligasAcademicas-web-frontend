@@ -30,7 +30,6 @@ import {
 import { useGetLeagueMemberships } from '../../../hooks/query/leagueMembership';
 import { useLogout } from '../../../hooks/query/sessions';
 import useAuthStore from '../../../stores/auth';
-import { resolveMediaUrl } from '../../../utils/media';
 import { hasAdminRole, hasManagerRole } from '../../../utils/roles';
 import OnlyLogo from '../OnlyLogo/OnlyLogo';
 
@@ -57,7 +56,7 @@ function getAuthenticatedContext(authUser, memberships = []) {
     hasManagerRole(membership?.role),
   );
 
-  if (hasAdminRole(authUser?.globalRole)) {
+  if (hasAdminRole(authUser?.roleKeys)) {
     return {
       badge: 'Painel administrativo',
       dashboardTo: '/admin/dashboard',
@@ -67,7 +66,7 @@ function getAuthenticatedContext(authUser, memberships = []) {
     };
   }
 
-  if (hasManagerRole(authUser?.globalRole) || hasManagementMembership) {
+  if (hasManagerRole(authUser?.roleKeys) || hasManagementMembership) {
     return {
       badge: 'Painel de gestão',
       dashboardTo: '/manager/dashboard',
@@ -183,7 +182,7 @@ export default function Header() {
 
             {isAuthenticated ? (
               <AvatarMenu
-                imageUrl={resolveMediaUrl(authUser?.imageURL)}
+                imageUrl={authUser?.image?.url}
                 initials={getInitials(authUser?.name)}
                 profileTo={authenticatedContext.profileTo}
                 onLogout={() => logout()}

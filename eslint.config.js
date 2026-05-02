@@ -67,6 +67,7 @@ export default [
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 0,
       'react/forbid-prop-types': 0,
+      'react/prop-types': 'off',
       'no-underscore-dangle': 0,
       'react/jsx-props-no-spreading': 0,
       'react/jsx-no-bind': 0,
