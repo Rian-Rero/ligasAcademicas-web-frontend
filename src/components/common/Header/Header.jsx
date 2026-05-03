@@ -5,7 +5,7 @@ import { IoClose, IoLogIn, IoMenu } from 'react-icons/io5';
 import { TbLogout2 } from 'react-icons/tb';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import AvatarMenu from './AvatarMenu';
+import AvatarMenu from './AvatarMenu/AvatarMenu';
 import {
   BrandArea,
   BrandInfo,

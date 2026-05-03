@@ -21,6 +21,7 @@ import {
   buildAdminUserErrorMessage,
 } from './utils';
 import { ConfirmDialog } from '../../../components/common';
+import { MembershipActionsMenu } from '../../../components/features';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
 import {
   useCreateLeagueMembership,
@@ -717,6 +718,10 @@ export default function AdminUsers() {
                             ? 'Universidade + Liga'
                             : 'Universidade'}
                         </MembershipTypeBadge>
+                        <MembershipActionsMenu
+                          membership={membership}
+                          onActionSuccess={handleRefresh}
+                        />
                         <SmallActionButton
                           type="button"
                           onClick={() => {

@@ -42,6 +42,7 @@ import {
   ToggleLabel,
   TogglesRow,
 } from './Styles';
+import { MembershipActionsMenu } from '../../../components/features';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
 import {
   useGetLeagueMemberships,
@@ -512,6 +513,12 @@ export default function ManagerMembers() {
                         {membership.isActive ? '' : ' - Inativo'}
                       </span>
                     </MemberMeta>
+                    <div>
+                      <MembershipActionsMenu
+                        membership={membership}
+                        onActionSuccess={handleRefresh}
+                      />
+                    </div>
                   </MemberItem>
                 );
               })}
