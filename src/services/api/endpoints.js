@@ -340,7 +340,7 @@ export const markAttendance = async ({ _id, hasAttended = true }) => {
 
 // Permissions
 export const getPermissions = async (filters = {}) => {
-  const { data } = await api.get('/permissions/permissions', {
+  const { data } = await api.get('/permissions', {
     params: filters,
   });
 
@@ -348,13 +348,13 @@ export const getPermissions = async (filters = {}) => {
 };
 
 export const getPermissionById = async (permissionId) => {
-  const { data } = await api.get(`/permissions/permissions/${permissionId}`);
+  const { data } = await api.get(`/permissions/${permissionId}`);
 
   return data;
 };
 
 export const createPermission = async (permissionData) => {
-  const { data } = await api.post('/permissions/permissions', permissionData);
+  const { data } = await api.post('/permissions', permissionData);
 
   return data;
 };
@@ -364,7 +364,7 @@ export const updatePermission = async ({
   data: permissionData,
 }) => {
   const { data } = await api.patch(
-    `/permissions/permissions/${permissionId}`,
+    `/permissions/${permissionId}`,
     permissionData,
   );
 
@@ -372,7 +372,7 @@ export const updatePermission = async ({
 };
 
 export const deletePermission = async (permissionId) => {
-  const { data } = await api.delete(`/permissions/permissions/${permissionId}`);
+  const { data } = await api.delete(`/permissions/${permissionId}`);
 
   return data;
 };

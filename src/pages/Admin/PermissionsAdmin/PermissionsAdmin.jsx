@@ -60,6 +60,25 @@ import {
 import { hasAdminRole } from '../../../utils/roles';
 import { notifyError, notifySuccess } from '../../../utils/toast';
 
+const moduleLabels = {
+  user: 'Usuários',
+  role: 'Papéis',
+  permission: 'Permissões',
+  event: 'Eventos',
+  attendance: 'Presenças',
+  certificate: 'Certificados',
+  squad: 'Squads',
+  academicLeague: 'Ligas Acadêmicas',
+  leagueMembership: 'Associações à Liga',
+  university: 'Universidades',
+  task: 'Tarefas',
+  system: 'Sistema',
+};
+
+const moduleDescriptions = {
+  task: 'Permissões disponíveis: task.create, task.view, task.edit e task.delete.',
+};
+
 export default function PermissionsAdmin() {
   const [activeTab, setActiveTab] = useState('roles');
   const [editingRole, setEditingRole] = useState(null);
@@ -74,7 +93,6 @@ export default function PermissionsAdmin() {
   const { data: roles = [], isLoading: rolesLoading } = useGetRoles({
     filters: { isGlobal: true },
   });
-  console.log('✌️roles --->', roles);
   const { data: permissions = [], isLoading: permissionsLoading } =
     useGetPermissions();
   const { data: users = [], isLoading: usersLoading } = useGetUsers();
@@ -411,7 +429,12 @@ export default function PermissionsAdmin() {
       <PermissionsGrid>
         {Object.entries(permissionsByModule).map(([module, list]) => (
           <PermissionCard key={module}>
-            <PermissionTitle>{module}</PermissionTitle>
+            <PermissionTitle>{moduleLabels[module] || module}</PermissionTitle>
+            {moduleDescriptions[module] && (
+              <PermissionDescription>
+                {moduleDescriptions[module]}
+              </PermissionDescription>
+            )}
             {list.map((permission) => (
               <div key={permission._id}>
                 <PermissionKey>{permission.key}</PermissionKey>
@@ -519,7 +542,7 @@ export default function PermissionsAdmin() {
               </li>
               <li>
                 <strong>Permissões:</strong> ações específicas como criar,
-                editar ou deletar recursos
+                editar ou deletar recursos, como eventos, tarefas e ligas
               </li>
               <li>
                 <strong>Admin:</strong> tem acesso irrestrito a todas as
@@ -539,7 +562,7 @@ export default function PermissionsAdmin() {
               </li>
               <li>
                 <strong>Gerenciador:</strong> pode gerenciar eventos, presença,
-                squads e membros da liga
+                tarefas, squads e membros da liga
               </li>
             </ul>
 
