@@ -9,8 +9,8 @@ export const adminUniversitySchema = z.object({
   number: z
     .string()
     .trim()
-    .min(1, 'Numero e obrigatorio')
-    .refine((value) => !Number.isNaN(Number(value)), 'Numero invalido'),
+    .min(1, 'Número é obrigatório')
+    .refine((value) => !Number.isNaN(Number(value)), 'Número inválido'),
   complement: z.string().trim().optional(),
 });
 
@@ -32,7 +32,7 @@ const adminUniversityErrorMessages = {
 export function buildAdminUniversityErrorMessage(err) {
   return buildAdminRequestErrorMessage(
     err,
-    'Nao foi possivel salvar a universidade',
+    'Não foi possível salvar a universidade',
     adminUniversityErrorMessages,
   );
 }

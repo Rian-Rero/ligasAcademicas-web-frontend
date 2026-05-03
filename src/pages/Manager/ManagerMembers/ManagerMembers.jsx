@@ -271,7 +271,7 @@ export default function ManagerMembers() {
       notifyError(
         buildRequestErrorMessage(
           err,
-          'Nao foi possivel atualizar a lista de membros',
+          'Não foi possível atualizar a lista de membros',
         ),
       );
     }
@@ -318,7 +318,7 @@ export default function ManagerMembers() {
       setIsCreatingNew(false);
     } catch (err) {
       notifyError(
-        buildRequestErrorMessage(err, 'Nao foi possivel criar o membro'),
+        buildRequestErrorMessage(err, 'Não foi possível criar o membro'),
       );
     }
   };
@@ -371,7 +371,7 @@ export default function ManagerMembers() {
       notifyError(
         buildRequestErrorMessage(
           err,
-          'As alterações foram processadas, mas nao foi possivel atualizar os dados na tela',
+          'As alterações foram processadas, mas não foi possível atualizar os dados na tela',
         ),
       );
       return;
@@ -399,7 +399,7 @@ export default function ManagerMembers() {
         : membershipUpdateResult.reason;
 
     notifyError(
-      buildRequestErrorMessage(error, 'Nao foi possivel salvar as alterações'),
+      buildRequestErrorMessage(error, 'Não foi possível salvar as alterações'),
     );
   };
 

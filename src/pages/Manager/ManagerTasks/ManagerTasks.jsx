@@ -102,6 +102,10 @@ export default function ManagerTasks() {
   const pendingTasks = sortedTasks.filter((t) => !t.completed);
   const completedTasks = sortedTasks.filter((t) => t.completed);
 
+  if (isLoadingTasks) {
+    return <Content>Carregando tarefas...</Content>;
+  }
+
   return (
     <>
       <Content>
@@ -120,9 +124,7 @@ export default function ManagerTasks() {
           </HeaderActions>
         </HeaderSection>
 
-        {isLoadingTasks &&
-        pendingTasks.length === 0 &&
-        completedTasks.length === 0 ? (
+        {pendingTasks.length === 0 && completedTasks.length === 0 ? (
           <EmptyState>
             <MdTaskAlt size={64} color="#d1d5db" />
             <h3>Nenhuma tarefa delegada</h3>

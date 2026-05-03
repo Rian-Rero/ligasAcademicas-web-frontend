@@ -26,7 +26,7 @@ export const StatusBadge = styled.span`
   margin-top: 1.4rem;
   padding: 0.95rem 1.3rem;
   border-radius: 999px;
-  background: ${(props) => (props.$isActive ? '#a8ffbf' : '#ff6b6b43')};
+  background: ${(props) => (props.$isActive ? '#a8ffbf57' : '#ff6b6b43')};
   color: ${(props) => (props.$isActive ? '#a8ffbf' : '#ff6b6b')};
   font-weight: 600;
   font-size: 1.35rem;

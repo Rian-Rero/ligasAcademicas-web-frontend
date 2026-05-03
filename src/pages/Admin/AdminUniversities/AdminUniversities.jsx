@@ -407,7 +407,7 @@ export default function AdminUniversities() {
       <ConfirmDialog
         isOpen={isDeleteConfirmOpen}
         title="Remover universidade"
-        description="Essa acao remove a universidade selecionada. Verifique se nao ha dependencias importantes antes de confirmar."
+        description="Essa ação remove a universidade selecionada. Verifique se não há dependências importantes antes de confirmar."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDelete}

@@ -8,7 +8,6 @@ import {
 } from '../../Student/StudentDashboard/Styles';
 
 export {
-  AgendaAction,
   AgendaInfo,
   AgendaItem,
   AgendaList,
@@ -182,5 +181,44 @@ export const ShortcutBox = styled.button`
     min-width: 2.2rem;
     min-height: 3rem;
     margin-top: 0.1rem;
+  }
+`;
+
+export const AgendaAction = styled.button`
+  display: flex-end;
+  margin-top: 1rem;
+  padding: 0.8rem 1.6rem;
+  background: transparent;
+  color: #f6a04f;
+  border: none;
+  font-size: 1.35rem;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border: none;
+    filter: brightness(1.2);
+  }
+`;
+
+export const EmptyState = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 5rem;
+  justify-content: center;
+  text-align: center;
+  margin-top: 2rem;
+  padding: 6rem 2rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 2rem;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.6);
+
+  h3 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 1rem;
   }
 `;

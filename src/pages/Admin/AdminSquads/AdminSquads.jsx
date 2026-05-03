@@ -398,9 +398,9 @@ export default function AdminSquads() {
                     <EntityBadge>{members.length} usuários</EntityBadge>
                   </EntityTitle>
                   <EntityMeta>
-                    <span>{league?.name || 'Liga nao informada'}</span>
+                    <span>{league?.name || 'Liga não informada'}</span>
                     <span>
-                      {university?.name || 'Universidade nao informada'}
+                      {university?.name || 'Universidade não informada'}
                     </span>
                   </EntityMeta>
                 </EntityItem>
@@ -522,7 +522,7 @@ export default function AdminSquads() {
       <ConfirmDialog
         isOpen={isDeleteConfirmOpen}
         title="Remover subequipe"
-        description="Essa acao remove a subequipe selecionada. Revise os vínculos de usuários antes de confirmar."
+        description="Essa ação remove a subequipe selecionada. Revise os vínculos de usuários antes de confirmar."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDelete}

@@ -132,7 +132,7 @@ export default function ManagerEvents() {
 
   const onSubmit = async (formData) => {
     if (!activeLeague?._id) {
-      notifyWarning('Nao foi possivel identificar a liga ativa');
+      notifyWarning('Não foi possível identificar a liga ativa');
       return;
     }
 
@@ -202,7 +202,7 @@ export default function ManagerEvents() {
 
             <Field>
               <Label>
-                <FiCalendar /> Data e horario
+                <FiCalendar /> Data e horário
               </Label>
               <TextInput
                 type="datetime-local"
@@ -318,7 +318,7 @@ export default function ManagerEvents() {
             <PreviewItem>
               <PreviewLabel>Liga</PreviewLabel>
               <PreviewValue>
-                {activeLeague?.name || 'Liga nao definida'}
+                {activeLeague?.name || 'Liga não definida'}
               </PreviewValue>
             </PreviewItem>
 
@@ -341,7 +341,7 @@ export default function ManagerEvents() {
             )}
 
             <PreviewItem>
-              <PreviewLabel>Data e horario</PreviewLabel>
+              <PreviewLabel>Data e horário</PreviewLabel>
               <PreviewValue>{formatPreviewDate(previewDateTime)}</PreviewValue>
             </PreviewItem>
 

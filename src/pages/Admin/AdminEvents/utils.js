@@ -9,17 +9,17 @@ export const adminEventSchema = z
     title: z
       .string()
       .trim()
-      .min(3, 'O titulo deve ter pelo menos 3 caracteres')
-      .max(120, 'O titulo deve ter no maximo 120 caracteres'),
+      .min(3, 'O título deve ter pelo menos 3 caracteres')
+      .max(120, 'O título deve ter no maximo 120 caracteres'),
     description: z
       .string()
       .trim()
-      .min(3, 'A descricao deve ter pelo menos 3 caracteres')
-      .max(500, 'A descricao deve ter no maximo 500 caracteres'),
+      .min(3, 'A descrição deve ter pelo menos 3 caracteres')
+      .max(500, 'A descrição deve ter no maximo 500 caracteres'),
     dateTime: z
       .string()
       .trim()
-      .nonempty('Informe a data e horario do evento')
+      .nonempty('Informe a data e horário do evento')
       .refine(
         (value) => !Number.isNaN(new Date(value).getTime()),
         'Informe uma data valida',
@@ -63,7 +63,7 @@ const adminEventErrorMessages = {
 export function buildAdminEventErrorMessage(err) {
   return buildAdminRequestErrorMessage(
     err,
-    'Nao foi possivel salvar o evento',
+    'Não foi possível salvar o evento',
     adminEventErrorMessages,
   );
 }

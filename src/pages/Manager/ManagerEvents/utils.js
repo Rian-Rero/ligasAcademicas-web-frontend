@@ -17,7 +17,7 @@ export const eventValidationSchema = z
     dateTime: z
       .string()
       .trim()
-      .nonempty('Informe a data e horario do evento')
+      .nonempty('Informe a data e horário do evento')
       .refine(
         (value) => !Number.isNaN(new Date(value).getTime()),
         'Informe uma data valida',
@@ -41,11 +41,11 @@ export const eventValidationSchema = z
   });
 
 const eventErrorMessages = {
-  [ERROR_CODES.BAD_REQUEST]: 'Dados invalidos para criar o evento',
-  [ERROR_CODES.UNAUTHORIZED]: 'Sua sessao expirou. Faca login novamente',
+  [ERROR_CODES.BAD_REQUEST]: 'Dados inválidos para criar o evento',
+  [ERROR_CODES.UNAUTHORIZED]: 'Sua sessão expirou. Faça login novamente',
   [ERROR_CODES.FORBIDDEN]: 'Apenas gestores podem cadastrar eventos',
-  [ERROR_CODES.NOT_FOUND]: 'Liga ou subequipe nao encontrada',
-  [ERROR_CODES.CONFLICT]: 'Nao foi possivel criar o evento para esta subequipe',
+  [ERROR_CODES.NOT_FOUND]: 'Liga ou subequipe não encontrada',
+  [ERROR_CODES.CONFLICT]: 'Não foi possível criar o evento para esta subequipe',
 };
 
 const eventDefaultErrorMessage =

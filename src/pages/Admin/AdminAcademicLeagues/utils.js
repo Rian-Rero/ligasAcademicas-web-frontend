@@ -31,7 +31,7 @@ const adminAcademicLeagueErrorMessages = {
 export function buildAdminAcademicLeagueErrorMessage(err) {
   return buildAdminRequestErrorMessage(
     err,
-    'Nao foi possivel salvar a liga acadêmica',
+    'Não foi possível salvar a liga acadêmica',
     adminAcademicLeagueErrorMessages,
   );
 }

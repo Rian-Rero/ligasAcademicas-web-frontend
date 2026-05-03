@@ -269,7 +269,7 @@ export default function ManagerEventsList() {
       notifyError(
         buildRequestErrorMessage(
           err,
-          'Nao foi possivel remover o evento selecionado',
+          'Não foi possível remover o evento selecionado',
         ),
       );
     }
@@ -282,7 +282,7 @@ export default function ManagerEventsList() {
     }
 
     if (!activeLeague?._id) {
-      notifyWarning('Nao foi possivel identificar a liga ativa');
+      notifyWarning('Não foi possível identificar a liga ativa');
       return;
     }
 
@@ -305,7 +305,7 @@ export default function ManagerEventsList() {
       await queryClient.invalidateQueries(['events']);
     } catch (err) {
       notifyError(
-        buildRequestErrorMessage(err, 'Nao foi possivel atualizar o evento'),
+        buildRequestErrorMessage(err, 'Não foi possível atualizar o evento'),
       );
     }
   };
@@ -316,7 +316,7 @@ export default function ManagerEventsList() {
         <div>
           <HeaderTitle>EVENTOS</HeaderTitle>
           <HeaderSubtitle>
-            Gerencie eventos da liga, edite informacoes e remova programacoes
+            Gerencie eventos da liga, edite informações e remova programações
             antigas.
           </HeaderSubtitle>
         </div>
@@ -408,7 +408,7 @@ export default function ManagerEventsList() {
 
             <Field>
               <Label>
-                <FiCalendar /> Data e horario
+                <FiCalendar /> Data e horário
               </Label>
               <TextInput
                 type="datetime-local"

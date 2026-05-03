@@ -6,7 +6,7 @@ import { buildAdminRequestErrorMessage } from '../utils';
 export const adminUserSchema = z
   .object({
     name: z.string().trim().min(3, 'Nome deve ter pelo menos 3 caracteres'),
-    email: z.email('E-mail invalido').trim(),
+    email: z.email('E-mail invlido').trim(),
     emailVerified: z.enum(['true', 'false']),
     membershipUniversity: z.string().trim().optional(),
     academicLeague: z.string().trim().optional(),
@@ -70,7 +70,7 @@ const adminUserErrorMessages = {
 export function buildAdminUserErrorMessage(err) {
   return buildAdminRequestErrorMessage(
     err,
-    'Nao foi possivel salvar o usuário',
+    'Não foi possível salvar o usuário',
     adminUserErrorMessages,
   );
 }

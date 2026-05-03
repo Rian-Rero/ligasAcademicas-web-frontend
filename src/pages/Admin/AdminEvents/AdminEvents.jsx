@@ -477,7 +477,7 @@ export function AdminEvents() {
             </Field>
 
             <Field>
-              <Label>Data e horario</Label>
+              <Label>Data e horário</Label>
               <TextInput type="datetime-local" {...register('dateTime')} />
               {errors.dateTime && (
                 <ErrorMessage>{errors.dateTime.message}</ErrorMessage>
@@ -505,7 +505,7 @@ export function AdminEvents() {
                 <option value="">
                   {formScope === 'squad'
                     ? 'Selecione uma subequipe'
-                    : 'Nao necessario neste escopo'}
+                    : 'Não necessario neste escopo'}
                 </option>
                 {squads.map((squad) => (
                   <option key={squad._id} value={normalizeId(squad._id)}>
@@ -545,8 +545,8 @@ export function AdminEvents() {
                 </HelperText>
               )}
               <HelperText>
-                Data: {formDateTime || 'Nao definida'} • Local:{' '}
-                {formLocation || 'Nao definido'} • Título:{' '}
+                Data: {formDateTime || 'Não definida'} • Local:{' '}
+                {formLocation || 'Não definido'} • Título:{' '}
                 {formTitle || 'Novo evento'}
               </HelperText>
               {formDescription && <HelperText>{formDescription}</HelperText>}
@@ -601,7 +601,7 @@ export function AdminEvents() {
         title="Excluir evento"
         description={
           selectedEvent
-            ? `Tem certeza que deseja excluir ${selectedEvent.title}? Essa ação nao pode ser desfeita.`
+            ? `Tem certeza que deseja excluir ${selectedEvent.title}? Essa ação não pode ser desfeita.`
             : 'Tem certeza que deseja excluir este evento?'
         }
         confirmLabel={isDeleting ? 'Excluindo...' : 'Excluir'}

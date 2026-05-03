@@ -237,7 +237,7 @@ export default function AdminAcademicLeagues() {
     <Content>
       <HeaderSection>
         <div>
-          <HeaderTitle>ADMINISTRAÇÃO DE LIGAS ACADEMICAS</HeaderTitle>
+          <HeaderTitle>ADMINISTRAÇÃO DE LIGAS ACADÊMICAS</HeaderTitle>
           <HeaderSubtitle>
             Mantenha as ligas vinculadas a universidade correta e use a pagina
             de usuários para controlar membros e papeis.
@@ -273,7 +273,7 @@ export default function AdminAcademicLeagues() {
 
       <PanelGrid>
         <ListCard>
-          <SectionTitle>Ligas academicas</SectionTitle>
+          <SectionTitle>Ligas acadêmicas</SectionTitle>
           <EntityList>
             {!filteredLeagues.length && (
               <EmptyState>Nenhuma liga encontrada.</EmptyState>
@@ -300,9 +300,9 @@ export default function AdminAcademicLeagues() {
                   </EntityTitle>
                   <EntityMeta>
                     <span>
-                      {university?.name || 'Universidade nao informada'}
+                      {university?.name || 'Universidade não informada'}
                     </span>
-                    <span>{league.area || 'Area nao informada'}</span>
+                    <span>{league.area || 'Area não informada'}</span>
                   </EntityMeta>
                 </EntityItem>
               );
@@ -405,7 +405,7 @@ export default function AdminAcademicLeagues() {
       <ConfirmDialog
         isOpen={isDeleteConfirmOpen}
         title="Remover liga acadêmica"
-        description="Essa acao remove a liga selecionada. Se houver usuários vinculados, confira o impacto antes de confirmar."
+        description="Essa ação remove a liga selecionada. Se houver usuários vinculados, confira o impacto antes de confirmar."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDelete}

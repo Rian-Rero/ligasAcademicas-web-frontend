@@ -148,7 +148,7 @@ export default function StudentEvents() {
 
   const handleConfirm = async (eventId) => {
     if (!activeMembership?._id) {
-      notifyWarning('Nao foi possivel identificar sua ligacao com a liga');
+      notifyWarning('Não foi possível identificar sua ligação com a liga');
       return;
     }
 
@@ -173,7 +173,7 @@ export default function StudentEvents() {
       notifyError(
         buildRequestErrorMessage(
           err,
-          'Nao foi possivel confirmar sua presença',
+          'Não foi possível confirmar sua presença',
         ),
       );
     } finally {
@@ -187,7 +187,7 @@ export default function StudentEvents() {
         <div>
           <HeaderTitle>MEUS EVENTOS</HeaderTitle>
           <HeaderSubtitle>
-            Confira os eventos disponiveis e confirme sua presença para garantir
+            Confira os eventos disponíveis e confirme sua presença para garantir
             sua vaga.
           </HeaderSubtitle>
         </div>

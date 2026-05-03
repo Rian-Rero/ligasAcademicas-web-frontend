@@ -33,6 +33,7 @@ import {
   ShortcutBox,
   ShortcutBoxes,
   TopCards,
+  EmptyState,
 } from './Styles';
 import { useGetAcademicLeagues } from '../../../hooks/query/academicLeague';
 import { useGetEvents } from '../../../hooks/query/event';
@@ -41,28 +42,17 @@ import { useGetSquads } from '../../../hooks/query/squad';
 import { useGetUniversities } from '../../../hooks/query/university';
 import useAuthStore from '../../../stores/auth';
 
-const fallbackAgenda = [
-  {
-    id: 'fallback-1',
-    date: 'DD/MM',
-    title: 'Título do Evento 1',
-    location: 'Local do Evento 1',
-  },
-  {
-    id: 'fallback-2',
-    date: 'DD/MM',
-    title: 'Título do Evento 2',
-    location: 'Local do Evento 2',
-  },
-];
+const fallbackAgenda = [];
 
-function formatDate(dateString) {
-  const parsedDate = new Date(dateString);
-  if (Number.isNaN(parsedDate.getTime())) return 'DD/MM';
+function formatDate(dateValue) {
+  if (!dateValue) return 'Data a definir';
 
-  return parsedDate.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
+  const parsedDate = new Date(dateValue);
+  if (Number.isNaN(parsedDate.getTime())) return 'Data a definir';
+
+  return parsedDate.toLocaleString('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
   });
 }
 
@@ -104,11 +94,13 @@ export default function ManagerDashboard() {
     enabled: Boolean(activeMembership?.academicLeague),
   });
 
-  const { data: eventsFromApi = [] } = useGetEvents({
-    filters: { academicLeague: activeMembership?.academicLeague },
-    enabled: Boolean(activeMembership?.academicLeague),
-    onError: () => {},
-  });
+  const { data: eventsFromApi = [], isLoading: isLoadingEvents } = useGetEvents(
+    {
+      filters: { academicLeague: activeMembership?.academicLeague },
+      enabled: Boolean(activeMembership?.academicLeague),
+      onError: () => {},
+    },
+  );
 
   const agenda = useMemo(() => {
     if (!eventsFromApi.length) return fallbackAgenda;
@@ -200,6 +192,12 @@ export default function ManagerDashboard() {
       <MiddleSection>
         <Box>
           <SectionHeading>Próximos Eventos</SectionHeading>
+          {isLoadingEvents && <p>Carregando eventos...</p>}
+          {!isLoadingEvents && !agenda.length && (
+            <EmptyState>
+              <h3>Nenhum evento agendado</h3>
+            </EmptyState>
+          )}
           <AgendaList>
             {agenda.map((item) => (
               <AgendaItem key={item.id}>
@@ -211,16 +209,12 @@ export default function ManagerDashboard() {
                   <strong>{item.title}</strong>
                   <span>{item.location}</span>
                 </div>
-                <AgendaAction
-                  type="button"
-                  $variant="primary"
-                  aria-label={`Gerenciar presenças do ${item.title}`}
-                >
-                  Gerenciar Presença
-                </AgendaAction>
               </AgendaItem>
             ))}
           </AgendaList>
+          <AgendaAction onClick={() => navigate('/manager/eventos')}>
+            Ver todos os eventos
+          </AgendaAction>
         </Box>
 
         <FeaturedTeamsCard>

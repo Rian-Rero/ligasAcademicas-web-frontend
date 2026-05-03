@@ -33,7 +33,7 @@ const adminSquadErrorMessages = {
 export function buildAdminSquadErrorMessage(err) {
   return buildAdminRequestErrorMessage(
     err,
-    'Nao foi possivel salvar a subequipe',
+    'Não foi possível salvar a subequipe',
     adminSquadErrorMessages,
   );
 }

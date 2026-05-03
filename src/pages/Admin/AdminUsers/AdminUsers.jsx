@@ -537,7 +537,7 @@ export default function AdminUsers() {
           <HeaderTitle>GERENCIAMENTO DE USUARIOS</HeaderTitle>
           <HeaderSubtitle>
             Filtre por universidade e liga para editar o perfil do usuário, o
-            vínculo com a liga e o status de ativacao.
+            vínculo com a liga e o status de ativação.
           </HeaderSubtitle>
         </div>
 
@@ -757,7 +757,7 @@ export default function AdminUsers() {
               <Label>E-mail verificado</Label>
               <SelectInput {...register('emailVerified')}>
                 <option value="true">Sim</option>
-                <option value="false">Nao</option>
+                <option value="false">Não</option>
               </SelectInput>
               {errors.emailVerified && (
                 <ErrorMessage>{errors.emailVerified.message}</ErrorMessage>
@@ -972,7 +972,7 @@ export default function AdminUsers() {
       <ConfirmDialog
         isOpen={isDeleteMembershipConfirmOpen}
         title="Remover vínculo"
-        description="Essa acao remove o vínculo selecionado do usuário com a liga e subequipe."
+        description="Essa ação remove o vínculo selecionado do usuário com a liga e subequipe."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDeleteMembership}
@@ -983,7 +983,7 @@ export default function AdminUsers() {
       <ConfirmDialog
         isOpen={isDeleteUserConfirmOpen}
         title="Remover usuário"
-        description="Essa acao remove o usuário selecionado. Verifique dependencias antes de confirmar."
+        description="Essa ação remove o usuário selecionado. Verifique dependências antes de confirmar."
         confirmLabel="Remover"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmDeleteUser}
