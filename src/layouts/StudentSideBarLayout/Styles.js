@@ -2,16 +2,23 @@ import styled from 'styled-components';
 
 export const Container = styled.main`
   display: grid;
-  grid-template-columns: minmax(18rem, 25rem) 1fr;
+  grid-template-columns: minmax(18rem, 30rem) 1fr;
   gap: 2rem;
-
   height: 100%;
   padding: clamp(2rem, 3vw, 3.2rem);
-  width: min(100%, 160rem);
+  width: 100%;
   margin: 0 auto;
 
   @media (max-width: 980px) {
     grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 1440px) {
+    grid-template-columns: minmax(25rem, 40rem) 1fr;
+
+    @media (min-width: 1800px) {
+      grid-template-columns: minmax(25rem, 50rem) 1fr;
+    }
   }
 `;
 
@@ -96,6 +103,18 @@ export const SideBarMenuItem = styled.button`
     border-color 180ms ease,
     background 180ms ease;
 
+  /* Media Queries para aumentar a fonte e o espaçamento em telas maiores */
+  @media (min-width: 1440px) {
+    font-size: 1.5rem;
+    padding: 1.2rem 1.5rem;
+  }
+
+  @media (min-width: 1920px) {
+    font-size: 1.75rem;
+    padding: 1.5rem 1.8rem;
+    gap: 1.5rem;
+  }
+
   &::before {
     content: '';
     position: absolute;
@@ -124,6 +143,19 @@ export const SideBarMenuItem = styled.button`
     transition:
       background 180ms ease,
       color 180ms ease;
+
+    /* Aumentando o tamanho do container do ícone proporcionalmente */
+    @media (min-width: 1440px) {
+      width: 3.5rem;
+      height: 3.5rem;
+      font-size: 1.15em; /* Aumenta o SVG interno caso ele herde de em */
+    }
+
+    @media (min-width: 1920px) {
+      width: 4rem;
+      height: 4rem;
+      font-size: 1.25em;
+    }
   }
 
   > * {
