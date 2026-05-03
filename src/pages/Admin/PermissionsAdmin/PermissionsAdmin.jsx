@@ -17,6 +17,10 @@ import {
   PermissionsGrid,
   PermissionModule,
   PermissionTitle,
+  RoleInputWrapper,
+  RoleSelect,
+  RoleSelectContainer,
+  RoleSelectLabel,
   SectionHeader,
   SectionDescription,
   SectionTitle,
@@ -441,38 +445,13 @@ export default function PermissionsAdmin() {
             : `Este usuário possui ${selectedUserRoles.length} cargo${selectedUserRoles.length !== 1 ? 's' : ''}.`}
         </PermissionHelper>
 
-        <div
-          style={{
-            display: 'flex',
-            gap: '12px',
-            marginBottom: '24px',
-            alignItems: 'flex-end',
-          }}
-        >
-          <label
-            htmlFor="role-select"
-            style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
-          >
-            <span
-              style={{
-                display: 'block',
-                marginBottom: '8px',
-                fontWeight: 'bold',
-              }}
-            >
-              Adicionar cargo
-            </span>
-            <select
+        <RoleInputWrapper>
+          <RoleSelectContainer htmlFor="role-select">
+            <RoleSelectLabel>Adicionar cargo</RoleSelectLabel>
+            <RoleSelect
               id="role-select"
               value={selectedRoleIdToAdd}
               onChange={(e) => setSelectedRoleIdToAdd(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                fontSize: '14px',
-              }}
             >
               <option value="">Selecione um cargo...</option>
               {roles
@@ -484,8 +463,8 @@ export default function PermissionsAdmin() {
                     {role.name}
                   </option>
                 ))}
-            </select>
-          </label>
+            </RoleSelect>
+          </RoleSelectContainer>
           <CreateButton
             type="button"
             onClick={handleAddRoleToUser}
@@ -495,7 +474,7 @@ export default function PermissionsAdmin() {
           >
             {addRoleToUser.isPending ? 'Adicionando...' : 'Adicionar'}
           </CreateButton>
-        </div>
+        </RoleInputWrapper>
 
         <SectionTitle>Permissões diretas</SectionTitle>
         <SectionDescription>
