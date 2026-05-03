@@ -29,13 +29,7 @@ export const adminUserSchema = z
       });
     }
 
-    if (values.academicLeague && !values.squad) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['squad'],
-        message: 'Selecione uma subequipe',
-      });
-    }
+    // Subequipe é opcional quando há uma liga; não exigir squad aqui.
 
     if (!values.academicLeague && values.squad) {
       ctx.addIssue({

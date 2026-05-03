@@ -343,7 +343,7 @@ export default function AdminUsers() {
 
     if (membershipMode === 'league') {
       payload.academicLeague = normalizeId(values.academicLeague);
-      payload.squad = normalizeId(values.squad);
+      if (values.squad) payload.squad = normalizeId(values.squad);
     }
 
     return payload;
@@ -365,11 +365,7 @@ export default function AdminUsers() {
         notifyWarning('Selecione uma liga para o vínculo com liga');
         return false;
       }
-
-      if (!values.squad) {
-        notifyWarning('Selecione uma subequipe para o vínculo com liga');
-        return false;
-      }
+      // subequipe é opcional — valide apenas a liga obrigatória.
     }
 
     return true;
@@ -702,7 +698,7 @@ export default function AdminUsers() {
                         </strong>
                         <span>
                           {isLeagueMembership
-                            ? `${squad?.name || 'Sem subequipe'} • ${formatRole(membership.role)}`
+                            ? `${formatRole(membership.role)}${squad?.name ? ` • ${squad.name}` : ''}`
                             : `${formatRole(membership.role)} • vínculo direto à universidade`}
                         </span>
                         <span
@@ -718,7 +714,7 @@ export default function AdminUsers() {
                       <MembershipActions>
                         <MembershipTypeBadge>
                           {isLeagueMembership
-                            ? 'Liga + subequipe'
+                            ? 'Universidade + Liga'
                             : 'Universidade'}
                         </MembershipTypeBadge>
                         <SmallActionButton
@@ -777,7 +773,7 @@ export default function AdminUsers() {
                   onClick={() => setMembershipMode('university')}
                 >
                   <strong>Universidade</strong>
-                  <span>Vincule o usuário só à universidade, sem liga.</span>
+                  <span>Vincule o usuário apenas à universidade.</span>
                 </MembershipModeButton>
 
                 <MembershipModeButton
@@ -785,8 +781,11 @@ export default function AdminUsers() {
                   $active={membershipMode === 'league'}
                   onClick={() => setMembershipMode('league')}
                 >
-                  <strong>Liga + subequipe</strong>
-                  <span>Crie um vínculo completo com liga e subequipe.</span>
+                  <strong>Universidade + Liga</strong>
+                  <span>
+                    Vincule o usuário à universidade e à liga; subequipe
+                    opcional.
+                  </span>
                 </MembershipModeButton>
               </MembershipModeSelector>
             </Field>
@@ -801,15 +800,15 @@ export default function AdminUsers() {
                   </strong>
                   <span>
                     {membershipMode === 'league'
-                      ? 'Universidade é herdada da liga e a subequipe é obrigatória.'
+                      ? 'Universidade é herdada da liga; subequipe é opcional.'
                       : 'A universidade é o único vínculo necessário. Liga e subequipe ficam ocultas.'}
                   </span>
                 </MembershipPanelTitle>
 
                 <MembershipTypeBadge>
                   {membershipMode === 'league'
-                    ? 'Modo liga'
-                    : 'Modo universidade'}
+                    ? 'Modo Universidade + Liga'
+                    : 'Modo Universidade'}
                 </MembershipTypeBadge>
               </MembershipPanelHeader>
 
@@ -856,23 +855,25 @@ export default function AdminUsers() {
                       )}
                     </Field>
 
-                    <Field>
-                      <Label>Subequipe</Label>
-                      <SelectInput {...register('squad')}>
-                        <option value="">Selecione uma subequipe</option>
-                        {availableSquads.map((squad) => (
-                          <option
-                            key={squad._id}
-                            value={normalizeId(squad._id)}
-                          >
-                            {squad.name}
-                          </option>
-                        ))}
-                      </SelectInput>
-                      {errors.squad && (
-                        <ErrorMessage>{errors.squad.message}</ErrorMessage>
-                      )}
-                    </Field>
+                    {availableSquads.length > 0 && (
+                      <Field>
+                        <Label>Subequipe</Label>
+                        <SelectInput {...register('squad')}>
+                          <option value="">Selecione uma subequipe</option>
+                          {availableSquads.map((squad) => (
+                            <option
+                              key={squad._id}
+                              value={normalizeId(squad._id)}
+                            >
+                              {squad.name}
+                            </option>
+                          ))}
+                        </SelectInput>
+                        {errors.squad && (
+                          <ErrorMessage>{errors.squad.message}</ErrorMessage>
+                        )}
+                      </Field>
+                    )}
                   </>
                 ) : (
                   <Field $fullWidth>
