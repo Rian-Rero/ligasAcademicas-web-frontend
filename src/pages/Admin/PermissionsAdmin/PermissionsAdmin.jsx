@@ -74,6 +74,7 @@ export default function PermissionsAdmin() {
   const { data: roles = [], isLoading: rolesLoading } = useGetRoles({
     filters: { isGlobal: true },
   });
+  console.log('✌️roles --->', roles);
   const { data: permissions = [], isLoading: permissionsLoading } =
     useGetPermissions();
   const { data: users = [], isLoading: usersLoading } = useGetUsers();
@@ -91,10 +92,22 @@ export default function PermissionsAdmin() {
     enabled: Boolean(selectedUserId),
   });
 
-  const createRole = useCreateRole();
-  const updateRole = useUpdateRole();
-  const deleteRole = useDeleteRole();
-  const updateUserPermissions = useUpdateUserPermissions();
+  const { mutateAsync: createRole } = useCreateRole({
+    onSuccess: () => {
+      notifySuccess('Papel criado com sucesso!');
+    },
+  });
+  const { mutateAsync: updateRole } = useUpdateRole({
+    onSuccess: () => {
+      notifySuccess('Papel atualizado com sucesso!');
+    },
+  });
+  const { mutateAsync: deleteRole } = useDeleteRole({
+    onSuccess: () => {
+      notifySuccess('Papel deletado com sucesso!');
+    },
+  });
+  const { mutateAsync: updateUserPermissions } = useUpdateUserPermissions({});
 
   const permissionsByModule = useMemo(() => {
     return permissions.reduce((accumulator, permission) => {
@@ -163,14 +176,12 @@ export default function PermissionsAdmin() {
   const handleSaveRole = async (formData) => {
     try {
       if (editingRole) {
-        await updateRole.mutateAsync({
+        await updateRole({
           roleId: editingRole._id,
           data: formData,
         });
-        notifySuccess('Papel atualizado com sucesso!');
       } else {
-        await createRole.mutateAsync(formData);
-        notifySuccess('Papel criado com sucesso!');
+        await createRole(formData);
       }
       setShowEditModal(false);
       setEditingRole(null);
@@ -188,8 +199,7 @@ export default function PermissionsAdmin() {
     if (!roleToDelete?._id) return;
 
     try {
-      await deleteRole.mutateAsync(roleToDelete._id);
-      notifySuccess('Papel deletado com sucesso!');
+      await deleteRole(roleToDelete._id);
     } catch (error) {
       notifyError(error.response?.data?.message || 'Erro ao deletar papel');
     } finally {
@@ -204,7 +214,7 @@ export default function PermissionsAdmin() {
     }
 
     try {
-      await updateUserPermissions.mutateAsync({
+      await updateUserPermissions({
         userId: selectedUserId,
         data: {
           roles: selectedUserRoles.map((role) => role._id),
