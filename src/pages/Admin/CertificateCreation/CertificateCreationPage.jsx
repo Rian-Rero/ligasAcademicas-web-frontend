@@ -6,11 +6,8 @@ import {
   Avatar,
   Box,
   Button,
-  Card,
   CardContent,
-  Chip,
   CircularProgress,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -20,81 +17,22 @@ import {
   Typography,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
-import styled from 'styled-components';
 
+import {
+  Container,
+  FormStack,
+  HeaderSection,
+  MemberInfo,
+  MembershipCard,
+  StatusChip,
+  StyledDialog,
+} from './Styles';
 import {
   useCreateCertificate,
   useGetCertificates,
 } from '../../../hooks/query/certificate';
 import { useGetInactiveLeagueMemberships } from '../../../hooks/query/leagueMembership';
 import { notifyError, notifySuccess } from '../../../utils/toast';
-
-const Container = styled(Box)`
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  color: ${({ theme }) => theme.colors.font.white};
-`;
-
-const HeaderSection = styled(Box)`
-  margin-bottom: 2rem;
-
-  h1 {
-    margin: 0;
-    font-size: 2rem;
-    font-weight: 600;
-    color: ${({ theme }) => theme.colors.font.white};
-  }
-`;
-
-const MembershipCard = styled(Card)`
-  transition: all 0.3s ease;
-  border-radius: 12px;
-  background-color: #081426 !important;
-  background-image: linear-gradient(
-    180deg,
-    #0f2342 0%,
-    #081426 100%
-  ) !important;
-  border: 1px solid
-    ${({ theme }) => theme?.palette?.divider || 'rgba(255, 255, 255, 0.14)'};
-  color: ${({ theme }) => theme.colors.font.white};
-
-  .MuiCardContent-root,
-  .MuiTypography-root {
-    color: ${({ theme }) => theme.colors.font.white};
-  }
-
-  &:hover {
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
-    transform: translateY(-2px);
-  }
-`;
-
-const StyledDialog = styled(Dialog)`
-  .MuiPaper-root {
-    background: linear-gradient(180deg, #0f2342 0%, #081426 100%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: ${({ theme }) => theme.colors.font.white};
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
-    border-radius: 12px;
-  }
-`;
-
-const MemberInfo = styled(Box)`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const StatusChip = styled(Chip)`
-  font-weight: 600;
-`;
-
-const FormStack = styled(Stack)`
-  gap: 1.5rem;
-`;
 
 function CertificateFormModal({
   open = false,
@@ -245,7 +183,7 @@ function CertificateFormModal({
   );
 }
 
-function CertificateCreationPage({ leagueId, universityId }) {
+export default function CertificateCreationPage({ leagueId, universityId }) {
   const [selectedMembership, setSelectedMembership] = useState(null);
   const [openCertForm, setOpenCertForm] = useState(false);
 
@@ -430,5 +368,3 @@ function CertificateCreationPage({ leagueId, universityId }) {
     </Container>
   );
 }
-
-export default CertificateCreationPage;
