@@ -52,6 +52,7 @@ import {
   useGetUsersByIds,
   useResetUserPasswordByManagement,
   useUpdateUserByManagement,
+  useCreateUser,
 } from '../../../hooks/query/user';
 import useAuthStore from '../../../stores/auth';
 import {
@@ -86,6 +87,7 @@ export default function ManagerMembers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMembershipId, setSelectedMembershipId] = useState('');
   const [formState, setFormState] = useState(initialFormState);
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
 
   const { data: managerMemberships = [] } = useGetLeagueMemberships({
     filters: { user: authUser?._id, isActive: true },
@@ -158,6 +160,8 @@ export default function ManagerMembers() {
   }, [members, searchTerm]);
 
   useEffect(() => {
+    if (isCreatingNew) return;
+
     if (!filteredMembers.length) {
       setSelectedMembershipId('');
       return;
@@ -170,7 +174,7 @@ export default function ManagerMembers() {
     if (!hasSelectedMember) {
       setSelectedMembershipId(normalizeId(filteredMembers[0].membership._id));
     }
-  }, [filteredMembers, selectedMembershipId]);
+  }, [filteredMembers, selectedMembershipId, isCreatingNew]);
 
   const selectedMember = useMemo(
     () =>
@@ -182,10 +186,11 @@ export default function ManagerMembers() {
 
   useEffect(() => {
     if (!selectedMember) {
-      setFormState(initialFormState);
+      if (!isCreatingNew) setFormState(initialFormState);
       return;
     }
 
+    setIsCreatingNew(false);
     setFormState({
       name: selectedMember.user.name || '',
       email: selectedMember.user.email || '',
@@ -197,7 +202,7 @@ export default function ManagerMembers() {
       squad: normalizeId(selectedMember.membership.squad),
       isActive: Boolean(selectedMember.membership.isActive),
     });
-  }, [managerLeagueId, selectedMember]);
+  }, [managerLeagueId, selectedMember, isCreatingNew]);
 
   const availableSquads = useMemo(() => {
     if (!formState.academicLeague) return [];
@@ -226,6 +231,9 @@ export default function ManagerMembers() {
 
   const { mutateAsync: updateUserByManagement, isPending: isUpdatingUser } =
     useUpdateUserByManagement();
+
+  const { mutateAsync: createUser, isPending: isCreatingUser } =
+    useCreateUser();
 
   const {
     mutateAsync: updateLeagueMembership,
@@ -265,6 +273,52 @@ export default function ManagerMembers() {
           err,
           'Nao foi possivel atualizar a lista de membros',
         ),
+      );
+    }
+  };
+
+  const handleStartCreate = () => {
+    setSelectedMembershipId('');
+    setIsCreatingNew(true);
+    setFormState(() => ({
+      ...initialFormState,
+      academicLeague: managerLeagueId || '',
+    }));
+  };
+
+  const handleCreateMember = async () => {
+    const name = formState.name.trim();
+    const email = formState.email.trim().toLowerCase();
+
+    if (!name || !email) {
+      notifyWarning('Nome e e-mail são obrigatórios para criar um membro');
+      return;
+    }
+
+    if (!managerLeagueId) {
+      notifyError('Liga do gestor não encontrada');
+      return;
+    }
+
+    try {
+      await createUser({
+        name,
+        email,
+        emailVerified: false,
+        academicLeague: managerLeagueId,
+      });
+
+      await Promise.all([
+        queryClient.invalidateQueries(['league-memberships']),
+        queryClient.invalidateQueries(['users']),
+      ]);
+
+      notifySuccess('Membro criado e vinculado à sua liga');
+      setFormState(initialFormState);
+      setIsCreatingNew(false);
+    } catch (err) {
+      notifyError(
+        buildRequestErrorMessage(err, 'Nao foi possivel criar o membro'),
       );
     }
   };
@@ -381,13 +435,22 @@ export default function ManagerMembers() {
           </HeaderSubtitle>
         </div>
 
-        <ActionButton
-          type="button"
-          onClick={handleRefresh}
-          disabled={isLoading || isSaving || isResettingPassword}
-        >
-          <FiRefreshCw /> Atualizar lista
-        </ActionButton>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <ActionButton
+            type="button"
+            onClick={handleRefresh}
+            disabled={isLoading || isSaving || isResettingPassword}
+          >
+            <FiRefreshCw /> Atualizar lista
+          </ActionButton>
+          <ActionButton
+            type="button"
+            onClick={handleStartCreate}
+            disabled={isCreatingUser || isLoading || isSaving}
+          >
+            <FiUser /> Adicionar membro
+          </ActionButton>
+        </div>
       </HeaderSection>
 
       <SearchBar>
@@ -426,9 +489,10 @@ export default function ManagerMembers() {
                     key={membership._id}
                     type="button"
                     $active={isSelected}
-                    onClick={() =>
-                      setSelectedMembershipId(normalizeId(membership._id))
-                    }
+                    onClick={() => {
+                      setIsCreatingNew(false);
+                      setSelectedMembershipId(normalizeId(membership._id));
+                    }}
                   >
                     <MemberTitle>
                       <span>{user.name}</span>
@@ -458,9 +522,45 @@ export default function ManagerMembers() {
           <SectionTitle>Editar membro</SectionTitle>
 
           {!selectedMember && (
-            <EmptyState>
-              Selecione um membro na lista para editar dados e permissões.
-            </EmptyState>
+            <FormGrid>
+              <Field $fullWidth>
+                <Label>Nome completo</Label>
+                <TextInput
+                  type="text"
+                  value={formState.name}
+                  onChange={handleTextChange('name')}
+                  placeholder="Nome do novo membro"
+                />
+              </Field>
+
+              <Field $fullWidth>
+                <Label>E-mail</Label>
+                <TextInput
+                  type="email"
+                  value={formState.email}
+                  onChange={handleTextChange('email')}
+                  placeholder="E-mail do novo membro"
+                />
+              </Field>
+
+              <ActionsRow>
+                <ActionButton
+                  type="button"
+                  $variant="primary"
+                  onClick={handleCreateMember}
+                  disabled={isCreatingUser}
+                >
+                  {isCreatingUser ? (
+                    <>
+                      <ClipLoader size={16} color={theme.colors.white} />
+                      Criando...
+                    </>
+                  ) : (
+                    <>Criar membro</>
+                  )}
+                </ActionButton>
+              </ActionsRow>
+            </FormGrid>
           )}
 
           {selectedMember && (
