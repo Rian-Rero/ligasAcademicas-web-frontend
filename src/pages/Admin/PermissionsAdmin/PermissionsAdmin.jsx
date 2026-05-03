@@ -730,6 +730,7 @@ export default function PermissionsAdmin() {
 
       <EditRoleModal
         role={editingRole}
+        permissions={permissions}
         isOpen={showEditModal}
         onClose={() => {
           setShowEditModal(false);
