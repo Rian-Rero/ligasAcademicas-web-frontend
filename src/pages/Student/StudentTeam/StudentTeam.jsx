@@ -287,33 +287,41 @@ export default function StudentTeam() {
 
       <SummaryCard>
         <SectionHeading>
-          <strong>{activeSquad?.name || 'Nome da Subequipe'}</strong>
+          <strong>
+            {activeSquad?.name || 'Você não pertence a nenhuma subequipe'}
+          </strong>
           <div>
             <span className="members-subtitle">
-              {activeUniversity?.name || activeLeague?.name || 'Nome'}
+              {activeUniversity?.name ||
+                activeLeague?.name ||
+                'Você não pertence a nenhuma liga'}
             </span>
             <span className="members-subtitle">
-              {totalMembersCount} {memberLabel}
+              {activeMembership?.squad
+                ? `${totalMembersCount} ${memberLabel}`
+                : ''}
             </span>
           </div>
         </SectionHeading>
         <TeamList>
-          {filteredTeam.map((member) => (
-            <TeamMember key={member.id}>
-              <TeamAvatar
-                $imageUrl={resolveMediaUrl(member?.imageURL)}
-                role="img"
-                aria-label={`Foto de ${member.name}`}
-              />
-              {member.name}
-              <ViewMemberProfileButton
-                type="button"
-                onClick={() => setSelectedMemberId(member.id)}
-              >
-                Ver detalhes
-              </ViewMemberProfileButton>
-            </TeamMember>
-          ))}
+          {activeMembership?.squad
+            ? filteredTeam.map((member) => (
+                <TeamMember key={member.id}>
+                  <TeamAvatar
+                    $imageUrl={resolveMediaUrl(member?.imageURL)}
+                    role="img"
+                    aria-label={`Foto de ${member.name}`}
+                  />
+                  {member.name}
+                  <ViewMemberProfileButton
+                    type="button"
+                    onClick={() => setSelectedMemberId(member.id)}
+                  >
+                    Ver detalhes
+                  </ViewMemberProfileButton>
+                </TeamMember>
+              ))
+            : null}
         </TeamList>
       </SummaryCard>
 

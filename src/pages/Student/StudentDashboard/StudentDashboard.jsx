@@ -6,6 +6,7 @@ import {
   FiCheckCircle,
   FiDownload,
   FiUsers,
+  FiXCircle,
 } from 'react-icons/fi';
 import { TbCertificate } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
@@ -224,9 +225,16 @@ export default function StudentDashboard() {
               ? `PÁGINA GERAL DO ALUNO - ${uppercaseStudentName}`
               : 'PÁGINA GERAL DO ALUNO'}
           </HeaderTitle>
-          <StatusBadge>
-            <FiCheckCircle />{' '}
-            {activeMembership?.isActive ? 'Membro ativo' : 'Status do Membro'}
+          <StatusBadge $isActive={activeMembership?.isActive}>
+            {activeMembership?.isActive ? (
+              <>
+                <FiCheckCircle /> Membro ativo
+              </>
+            ) : (
+              <>
+                <FiXCircle /> Inativo
+              </>
+            )}
           </StatusBadge>
         </div>
       </HeaderSection>
@@ -332,25 +340,33 @@ export default function StudentDashboard() {
           <SectionHeading>
             <strong>Minha subequipe </strong>
             <span>
-              ({activeUniversity?.name || activeLeague?.name || 'Nome'})
+              (
+              {activeUniversity?.name ||
+                activeLeague?.name ||
+                'Você não pertence a nenhuma liga'}
+              )
             </span>
             <div>
               <span className="members-subtitle">
-                {totalMembersCount} {memberLabel}
+                {activeMembership?.squad
+                  ? `${totalMembersCount} ${memberLabel}`
+                  : 'Sem subequipe'}
               </span>
             </div>
           </SectionHeading>
           <TeamList>
-            {team.map((member) => (
-              <TeamMember key={member.id}>
-                <TeamAvatar
-                  $imageUrl={resolveMediaUrl(member?.imageURL)}
-                  role="img"
-                  aria-label={`Foto de ${member.name}`}
-                />
-                {member.name}
-              </TeamMember>
-            ))}
+            {activeMembership?.squad
+              ? team.map((member) => (
+                  <TeamMember key={member.id}>
+                    <TeamAvatar
+                      $imageUrl={resolveMediaUrl(member?.imageURL)}
+                      role="img"
+                      aria-label={`Foto de ${member.name}`}
+                    />
+                    {member.name}
+                  </TeamMember>
+                ))
+              : null}
           </TeamList>
           <SeeTeamLink type="button" onClick={() => navigate('/student/team')}>
             Ver mais
