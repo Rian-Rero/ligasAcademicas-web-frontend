@@ -40,7 +40,8 @@ const HeaderSection = styled(Box)`
 const CertificateCard = styled(Card)`
   transition: all 0.3s ease;
   border-radius: 12px;
-  border: 1px solid ${({ theme }) => theme.palette.divider};
+  border: 1px solid
+    ${({ theme }) => theme?.palette?.divider || 'rgba(255, 255, 255, 0.14)'};
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 
   &:hover {

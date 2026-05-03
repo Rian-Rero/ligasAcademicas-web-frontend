@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Edit as EditIcon } from '@mui/icons-material';
 import {
@@ -22,7 +22,10 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import styled from 'styled-components';
 
-import { useCreateCertificate } from '../../../hooks/query/certificate';
+import {
+  useCreateCertificate,
+  useGetCertificates,
+} from '../../../hooks/query/certificate';
 import { useGetInactiveLeagueMemberships } from '../../../hooks/query/leagueMembership';
 import { notifyError, notifySuccess } from '../../../utils/toast';
 
@@ -30,6 +33,7 @@ const Container = styled(Box)`
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  color: ${({ theme }) => theme.colors.font.white};
 `;
 
 const HeaderSection = styled(Box)`
@@ -39,16 +43,41 @@ const HeaderSection = styled(Box)`
     margin: 0;
     font-size: 2rem;
     font-weight: 600;
+    color: ${({ theme }) => theme.colors.font.white};
   }
 `;
 
 const MembershipCard = styled(Card)`
   transition: all 0.3s ease;
   border-radius: 12px;
-  border: 1px solid ${({ theme }) => theme.palette.divider};
+  background-color: #081426 !important;
+  background-image: linear-gradient(
+    180deg,
+    #0f2342 0%,
+    #081426 100%
+  ) !important;
+  border: 1px solid
+    ${({ theme }) => theme?.palette?.divider || 'rgba(255, 255, 255, 0.14)'};
+  color: ${({ theme }) => theme.colors.font.white};
+
+  .MuiCardContent-root,
+  .MuiTypography-root {
+    color: ${({ theme }) => theme.colors.font.white};
+  }
 
   &:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    transform: translateY(-2px);
+  }
+`;
+
+const StyledDialog = styled(Dialog)`
+  .MuiPaper-root {
+    background: linear-gradient(180deg, #0f2342 0%, #081426 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: ${({ theme }) => theme.colors.font.white};
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+    border-radius: 12px;
   }
 `;
 
@@ -73,6 +102,30 @@ function CertificateFormModal({
   membership = null,
   onSuccess = () => {},
 }) {
+  const textFieldSx = {
+    '& .MuiInputLabel-root': {
+      color: 'rgba(255,255,255,0.7)',
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: 'rgba(255,255,255,0.9)',
+    },
+    '& .MuiOutlinedInput-root': {
+      color: '#ffffff',
+      '& fieldset': {
+        borderColor: 'rgba(255,255,255,0.25)',
+      },
+      '&:hover fieldset': {
+        borderColor: 'rgba(255,255,255,0.45)',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#42a5f5',
+      },
+    },
+    '& .MuiFormHelperText-root': {
+      color: '#ffb4ab',
+    },
+  };
+
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       workLoadHours: '40',
@@ -103,14 +156,21 @@ function CertificateFormModal({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ fontWeight: 600, fontSize: '1.25rem' }}>
+    <StyledDialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle
+        sx={{
+          fontWeight: 600,
+          fontSize: '1.25rem',
+          color: '#ffffff',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+        }}
+      >
         Gerar Certificado
       </DialogTitle>
 
       <DialogContent>
         <FormStack sx={{ mt: 2 }}>
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.75)' }}>
             Membro: <strong>{membership?.user?.name}</strong>
           </Typography>
 
@@ -128,6 +188,7 @@ function CertificateFormModal({
                 label="Horas de Trabalho"
                 inputProps={{ step: '0.5', min: '0' }}
                 fullWidth
+                sx={textFieldSx}
                 error={!!error}
                 helperText={error?.message}
               />
@@ -145,6 +206,7 @@ function CertificateFormModal({
                 label="Data de Emissão"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
+                sx={textFieldSx}
                 error={!!error}
                 helperText={error?.message}
               />
@@ -153,8 +215,14 @@ function CertificateFormModal({
         </FormStack>
       </DialogContent>
 
-      <DialogActions sx={{ padding: '1rem' }}>
-        <Button onClick={onClose} disabled={isPending}>
+      <DialogActions
+        sx={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}
+      >
+        <Button
+          onClick={onClose}
+          disabled={isPending}
+          sx={{ color: 'rgba(255,255,255,0.9)' }}
+        >
           Cancelar
         </Button>
         <Button
@@ -173,7 +241,7 @@ function CertificateFormModal({
           )}
         </Button>
       </DialogActions>
-    </Dialog>
+    </StyledDialog>
   );
 }
 
@@ -189,10 +257,37 @@ function CertificateCreationPage({ leagueId, universityId }) {
     data: inactiveMemberships = [],
     isLoading,
     isError,
-    refetch,
+    refetch: refetchInactiveMemberships,
   } = useGetInactiveLeagueMemberships({
     filters,
   });
+
+  const inactiveMembershipIds = useMemo(
+    () => inactiveMemberships.map((membership) => membership._id),
+    [inactiveMemberships],
+  );
+
+  const {
+    data: existingCertificates = [],
+    isLoading: isLoadingCertificates,
+    refetch: refetchCertificates,
+  } = useGetCertificates({
+    filters: { leagueMembership: inactiveMembershipIds },
+    enabled: inactiveMembershipIds.length > 0,
+    queryKey: ['certificates-for-inactive-memberships', inactiveMembershipIds],
+  });
+
+  const availableMembershipsForCertificate = useMemo(() => {
+    const membershipsWithCertificate = new Set(
+      existingCertificates.map((certificate) =>
+        String(certificate.leagueMembership),
+      ),
+    );
+
+    return inactiveMemberships.filter(
+      (membership) => !membershipsWithCertificate.has(String(membership._id)),
+    );
+  }, [existingCertificates, inactiveMemberships]);
 
   const handleOpenCertForm = (membership) => {
     setSelectedMembership(membership);
@@ -205,7 +300,8 @@ function CertificateCreationPage({ leagueId, universityId }) {
   };
 
   const handleCertFormSuccess = () => {
-    refetch();
+    refetchInactiveMemberships();
+    refetchCertificates();
     handleCloseCertForm();
   };
 
@@ -221,22 +317,22 @@ function CertificateCreationPage({ leagueId, universityId }) {
 
   let content;
 
-  if (isLoading) {
+  if (isLoading || isLoadingCertificates) {
     content = (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
         <CircularProgress />
       </Box>
     );
-  } else if (inactiveMemberships.length === 0) {
+  } else if (availableMembershipsForCertificate.length === 0) {
     content = (
       <Alert severity="info">
-        Nenhum membro com ciclo encerrado encontrado para gerar certificados.
+        Nenhum membro pendente para emissão de certificado.
       </Alert>
     );
   } else {
     content = (
       <Grid container spacing={2}>
-        {inactiveMemberships.map((membership) => (
+        {availableMembershipsForCertificate.map((membership) => (
           <Grid item xs={12} sm={6} md={4} key={membership._id}>
             <MembershipCard>
               <CardContent>
@@ -313,7 +409,10 @@ function CertificateCreationPage({ leagueId, universityId }) {
     <Container>
       <HeaderSection>
         <h1>Gerar Certificados</h1>
-        <Typography variant="body1" color="textSecondary" sx={{ mt: 0.5 }}>
+        <Typography
+          variant="body1"
+          sx={{ mt: 0.5, color: 'rgba(255,255,255,0.72)' }}
+        >
           Selecione membros com ciclo encerrado para gerar seus certificados
         </Typography>
       </HeaderSection>
