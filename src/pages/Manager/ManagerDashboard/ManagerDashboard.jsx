@@ -297,7 +297,10 @@ export default function ManagerDashboard() {
             Adicionar Novo Membro
           </ShortcutBox>
 
-          <ShortcutBox type="button">
+          <ShortcutBox
+            type="button"
+            onClick={() => navigate('/manager/certificados')}
+          >
             <CardIcon>
               <CgFileDocument />
             </CardIcon>

@@ -11,6 +11,7 @@ export { default as ManagerEventsList } from './Manager/ManagerEventsList/Manage
 export { default as ManagerMembers } from './Manager/ManagerMembers/ManagerMembers';
 export { default as ManagerSquads } from './Manager/ManagerSquads/ManagerSquads';
 export { default as ManagerTasks } from './Manager/ManagerTasks/ManagerTasks';
+export { default as ManagerCertificates } from './Manager/ManagerCertificates/ManagerCertificates';
 export { default as StudentEvents } from './Student/StudentEvents/StudentEvents';
 export { default as StudentDashboard } from './Student/StudentDashboard/StudentDashboard';
 export { default as StudentTeam } from './Student/StudentTeam/StudentTeam';
