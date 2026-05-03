@@ -201,12 +201,13 @@ export const UserPanelHeader = styled.div`
 
 export const UserSearchBox = styled.input`
   width: 100%;
-  padding: 0.85rem 1rem;
+  padding: 0.95rem 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.05);
   color: #f3f4f7;
-  font-size: 0.98rem;
+  font-size: 1.05rem;
+  height: 3rem;
 
   &:focus {
     outline: none;
