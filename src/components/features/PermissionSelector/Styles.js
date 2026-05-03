@@ -51,9 +51,31 @@ export const PermissionList = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+
+  &::-webkit-scrollbar {
+    width: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 999px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(246, 160, 79, 0.5);
+    border-radius: 999px;
+
+    &:hover {
+      background: rgba(246, 160, 79, 0.7);
+    }
+  }
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    max-height: 40vh;
   }
 `;
 

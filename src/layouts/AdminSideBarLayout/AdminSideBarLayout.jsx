@@ -60,6 +60,11 @@ const navigation = [
     path: '/admin/permissões',
   },
   {
+    label: 'Tarefas',
+    icon: <FiCalendar />,
+    path: '/admin/tasks',
+  },
+  {
     label: 'Meu Perfil',
     icon: <FiUser />,
     path: '/admin/perfil',

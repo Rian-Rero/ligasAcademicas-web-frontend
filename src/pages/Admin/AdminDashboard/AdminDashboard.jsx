@@ -44,9 +44,9 @@ import { useGetUniversities } from '../../../hooks/query/university';
 import { useGetUsers } from '../../../hooks/query/user';
 
 const fallbackHighlights = [
-  { name: 'Universidades', value: 'cadastre e organize instituições' },
-  { name: 'Ligas', value: 'mantenha áreas e descrições atualizadas' },
-  { name: 'Usuários', value: 'controle acesso e vínculos' },
+  { name: 'Universidades', value: 'Cadastre e organize instituições' },
+  { name: 'Ligas', value: 'Mantenha áreas e descrições atualizadas' },
+  { name: 'Usuários', value: 'Controle acesso e vínculos' },
 ];
 
 export default function AdminDashboard() {

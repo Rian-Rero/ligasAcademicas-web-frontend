@@ -188,7 +188,7 @@ export function useGetGoogleCalendarLinkUrl({
 
 export function useUnlinkGoogleCalendar({
   onSuccess = () => {},
-  onError = (err) => console.log(err),
+  onError = (err) => err,
 } = {}) {
   return useMutation({
     mutationFn: unlinkGoogleCalendar,

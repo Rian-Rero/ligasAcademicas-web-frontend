@@ -201,12 +201,13 @@ export const UserPanelHeader = styled.div`
 
 export const UserSearchBox = styled.input`
   width: 100%;
-  padding: 0.85rem 1rem;
+  padding: 0.95rem 1.2rem;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.05);
   color: #f3f4f7;
-  font-size: 0.98rem;
+  font-size: 1.05rem;
+  height: 3rem;
 
   &:focus {
     outline: none;
@@ -445,4 +446,88 @@ export const PermissionDescription = styled.p`
   color: rgba(241, 245, 255, 0.78);
   font-size: 0.9rem;
   line-height: 1.4;
+`;
+
+export const RoleSelectContainer = styled.label`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  font-weight: 500;
+  color: #ffffff;
+`;
+
+export const RoleSelectLabel = styled.span`
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #f3f4f7;
+  font-size: 0.95rem;
+  font-weight: 500;
+`;
+
+export const RoleSelect = styled.select`
+  width: 100%;
+  height: 2.8rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0.6rem;
+  font-size: 0.95rem;
+  color: #ffffff;
+  border: 1px solid rgba(167, 206, 255, 0.38);
+  background: linear-gradient(
+    165deg,
+    rgba(8, 22, 44, 0.78),
+    rgba(11, 29, 54, 0.68)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 10px 24px rgba(0, 0, 0, 0.24);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+  cursor: pointer;
+
+  option {
+    background: #0b1d36;
+    color: #ffffff;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: rgba(0, 140, 255, 0.75);
+    background: linear-gradient(
+      165deg,
+      rgba(10, 27, 54, 0.9),
+      rgba(12, 34, 66, 0.82)
+    );
+    box-shadow:
+      0 0 0 3px rgba(0, 140, 255, 0.22),
+      0 12px 28px rgba(0, 0, 0, 0.28);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 700px) {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.8rem;
+  }
+`;
+
+export const RoleInputWrapper = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 768px) {
+    gap: 0.8rem;
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
 `;

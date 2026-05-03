@@ -1,4 +1,4 @@
-import { FiCalendar, FiUsers, FiUser } from 'react-icons/fi';
+import { FiCalendar, FiCheckSquare, FiUsers, FiUser } from 'react-icons/fi';
 import { GrAddCircle } from 'react-icons/gr';
 import {
   TbCertificate,
@@ -59,6 +59,11 @@ const navigation = [
     label: 'Meu Perfil',
     icon: <FiUser />,
     path: '/manager/perfil',
+  },
+  {
+    label: 'Tarefas',
+    icon: <FiCheckSquare />,
+    path: '/manager/tasks',
   },
 ];
 

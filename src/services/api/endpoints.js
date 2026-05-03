@@ -340,7 +340,7 @@ export const markAttendance = async ({ _id, hasAttended = true }) => {
 
 // Permissions
 export const getPermissions = async (filters = {}) => {
-  const { data } = await api.get('/permissions/permissions', {
+  const { data } = await api.get('/permissions', {
     params: filters,
   });
 
@@ -348,13 +348,13 @@ export const getPermissions = async (filters = {}) => {
 };
 
 export const getPermissionById = async (permissionId) => {
-  const { data } = await api.get(`/permissions/permissions/${permissionId}`);
+  const { data } = await api.get(`/permissions/${permissionId}`);
 
   return data;
 };
 
 export const createPermission = async (permissionData) => {
-  const { data } = await api.post('/permissions/permissions', permissionData);
+  const { data } = await api.post('/permissions', permissionData);
 
   return data;
 };
@@ -364,7 +364,7 @@ export const updatePermission = async ({
   data: permissionData,
 }) => {
   const { data } = await api.patch(
-    `/permissions/permissions/${permissionId}`,
+    `/permissions/${permissionId}`,
     permissionData,
   );
 
@@ -372,7 +372,7 @@ export const updatePermission = async ({
 };
 
 export const deletePermission = async (permissionId) => {
-  const { data } = await api.delete(`/permissions/permissions/${permissionId}`);
+  const { data } = await api.delete(`/permissions/${permissionId}`);
 
   return data;
 };
@@ -518,6 +518,38 @@ export const removePermissionFromUser = async ({
       data: { permissionId, academicLeague },
     },
   );
+
+  return data;
+};
+
+// Tasks
+export const getTasks = async (filters = {}) => {
+  const { data } = await api.get('/tasks', { params: filters });
+
+  return data;
+};
+export const getTaskById = async (_id) => {
+  const { data } = await api.get(`/tasks/${_id}`);
+
+  return data;
+};
+export const createTask = async (newTask) => {
+  const { data } = await api.post('/tasks', newTask);
+
+  return data;
+};
+export const updateTask = async ({ _id, inputData }) => {
+  const { data } = await api.patch(`/tasks/${_id}`, inputData);
+
+  return data;
+};
+export const completeTask = async (_id) => {
+  const { data } = await api.patch(`/tasks/${_id}/complete`);
+
+  return data;
+};
+export const deleteTask = async (_id) => {
+  const { data } = await api.delete(`/tasks/${_id}`);
 
   return data;
 };
