@@ -46,7 +46,7 @@ import {
   TextButton,
   UploadHint,
 } from './Styles';
-import UploadProfilePhotoModal from './UploadProfilePhotoModal';
+import UploadProfilePhotoModal from './UploadProfilePhotoModal/UploadProfilePhotoModal';
 import {
   buildProfileUpdateErrorMessage,
   profileValidationSchema,

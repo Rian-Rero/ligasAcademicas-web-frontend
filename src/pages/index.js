@@ -24,3 +24,5 @@ export { default as AdminSquads } from './Admin/AdminSquads/AdminSquads';
 export { default as AdminUsers } from './Admin/AdminUsers/AdminUsers';
 export { default as AdminEvents } from './Admin/AdminEvents/AdminEvents';
 export { default as PermissionsAdmin } from './Admin/PermissionsAdmin/PermissionsAdmin';
+export { default as CertificateCreationPage } from './Admin/CertificateCreation/CertificateCreationPage';
+export { default as StudentCertificatesPage } from './Student/Certificates/StudentCertificatesPage';

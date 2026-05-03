@@ -107,3 +107,18 @@ export function useDeleteCertificate({
     onError,
   });
 }
+
+export function useCertificatesByLeagueMembership({
+  filters = {},
+  enabled = true,
+  onSuccess = () => {},
+  onError = (err) => console.error(err),
+} = {}) {
+  return useQuery({
+    queryKey: ['certificates-for-creation', filters],
+    queryFn: () => getCertificates(filters),
+    enabled,
+    onSuccess,
+    onError,
+  });
+}

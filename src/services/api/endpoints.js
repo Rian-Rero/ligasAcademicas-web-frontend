@@ -152,6 +152,13 @@ export const getLeagueMembershipById = async (_id) => {
 
   return data;
 };
+export const getInactiveLeagueMemberships = async (filters = {}) => {
+  const { data } = await api.get('/league-memberships/inactive', {
+    params: filters,
+  });
+
+  return data;
+};
 export const createLeagueMembership = async (newLeagueMembership) => {
   const { data } = await api.post('/league-memberships', newLeagueMembership);
 
@@ -164,6 +171,11 @@ export const updateLeagueMembership = async ({ _id, inputData }) => {
 };
 export const deleteLeagueMembership = async (_id) => {
   const { data } = await api.delete(`/league-memberships/${_id}`);
+
+  return data;
+};
+export const endLeagueMembership = async (_id) => {
+  const { data } = await api.patch(`/league-memberships/${_id}/end`);
 
   return data;
 };

@@ -7,6 +7,8 @@ import {
   getLeagueMembershipById,
   getLeagueMemberships,
   updateLeagueMembership,
+  getInactiveLeagueMemberships,
+  endLeagueMembership,
 } from '../../services/api/endpoints';
 
 export function useGetLeagueMemberships({
@@ -19,6 +21,22 @@ export function useGetLeagueMemberships({
   return useQuery({
     queryKey,
     queryFn: () => getLeagueMemberships(filters),
+    enabled,
+    onSuccess,
+    onError,
+  });
+}
+
+export function useGetInactiveLeagueMemberships({
+  filters,
+  enabled = true,
+  queryKey = ['league-memberships-inactive', filters],
+  onSuccess = () => {},
+  onError = (err) => console.error(err),
+} = {}) {
+  return useQuery({
+    queryKey,
+    queryFn: () => getInactiveLeagueMemberships(filters),
     enabled,
     onSuccess,
     onError,
@@ -80,6 +98,17 @@ export function useDeleteLeagueMembership({
 } = {}) {
   return useMutation({
     mutationFn: deleteLeagueMembership,
+    onSuccess,
+    onError,
+  });
+}
+
+export function useEndLeagueMembership({
+  onSuccess = () => {},
+  onError = (err) => console.error(err),
+} = {}) {
+  return useMutation({
+    mutationFn: endLeagueMembership,
     onSuccess,
     onError,
   });
