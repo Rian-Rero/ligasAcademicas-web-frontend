@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -64,6 +64,7 @@ import {
 import { getUserById } from '../../services/api/endpoints';
 import useAuthStore from '../../stores/auth';
 import { resolveMediaUrl } from '../../utils/media';
+import { hasAdminRole, hasManagerRole } from '../../utils/roles';
 import { notifyError, notifySuccess } from '../../utils/toast';
 
 function formatRole(role) {
@@ -239,9 +240,36 @@ export default function Profile() {
 
   const isEmailVerified = Boolean(authUser?.emailVerified);
   const isGoogleLinked = Boolean(authUser?.googleCalendarLinked);
-  const displayRole = formatRole(
-    activeMembership?.role || authUser?.roleKeys?.[0],
-  );
+
+  const displayRole = useMemo(() => {
+    const candidates = [activeMembership?.role, ...(authUser?.roleKeys || [])]
+      .filter(Boolean)
+      .map((r) => String(r));
+
+    if (candidates.length === 0) return formatRole(null);
+
+    if (hasAdminRole(candidates)) {
+      const admin = candidates.find((r) =>
+        String(r).toLowerCase().includes('admin'),
+      );
+      return formatRole(admin || 'admin');
+    }
+
+    if (hasManagerRole(candidates)) {
+      const manager = candidates.find((r) => {
+        const key = String(r).toLowerCase();
+        return (
+          key.includes('manager') ||
+          key.includes('president') ||
+          key.includes('marketing')
+        );
+      });
+
+      return formatRole(manager || candidates[0]);
+    }
+
+    return formatRole(candidates[0]);
+  }, [activeMembership?.role, authUser?.roleKeys]);
 
   const handleSelectProfilePhoto = (event) => {
     const selectedFile = event.target.files?.[0];
