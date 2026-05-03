@@ -4,6 +4,7 @@ export const Content = styled.section`
   display: flex;
   flex-direction: column;
   gap: 1.4rem;
+  height: 100%;
 `;
 
 export const HeaderSection = styled.header`
