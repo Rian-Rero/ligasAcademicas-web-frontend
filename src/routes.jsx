@@ -30,6 +30,7 @@ import {
   StudentDashboard,
   StudentTeam,
   StudentCertificates,
+  CertificateCreationPage,
   EmailConfirmation,
   ForgotPassword,
   RedefinePassword,
@@ -113,6 +114,10 @@ const router = createBrowserRouter(
                 path="ligas-academicas"
                 element={<AdminAcademicLeagues />}
               />
+              <Route
+                path="certificados"
+                element={<CertificateCreationPage />}
+              />
               <Route path="eventos" element={<AdminEvents />} />
               <Route path="subequipes" element={<AdminSquads />} />
               <Route path="usuários" element={<AdminUsers />} />
@@ -138,6 +143,10 @@ const router = createBrowserRouter(
           <Route element={<ManagerPrivateRoutes />}>
             <Route path="manager" element={<ManagerSideBarLayout />}>
               <Route path="dashboard" element={<ManagerDashboard />} />
+              <Route
+                path="certificados"
+                element={<CertificateCreationPage />}
+              />
               <Route path="eventos" element={<ManagerEventsList />} />
               <Route path="criar-evento" element={<ManagerEvents />} />
               <Route path="membros" element={<ManagerMembers />} />

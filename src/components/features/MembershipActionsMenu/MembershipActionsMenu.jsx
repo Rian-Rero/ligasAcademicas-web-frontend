@@ -10,29 +10,21 @@ import {
   Box,
   Button,
   CircularProgress,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
-  Menu,
   MenuItem,
   Stack,
   Typography,
 } from '@mui/material';
-import styled from 'styled-components';
 
+import { StyledDialog, StyledMenu } from './Styles';
 import {
   useEndLeagueMembership,
   useDeleteLeagueMembership,
 } from '../../../hooks/query/leagueMembership';
 import { notifyError, notifySuccess } from '../../../utils/toast';
-
-const StyledMenu = styled(Menu)`
-  .MuiPaper-root {
-    border-radius: 8px;
-  }
-`;
 
 function MembershipActionsMenu({
   membership = null,
@@ -96,7 +88,13 @@ function MembershipActionsMenu({
 
   return (
     <>
-      <IconButton size="small" onClick={handleOpenMenu} disabled={!membership}>
+      <IconButton
+        size="small"
+        onClick={handleOpenMenu}
+        disabled={!membership}
+        sx={{ color: '#ffffff' }}
+        aria-label="abrir ações"
+      >
         <MoreVertIcon />
       </IconButton>
 
@@ -115,36 +113,54 @@ function MembershipActionsMenu({
         </MenuItem>
       </StyledMenu>
 
-      <Dialog
+      <StyledDialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle sx={{ fontWeight: 600 }}>
+        <DialogTitle sx={{ fontWeight: 600, color: '#ffffff' }}>
           {actionType === 'end' ? 'Encerrar Ciclo' : 'Expulsar Membro'}
         </DialogTitle>
 
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <Box>
-              <Typography variant="body2" color="textSecondary">
+              <Typography
+                variant="body2"
+                sx={{ color: 'rgba(255,255,255,0.75)' }}
+              >
                 Membro: <strong>{membership?.user?.name}</strong>
               </Typography>
-              <Typography variant="body2" color="textSecondary">
+              <Typography
+                variant="body2"
+                sx={{ color: 'rgba(255,255,255,0.75)' }}
+              >
                 Função: <strong>{membership?.role}</strong>
               </Typography>
             </Box>
 
             {actionType === 'end' && (
-              <Alert severity="info">
+              <Alert
+                severity="info"
+                sx={{
+                  backgroundColor: 'rgba(2, 136, 209, 0.15)',
+                  color: '#e3f2fd',
+                }}
+              >
                 Ao encerrar o ciclo, um histórico de função será registrado e o
                 membro poderá receber um certificado de participação.
               </Alert>
             )}
 
             {actionType === 'expel' && (
-              <Alert severity="warning">
+              <Alert
+                severity="warning"
+                sx={{
+                  backgroundColor: 'rgba(237, 108, 2, 0.18)',
+                  color: '#fff3e0',
+                }}
+              >
                 Ao expulsar o membro, sua participação será removida do sistema
                 e não poderá ser recuperada.
               </Alert>
@@ -153,7 +169,11 @@ function MembershipActionsMenu({
         </DialogContent>
 
         <DialogActions sx={{ padding: '1rem' }}>
-          <Button onClick={() => setOpenDialog(false)} disabled={isLoading}>
+          <Button
+            onClick={() => setOpenDialog(false)}
+            disabled={isLoading}
+            sx={{ color: 'rgba(255,255,255,0.85)' }}
+          >
             Cancelar
           </Button>
           <Button
@@ -172,7 +192,7 @@ function MembershipActionsMenu({
             )}
           </Button>
         </DialogActions>
-      </Dialog>
+      </StyledDialog>
     </>
   );
 }
