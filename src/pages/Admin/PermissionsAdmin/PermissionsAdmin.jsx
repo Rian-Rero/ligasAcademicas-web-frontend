@@ -53,8 +53,10 @@ import {
 } from '../../../hooks/query/roles';
 import { useGetUsers } from '../../../hooks/query/user';
 import {
+  useAddRoleToUser,
   useGetUserPermissionDetails,
   useGetUserPermissions,
+  useRemoveRoleFromUser,
   useUpdateUserPermissions,
 } from '../../../hooks/query/userPermissions';
 import { hasAdminRole } from '../../../utils/roles';
@@ -89,6 +91,7 @@ export default function PermissionsAdmin() {
   const [userSearchTerm, setUserSearchTerm] = useState('');
   const [selectedDirectPermissionIds, setSelectedDirectPermissionIds] =
     useState([]);
+  const [selectedRoleIdToAdd, setSelectedRoleIdToAdd] = useState('');
 
   const { data: roles = [], isLoading: rolesLoading } = useGetRoles({
     filters: { isGlobal: true },
@@ -126,6 +129,8 @@ export default function PermissionsAdmin() {
     },
   });
   const { mutateAsync: updateUserPermissions } = useUpdateUserPermissions({});
+  const { mutateAsync: addRoleToUser } = useAddRoleToUser({});
+  const { mutateAsync: removeRoleFromUser } = useRemoveRoleFromUser({});
 
   const permissionsByModule = useMemo(() => {
     return permissions.reduce((accumulator, permission) => {
@@ -249,6 +254,45 @@ export default function PermissionsAdmin() {
     }
   }
 
+  async function handleAddRoleToUser() {
+    if (!selectedUserId || !selectedRoleIdToAdd) {
+      return;
+    }
+
+    try {
+      await addRoleToUser({
+        userId: selectedUserId,
+        roleId: selectedRoleIdToAdd,
+      });
+
+      notifySuccess('Cargo adicionado com sucesso!');
+      setSelectedRoleIdToAdd('');
+    } catch (error) {
+      notifyError(
+        error.response?.data?.message || 'Erro ao adicionar cargo ao usuário',
+      );
+    }
+  }
+
+  async function handleRemoveRoleFromUser(roleId) {
+    if (!selectedUserId) {
+      return;
+    }
+
+    try {
+      await removeRoleFromUser({
+        userId: selectedUserId,
+        roleId,
+      });
+
+      notifySuccess('Cargo removido com sucesso!');
+    } catch (error) {
+      notifyError(
+        error.response?.data?.message || 'Erro ao remover cargo do usuário',
+      );
+    }
+  }
+
   const deleteRoleDescription = roleToDelete
     ? `Tem certeza que deseja deletar o papel ${roleToDelete.name}?`
     : 'Tem certeza que deseja deletar este papel?';
@@ -352,15 +396,111 @@ export default function PermissionsAdmin() {
             </StatBadge>
             <StatBadge>
               <strong>{selectedUserRoles.length}</strong>
-              papéis vinculados
+              cargos vinculados
             </StatBadge>
           </UserStats>
         </UserDetailsHeader>
 
+        <SectionTitle>Cargos</SectionTitle>
+        <SectionDescription>
+          Adicione cargos que agrupam múltiplas permissões. Os cargos aparecem
+          no perfil do usuário e determinam suas permissões efetivas.
+        </SectionDescription>
+
+        {selectedUserRoles.length > 0 && (
+          <>
+            <SectionTitle>Cargos atuais</SectionTitle>
+            <UserChips>
+              {selectedUserRoles.map((role) => (
+                <UserChip key={role._id}>
+                  {role.name}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveRoleFromUser(role._id)}
+                    style={{
+                      marginLeft: '8px',
+                      background: 'none',
+                      border: 'none',
+                      color: 'inherit',
+                      cursor: 'pointer',
+                      fontSize: '1.2em',
+                    }}
+                    title="Remover cargo"
+                  >
+                    ✕
+                  </button>
+                </UserChip>
+              ))}
+            </UserChips>
+          </>
+        )}
+
+        <PermissionHelper>
+          {selectedUserRoles.length === 0
+            ? 'Nenhum cargo atribuído ainda.'
+            : `Este usuário possui ${selectedUserRoles.length} cargo${selectedUserRoles.length !== 1 ? 's' : ''}.`}
+        </PermissionHelper>
+
+        <div
+          style={{
+            display: 'flex',
+            gap: '12px',
+            marginBottom: '24px',
+            alignItems: 'flex-end',
+          }}
+        >
+          <label
+            htmlFor="role-select"
+            style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+          >
+            <span
+              style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: 'bold',
+              }}
+            >
+              Adicionar cargo
+            </span>
+            <select
+              id="role-select"
+              value={selectedRoleIdToAdd}
+              onChange={(e) => setSelectedRoleIdToAdd(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '14px',
+              }}
+            >
+              <option value="">Selecione um cargo...</option>
+              {roles
+                .filter(
+                  (role) => !selectedUserRoles.some((r) => r._id === role._id),
+                )
+                .map((role) => (
+                  <option key={role._id} value={role._id}>
+                    {role.name}
+                  </option>
+                ))}
+            </select>
+          </label>
+          <CreateButton
+            type="button"
+            onClick={handleAddRoleToUser}
+            disabled={
+              !selectedRoleIdToAdd || addRoleToUser.isPending || rolesLoading
+            }
+          >
+            {addRoleToUser.isPending ? 'Adicionando...' : 'Adicionar'}
+          </CreateButton>
+        </div>
+
         <SectionTitle>Permissões diretas</SectionTitle>
         <SectionDescription>
           Esses itens são salvos diretamente no usuário e são independentes dos
-          papéis atribuídos.
+          cargos atribuídos.
         </SectionDescription>
 
         <PermissionSelector
@@ -372,7 +512,7 @@ export default function PermissionsAdmin() {
         />
 
         <PermissionHelper>
-          O salvamento mantém os papéis atuais e atualiza apenas o conjunto de
+          O salvamento mantém os cargos atuais e atualiza apenas o conjunto de
           permissões diretas.
         </PermissionHelper>
 
