@@ -86,8 +86,8 @@ flowchart LR
   QueryHooks --> ApiEndpoints
   ApiEndpoints --> AxiosApi
   AxiosApi --> Backend
-  AxiosApi ..> AuthStore
-  QueryHooks ..> AuthStore
+  AxiosApi -.-> AuthStore
+  QueryHooks -.-> AuthStore
 ```
 
 Relações de suporte:
