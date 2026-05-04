@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
@@ -14,6 +14,7 @@ import { LuBuilding } from 'react-icons/lu';
 import { ClipLoader } from 'react-spinners';
 import { useTheme } from 'styled-components';
 
+import UniversityLogoModal from './UniversityLogoModal/UniversityLogoModal';
 import {
   adminUniversityDefaultValues,
   adminUniversitySchema,
@@ -26,6 +27,7 @@ import {
   useCreateUniversity,
   useDeleteUniversity,
   useGetUniversities,
+  useUploadUniversityLogo,
   useUpdateUniversity,
 } from '../../../hooks/query/university';
 import {
@@ -69,6 +71,7 @@ export default function AdminUniversities() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUniversityId, setSelectedUniversityId] = useState('');
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
 
   const { data: universities = [] } = useGetUniversities();
   const { data: leagues = [] } = useGetAcademicLeagues();
@@ -78,6 +81,8 @@ export default function AdminUniversities() {
     useCreateUniversity();
   const { mutateAsync: updateUniversity, isPending: isUpdating } =
     useUpdateUniversity();
+  const { mutateAsync: uploadUniversityLogo, isPending: isUploadingLogo } =
+    useUploadUniversityLogo();
   const { mutateAsync: deleteUniversity, isPending: isDeleting } =
     useDeleteUniversity();
 
@@ -91,9 +96,9 @@ export default function AdminUniversities() {
     defaultValues: adminUniversityDefaultValues,
   });
 
-  const fileInputRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+  const [currentLogoUrl, setCurrentLogoUrl] = useState('');
 
   const filteredUniversities = useMemo(
     () =>
@@ -162,6 +167,7 @@ export default function AdminUniversities() {
       reset(adminUniversityDefaultValues);
       setSelectedImage(null);
       setImagePreviewUrl('');
+      setCurrentLogoUrl('');
       return;
     }
 
@@ -173,12 +179,18 @@ export default function AdminUniversities() {
     });
 
     setSelectedImage(null);
-    setImagePreviewUrl(selectedUniversity.logo?.url || '');
+    const persistedLogoUrl = selectedUniversity.logo?.url || '';
+    setCurrentLogoUrl(persistedLogoUrl);
+    setImagePreviewUrl(persistedLogoUrl);
   }, [reset, selectedUniversity]);
 
   const handleCreateNew = () => {
     setSelectedUniversityId('');
     reset(adminUniversityDefaultValues);
+    setSelectedImage(null);
+    setImagePreviewUrl('');
+    setCurrentLogoUrl('');
+    setIsLogoModalOpen(false);
   };
 
   const handleSelectImage = (event) => {
@@ -223,7 +235,25 @@ export default function AdminUniversities() {
     }
 
     setSelectedImage(null);
-    setImagePreviewUrl('');
+    setImagePreviewUrl(currentLogoUrl);
+  };
+
+  const handleOpenLogoModal = () => {
+    setIsLogoModalOpen(true);
+  };
+
+  const handleCancelLogoModal = () => {
+    if (imagePreviewUrl && imagePreviewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+
+    setSelectedImage(null);
+    setImagePreviewUrl(currentLogoUrl);
+    setIsLogoModalOpen(false);
+  };
+
+  const handleConfirmLogoModal = () => {
+    setIsLogoModalOpen(false);
   };
 
   const onSubmit = handleSubmit(async (values) => {
@@ -235,34 +265,47 @@ export default function AdminUniversities() {
     };
 
     try {
-      // If an image file was selected, send multipart/form-data
-      if (selectedImage) {
-        const formData = new FormData();
-        Object.keys(basePayload).forEach((key) => {
-          formData.append(key, basePayload[key]);
-        });
-        // backend expects 'logo' for university image
-        formData.append('logo', selectedImage);
-
-        if (selectedUniversity?._id) {
-          await updateUniversity({
+      const savedUniversity = selectedUniversity?._id
+        ? await updateUniversity({
             _id: selectedUniversity._id,
-            inputData: formData,
-          });
-          notifySuccess('Universidade atualizada com sucesso');
-        } else {
-          await createUniversity(formData);
-          notifySuccess('Universidade criada com sucesso');
+            inputData: basePayload,
+          })
+        : await createUniversity(basePayload);
+
+      const universityId = savedUniversity?._id || selectedUniversity?._id;
+      let logoUploadFailed = false;
+
+      if (selectedImage) {
+        if (universityId) {
+          try {
+            await uploadUniversityLogo({
+              _id: universityId,
+              file: selectedImage,
+            });
+          } catch {
+            logoUploadFailed = true;
+          }
         }
-      } else if (selectedUniversity?._id) {
-        await updateUniversity({
-          _id: selectedUniversity._id,
-          inputData: basePayload,
-        });
-        notifySuccess('Universidade atualizada com sucesso');
+      }
+
+      if (selectedImage && logoUploadFailed) {
+        notifyWarning(
+          selectedUniversity?._id
+            ? 'Universidade salva, mas o logo não pôde ser enviado.'
+            : 'Universidade criada, mas o logo não pôde ser enviado.',
+        );
+      } else if (selectedImage) {
+        notifySuccess(
+          selectedUniversity?._id
+            ? 'Universidade atualizada com logo'
+            : 'Universidade criada com logo',
+        );
       } else {
-        await createUniversity(basePayload);
-        notifySuccess('Universidade criada com sucesso');
+        notifySuccess(
+          selectedUniversity?._id
+            ? 'Universidade atualizada com sucesso'
+            : 'Universidade criada com sucesso',
+        );
       }
 
       await Promise.all([
@@ -308,6 +351,7 @@ export default function AdminUniversities() {
     errors.name?.message || errors.street?.message || errors.number?.message;
 
   const isSaving = isCreating || isUpdating || isDeleting;
+  const isLogoSaving = isUploadingLogo;
 
   return (
     <Content>
@@ -448,46 +492,33 @@ export default function AdminUniversities() {
               />
             </Field>
 
-            <Field>
-              <Label>Logo (opcional)</Label>
-              <div
-                style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  onChange={handleSelectImage}
-                  style={{ display: 'inline-block' }}
-                />
+            <Field $fullWidth>
+              <Label>Logo da universidade</Label>
+              <HelperText>
+                {imagePreviewUrl
+                  ? 'Uma imagem já foi selecionada para este cadastro.'
+                  : 'Adicione uma imagem opcional para identificar melhor a universidade.'}
+              </HelperText>
+              <ActionRow style={{ justifyContent: 'flex-start' }}>
+                <ActionButton
+                  type="button"
+                  onClick={handleOpenLogoModal}
+                  disabled={isSaving || isLogoSaving}
+                >
+                  {imagePreviewUrl ? 'Alterar imagem' : 'Selecionar imagem'}
+                </ActionButton>
+
                 {imagePreviewUrl ? (
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: '0.5rem',
-                      alignItems: 'center',
-                    }}
+                  <ActionButton
+                    type="button"
+                    $variant="warning"
+                    onClick={handleRemoveSelectedImage}
+                    disabled={isSaving || isLogoSaving}
                   >
-                    <img
-                      src={imagePreviewUrl}
-                      alt="preview"
-                      style={{
-                        width: 56,
-                        height: 56,
-                        objectFit: 'cover',
-                        borderRadius: 6,
-                      }}
-                    />
-                    <ActionButton
-                      type="button"
-                      $variant="warning"
-                      onClick={handleRemoveSelectedImage}
-                    >
-                      Remover
-                    </ActionButton>
-                  </div>
+                    Remover seleção
+                  </ActionButton>
                 ) : null}
-              </div>
+              </ActionRow>
             </Field>
 
             <Field $fullWidth>
@@ -537,6 +568,16 @@ export default function AdminUniversities() {
         onConfirm={handleConfirmDelete}
         onCancel={() => setIsDeleteConfirmOpen(false)}
         isLoading={isSaving}
+      />
+
+      <UniversityLogoModal
+        isOpen={isLogoModalOpen}
+        onClose={handleCancelLogoModal}
+        previewUrl={imagePreviewUrl}
+        isLoading={isLogoSaving}
+        onConfirm={handleConfirmLogoModal}
+        onSelectFile={handleSelectImage}
+        universityName={selectedUniversity?.name || ''}
       />
     </Content>
   );

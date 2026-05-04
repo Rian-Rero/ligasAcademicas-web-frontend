@@ -228,6 +228,14 @@ export const updateUniversity = async ({ _id, inputData }) => {
 
   return data;
 };
+export const uploadUniversityLogo = async ({ _id, file }) => {
+  const formData = new FormData();
+  formData.append('logo', file);
+
+  const { data } = await api.post(`/universities/${_id}`, formData);
+
+  return data;
+};
 export const deleteUniversity = async (_id) => {
   const { data } = await api.delete(`/universities/${_id}`);
 

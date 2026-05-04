@@ -6,6 +6,7 @@ import {
   deleteUniversity,
   getUniversities,
   getUniversityById,
+  uploadUniversityLogo,
   updateUniversity,
 } from '../../services/api/endpoints';
 
@@ -58,6 +59,17 @@ export function useUpdateUniversity({
 } = {}) {
   return useMutation({
     mutationFn: updateUniversity,
+    onSuccess,
+    onError,
+  });
+}
+
+export function useUploadUniversityLogo({
+  onSuccess = () => {},
+  onError = (err) => console.error(err),
+} = {}) {
+  return useMutation({
+    mutationFn: uploadUniversityLogo,
     onSuccess,
     onError,
   });

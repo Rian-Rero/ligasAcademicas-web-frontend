@@ -260,6 +260,90 @@ export const ErrorMessage = styled.span`
   font-size: 1.2rem;
 `;
 
+export const UniversityLogoUpload = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+  padding: 1rem;
+  border-radius: 1.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  @media (max-width: 620px) {
+    flex-direction: column;
+  }
+`;
+
+export const UniversityLogoPreview = styled.div`
+  width: 13rem;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  border-radius: 1.2rem;
+  border: 2px dashed rgba(0, 163, 255, 0.45);
+  background: rgba(0, 140, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  @media (max-width: 620px) {
+    width: 100%;
+    max-width: 18rem;
+    margin-inline: auto;
+  }
+`;
+
+export const UniversityLogoPreviewImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+export const UniversityLogoPlaceholder = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 1rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.72);
+
+  svg {
+    font-size: 2.6rem;
+    color: #a6d0ff;
+  }
+
+  strong {
+    color: #ffffff;
+    font-size: 1.35rem;
+  }
+
+  span {
+    font-size: 1.1rem;
+    line-height: 1.35;
+  }
+`;
+
+export const UniversityLogoPanel = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.9rem;
+`;
+
+export const UniversityLogoHint = styled.small`
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 1.15rem;
+`;
+
+export const UniversityLogoActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+`;
+
 export const EmptyState = styled.div`
   padding: 1.4rem;
   border-radius: 1.2rem;
