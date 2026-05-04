@@ -18,7 +18,7 @@ A plataforma automatiza processos burocráticos, permitindo o controle eficiente
 | Nome                              | Papel / Responsabilidade |
 | :-------------------------------- | :----------------------- |
 | **Rian Rero Lopes Jericó Vieira** | Desenvolvedor Fullstack  |
-| **Lara Strutz Carvalho**          | Desenvolvedor Frontend  |
+| **Lara Strutz Carvalho**          | Desenvolvedor Frontend   |
 | **João Paulo Gonçalves da Silva** | Desenvolvedor Backend    |
 | **Yan Adriel Martins Silva**      | Desenvolvedor Fullstack  |
 
@@ -86,9 +86,14 @@ flowchart LR
 	QueryHooks --> ApiEndpoints
 	ApiEndpoints --> AxiosApi
 	AxiosApi --> Backend
-	AxiosApi ..> AuthStore : injeta Bearer token
-	QueryHooks ..> AuthStore : login / refresh / logout
+	AxiosApi ..> AuthStore
+	QueryHooks ..> AuthStore
 ```
+
+Relações de suporte:
+
+- `AxiosApi` injeta o token Bearer vindo de `AuthStore`.
+- `QueryHooks` consome `AuthStore` para login, refresh e logout.
 
 ### O que este frontend cobre
 
@@ -110,7 +115,7 @@ flowchart LR
 
 1. Instale as dependências.
 2. Configure `VITE_BACKEND_URL` apontando para o backend.
-3. Execute `npm run dev`.
+3. Execute `yarn dev`.
 
 ### Variáveis de ambiente
 
@@ -122,10 +127,11 @@ VITE_NODE_ENV=
 ### Scripts úteis
 
 ```bash
-npm run dev
-npm run build
-npm run preview
-npm run lint
+yarn dev
+yarn build
+yarn preview
+yarn lint
+yarn install
 ```
 
 ---

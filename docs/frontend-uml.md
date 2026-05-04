@@ -121,9 +121,14 @@ flowchart LR
   QueryHooks --> ApiEndpoints
   ApiEndpoints --> AxiosApi
   AxiosApi --> Backend
-  AxiosApi ..> AuthStore : injeta Bearer token
-  QueryHooks ..> AuthStore : login / refresh / logout
+  AxiosApi ..> AuthStore
+  QueryHooks ..> AuthStore
 ```
+
+Relações de suporte:
+
+- `AxiosApi` injeta o token Bearer vindo de `AuthStore`.
+- `QueryHooks` consome `AuthStore` para login, refresh e logout.
 
 ## Camadas relevantes
 
