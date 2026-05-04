@@ -18,7 +18,7 @@ A plataforma automatiza processos burocráticos, permitindo o controle eficiente
 | Nome                              | Papel / Responsabilidade |
 | :-------------------------------- | :----------------------- |
 | **Rian Rero Lopes Jericó Vieira** | Desenvolvedor Fullstack  |
-| **Lara Strutz Carvalho**          | Desenvolvedor Fullstack  |
+| **Lara Strutz Carvalho**          | Desenvolvedor Frontend  |
 | **João Paulo Gonçalves da Silva** | Desenvolvedor Backend    |
 | **Yan Adriel Martins Silva**      | Desenvolvedor Fullstack  |
 
@@ -30,6 +30,103 @@ A plataforma automatiza processos burocráticos, permitindo o controle eficiente
 - **Backend:** Node.js com Express
 - **Banco de Dados:** MongoDB
 - **Inteligência Artificial (Auxílio ao Desenvolvimento):** Gemini, Claude Code e ChatGPT
+
+---
+
+## 🧭 Documentação Preliminar do Sistema
+
+### Arquitetura de navegação
+
+```mermaid
+flowchart TB
+	Router[RouterProvider / routes.jsx]
+	AppLayout[AppLayout]
+	PrivateRoutes[PrivateRoutes\nautenticação obrigatória]
+	AdminPrivateRoutes[AdminPrivateRoutes\nrole admin]
+	ManagerPrivateRoutes[ManagerPrivateRoutes\nrole manager ou membership de gestão]
+
+	Home[Home]
+	Login[Login]
+	Forgot[ForgotPassword]
+	Reset[RedefinePassword]
+	Confirm[EmailConfirmation]
+	ChangePwd[ChangePassword]
+
+	AdminLayout[AdminSideBarLayout]
+	StudentLayout[StudentSideBarLayout]
+	ManagerLayout[ManagerSideBarLayout]
+
+	Router --> AppLayout
+	AppLayout --> Home
+	AppLayout --> Login
+	AppLayout --> Forgot
+	AppLayout --> Reset
+	AppLayout --> Confirm
+	AppLayout --> PrivateRoutes
+	PrivateRoutes --> ChangePwd
+	PrivateRoutes --> AdminPrivateRoutes
+	PrivateRoutes --> StudentLayout
+	PrivateRoutes --> ManagerPrivateRoutes
+	AdminPrivateRoutes --> AdminLayout
+	ManagerPrivateRoutes --> ManagerLayout
+```
+
+### Fluxo de dados
+
+```mermaid
+flowchart LR
+	Pages[Páginas]
+	QueryHooks[hooks/query/*]
+	ApiEndpoints[services/api/endpoints.js]
+	AxiosApi[services/api/instance.js]
+	Backend[Backend /sgla-api]
+	AuthStore[stores/auth.js]
+
+	Pages --> QueryHooks
+	QueryHooks --> ApiEndpoints
+	ApiEndpoints --> AxiosApi
+	AxiosApi --> Backend
+	AxiosApi ..> AuthStore : injeta Bearer token
+	QueryHooks ..> AuthStore : login / refresh / logout
+```
+
+### O que este frontend cobre
+
+- Login, logout, refresh token e recuperação de senha.
+- Áreas específicas para admin, manager e student.
+- Gestão de usuários, ligas, eventos, subequipes, tarefas e certificados.
+- Consumo da API com cache e invalidação via React Query.
+
+### Estrutura útil para documentação
+
+- `src/routes.jsx` define a navegação e os guardas.
+- `src/layouts/` concentra os layouts por perfil.
+- `src/pages/` reúne as telas do sistema.
+- `src/hooks/query/` encapsula queries e mutations.
+- `src/services/api/` concentra o contrato HTTP.
+- `src/stores/auth.js` mantém o estado de autenticação.
+
+### Execução local
+
+1. Instale as dependências.
+2. Configure `VITE_BACKEND_URL` apontando para o backend.
+3. Execute `npm run dev`.
+
+### Variáveis de ambiente
+
+```bash
+VITE_BACKEND_URL=
+VITE_NODE_ENV=
+```
+
+### Scripts úteis
+
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run lint
+```
 
 ---
 
@@ -66,6 +163,15 @@ O desenvolvimento deste sistema é guiado pelas seguintes necessidades de seus d
 
 ---
 
+## 📚 Referências Técnicas
+
+- [UML do frontend](docs/frontend-uml.md)
+- [Rotas da aplicação](src/routes.jsx)
+- [Instância HTTP](src/services/api/instance.js)
+- [Store de autenticação](src/stores/auth.js)
+
+---
+
 ## 🚀 Como executar o projeto localmente
 
-_(Em breve: Instruções passo a passo de como instalar as dependências, configurar as variáveis de ambiente `.env` e rodar os servidores Frontend e Backend localmente)._
+Use as instruções da seção de documentação preliminar acima.
