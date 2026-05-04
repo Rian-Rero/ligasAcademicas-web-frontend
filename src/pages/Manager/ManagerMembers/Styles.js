@@ -219,16 +219,37 @@ const fieldStyles = css`
   width: 100%;
   min-height: 4.4rem;
   border-radius: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(13, 22, 45, 0.65);
+  border: 1px solid rgba(167, 206, 255, 0.38);
+  background: linear-gradient(
+    165deg,
+    rgba(8, 22, 44, 0.78),
+    rgba(11, 29, 54, 0.68)
+  );
   color: #ffffff;
   padding: 0 1rem;
-  font-size: 1.4rem;
+  font-size: clamp(1.2rem, 1.3vw, 1.5rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 10px 24px rgba(0, 0, 0, 0.24);
+  transition: all 0.25s ease;
+  font-weight: 500;
 
   &:focus {
     outline: none;
-    border-color: rgba(0, 163, 255, 0.85);
-    box-shadow: 0 0 0 3px rgba(0, 163, 255, 0.18);
+    border-color: rgba(0, 140, 255, 0.75);
+    box-shadow:
+      0 0 0 3px rgba(0, 140, 255, 0.22),
+      0 12px 28px rgba(0, 0, 0, 0.28);
+    background: linear-gradient(
+      165deg,
+      rgba(10, 27, 54, 0.9),
+      rgba(12, 34, 66, 0.82)
+    );
+  }
+
+  &:hover {
+    border-color: rgba(0, 140, 255, 0.5);
+    filter: brightness(1.02);
   }
 `;
 
@@ -237,6 +258,29 @@ export const TextInput = styled.input`
 `;
 
 export const SelectInput = styled.select`
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237dc2ff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 3rem;
+  cursor: pointer;
+
+  option {
+    background: #0b1d36;
+    color: #ffffff;
+    font-weight: 500;
+  }
+
+  &:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237dc2ff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+  }
+
+  @media (max-width: 600px) {
+    padding-right: 2.8rem;
+    background-position: right 0.8rem center;
+  }
   ${fieldStyles};
 `;
 
