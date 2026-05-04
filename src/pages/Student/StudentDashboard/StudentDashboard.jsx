@@ -7,6 +7,7 @@ import {
   FiDownload,
   FiUsers,
   FiXCircle,
+  FiCheckSquare,
 } from 'react-icons/fi';
 import { TbCertificate } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
@@ -289,7 +290,10 @@ export default function StudentDashboard() {
                     <strong>{item.title}</strong>
                     <span>{item.location}</span>
                   </div>
-                  <AgendaAction $variant={item.variant}>
+                  <AgendaAction
+                    onClick={() => navigate('/student/events')}
+                    $variant={item.variant}
+                  >
                     {item.action}
                   </AgendaAction>
                 </AgendaItem>
@@ -386,11 +390,14 @@ export default function StudentDashboard() {
 
         <SummaryCard>
           <SectionHeading>Atalhos rápidos</SectionHeading>
-          <QuickLink type="button">
-            <TbCertificate /> Ver todos os certificados <FiArrowRight />
+          <QuickLink
+            type="button"
+            onClick={() => navigate('/student/certificates')}
+          >
+            <TbCertificate /> Ver meu certificado <FiArrowRight />
           </QuickLink>
-          <QuickLink type="button">
-            <FiCalendar /> Ver calendário completo <FiArrowRight />
+          <QuickLink type="button" onClick={() => navigate('/student/tasks')}>
+            <FiCheckSquare /> Ver minhas tarefas <FiArrowRight />
           </QuickLink>
         </SummaryCard>
       </BottomCards>
