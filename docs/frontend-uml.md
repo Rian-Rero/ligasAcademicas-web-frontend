@@ -103,10 +103,10 @@ flowchart TB
   ManagerLayout --> ManagerTasks
   ManagerLayout --> ManagerProfile
 
-  PrivateRoutes ..> AuthStore
-  AdminPrivateRoutes ..> AuthStore
-  ManagerPrivateRoutes ..> AuthStore
-  ManagerPrivateRoutes ..> useGetLeagueMemberships
+  PrivateRoutes -.-> AuthStore
+  AdminPrivateRoutes -.-> AuthStore
+  ManagerPrivateRoutes -.-> AuthStore
+  ManagerPrivateRoutes -.-> useGetLeagueMemberships
 ```
 
 Relações de suporte:
@@ -129,8 +129,8 @@ flowchart LR
   QueryHooks --> ApiEndpoints
   ApiEndpoints --> AxiosApi
   AxiosApi --> Backend
-  AxiosApi ..> AuthStore
-  QueryHooks ..> AuthStore
+  AxiosApi -.-> AuthStore
+  QueryHooks -.-> AuthStore
 ```
 
 Relações de suporte:
