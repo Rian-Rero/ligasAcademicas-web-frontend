@@ -14,7 +14,8 @@ export const Container = styled.div`
 export const PageTitle = styled.h1`
   margin: 0 0 2rem 0;
   color: #f3f4f7;
-  font-size: 2rem;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 800;
   letter-spacing: 0.02em;
   text-shadow: 0 0.15rem 0.5rem rgba(0, 0, 0, 0.4);
 
@@ -78,14 +79,16 @@ export const ContentArea = styled.div`
 export const SectionTitle = styled.h2`
   margin: 0;
   color: #f3f4f7;
-  font-size: 1.3rem;
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  font-weight: 700;
   letter-spacing: 0.01em;
 `;
 
 export const SectionDescription = styled.p`
   margin: 0.5rem 0 0 0;
-  color: rgba(241, 245, 255, 0.66);
-  line-height: 1.5;
+  color: rgba(241, 245, 255, 0.72);
+  line-height: 1.6;
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
 `;
 
 export const SectionHeader = styled.div`
@@ -386,22 +389,30 @@ export const EmptySelection = styled.div`
 
 export const PermissionsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(clamp(280px, 28vw, 400px), 1fr)
+  );
+  gap: clamp(1rem, 1.5vw, 1.4rem);
+
+  @media (min-width: 2560px) {
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 1.6rem;
+  }
 `;
 
 export const PermissionCard = styled.div`
-  padding: 1rem 1rem 0.9rem;
-  border-radius: 1.2rem;
-  border: 1px solid transparent;
+  padding: clamp(1.2rem, 2vw, 1.8rem);
+  border-radius: 1.5rem;
+  border: 1.5px solid transparent;
   background:
     linear-gradient(160deg, rgba(11, 22, 42, 0.95), rgba(8, 18, 34, 0.95))
       padding-box,
     linear-gradient(120deg, rgba(47, 143, 255, 0.42), rgba(246, 160, 79, 0.32))
       border-box;
-  color: rgba(241, 245, 255, 0.9);
+  color: rgba(241, 245, 255, 0.92);
   box-shadow:
-    0 1rem 2rem rgba(0, 0, 0, 0.34),
+    0 1.2rem 2.4rem rgba(0, 0, 0, 0.36),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
   overflow: hidden;
   position: relative;
@@ -416,6 +427,18 @@ export const PermissionCard = styled.div`
       rgba(246, 160, 79, 0.05)
     );
     pointer-events: none;
+
+    &:hover {
+      transform: translateY(-3px);
+      filter: brightness(1.05);
+      border-color: rgba(47, 143, 255, 0.6);
+      box-shadow:
+        0 1.4rem 2.8rem rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    transition: all 0.3s ease;
+    cursor: pointer;
   }
 `;
 
@@ -424,27 +447,33 @@ export const PermissionTitle = styled.h4`
   color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.95rem;
-`;
-
-export const PermissionKey = styled.p`
-  margin: 0.25rem 0;
-  color: #7dc2ff;
-  font-family: monospace;
-  font-size: 0.85rem;
+  font-size: clamp(0.9rem, 1.2vw, 1.1rem);
   font-weight: 700;
 `;
 
+export const PermissionKey = styled.p`
+  margin: 0.35rem 0;
+  color: #7dc2ff;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: clamp(0.8rem, 1vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+`;
+
 export const PermissionModule = styled.p`
-  margin: 0.25rem 0;
-  color: rgba(241, 245, 255, 0.68);
-  font-size: 0.85rem;
+  margin: 0.35rem 0;
+  color: rgba(241, 245, 255, 0.75);
+  font-size: clamp(0.8rem, 1vw, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.01em;
 `;
 
 export const PermissionDescription = styled.p`
-  margin: 0.75rem 0 0 0;
-  color: rgba(241, 245, 255, 0.78);
-  font-size: 0.9rem;
+  margin: 0.8rem 0 0 0;
+  color: rgba(241, 245, 255, 0.82);
+  font-size: clamp(0.8rem, 1vw, 0.95rem);
+  font-weight: 400;
   line-height: 1.4;
 `;
 
@@ -460,16 +489,18 @@ export const RoleSelectLabel = styled.span`
   display: block;
   margin-bottom: 0.5rem;
   color: #f3f4f7;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 `;
 
 export const RoleSelect = styled.select`
   width: 100%;
-  height: 2.8rem;
-  padding: 0.6rem 1rem;
-  border-radius: 0.6rem;
-  font-size: 0.95rem;
+  height: clamp(2.8rem, 5vw, 3.4rem);
+  padding: clamp(0.6rem, 1vw, 0.8rem) clamp(1rem, 1.5vw, 1.2rem);
+  border-radius: 0.8rem;
+  font-size: clamp(0.9rem, 1.1vw, 1rem);
   color: #ffffff;
   border: 1px solid rgba(167, 206, 255, 0.38);
   background: linear-gradient(
@@ -483,22 +514,34 @@ export const RoleSelect = styled.select`
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    color 0.2s ease;
+  font-weight: 500;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237dc2ff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.8rem;
   cursor: pointer;
 
   option {
     background: #0b1d36;
+    font-weight: 500;
     color: #ffffff;
+  }
+
+  &:hover {
+    border-color: rgba(0, 140, 255, 0.5);
+    filter: brightness(1.02);
   }
 
   &:focus {
     outline: none;
     border-color: rgba(0, 140, 255, 0.75);
-    background: linear-gradient(
-      165deg,
-      rgba(10, 27, 54, 0.9),
-      rgba(12, 34, 66, 0.82)
-    );
+    background:
+      linear-gradient(165deg, rgba(10, 27, 54, 0.9), rgba(12, 34, 66, 0.82)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237dc2ff' d='M6 9L1 4h10z'/%3E%3C/svg%3E")
+        no-repeat right 1rem center;
     box-shadow:
       0 0 0 3px rgba(0, 140, 255, 0.22),
       0 12px 28px rgba(0, 0, 0, 0.28);
@@ -509,9 +552,17 @@ export const RoleSelect = styled.select`
     cursor: not-allowed;
   }
 
+  @media (min-width: 1920px) {
+    height: 3.6rem;
+    font-size: 1.05rem;
+    padding: 0.8rem 1.2rem;
+    padding-right: 3rem;
+  }
+
   @media (max-width: 700px) {
     font-size: 0.9rem;
-    padding: 0.5rem 0.8rem;
+    padding: 0.5rem 2.5rem 0.5rem 0.8rem;
+    height: 2.8rem;
   }
 `;
 
