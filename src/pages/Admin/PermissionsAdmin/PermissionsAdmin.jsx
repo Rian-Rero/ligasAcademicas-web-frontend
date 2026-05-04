@@ -63,8 +63,9 @@ import {
   useRemoveRoleFromUser,
   useUpdateUserPermissions,
 } from '../../../hooks/query/userPermissions';
-import { hasAdminRole } from '../../../utils/roles';
+import { hasAdminRole, hasManagerRole } from '../../../utils/roles';
 import { notifyError, notifySuccess } from '../../../utils/toast';
+import { formatRole } from '../../Manager/utils';
 
 const moduleLabels = {
   user: 'Usuários',
@@ -144,6 +145,40 @@ export default function PermissionsAdmin() {
       return accumulator;
     }, {});
   }, [permissions]);
+
+  function getUserDisplayRole(user) {
+    const candidates = [
+      // membership role, when available
+      user?.membership?.role,
+      ...(user?.roleKeys || []),
+    ]
+      .filter(Boolean)
+      .map((r) => String(r));
+
+    if (candidates.length === 0) return formatRole(null);
+
+    if (hasAdminRole(candidates)) {
+      const admin = candidates.find((r) =>
+        String(r).toLowerCase().includes('admin'),
+      );
+      return formatRole(admin || 'admin');
+    }
+
+    if (hasManagerRole(candidates)) {
+      const manager = candidates.find((r) => {
+        const key = String(r).toLowerCase();
+        return (
+          key.includes('manager') ||
+          key.includes('president') ||
+          key.includes('marketing')
+        );
+      });
+
+      return formatRole(manager || candidates[0]);
+    }
+
+    return formatRole(candidates[0]);
+  }
 
   const filteredUsers = useMemo(() => {
     const search = userSearchTerm.trim().toLowerCase();
@@ -323,7 +358,7 @@ export default function PermissionsAdmin() {
           >
             <UserCardTitle>
               <UserCardName>{user.name}</UserCardName>
-              <UserCardBadge>{user.roleKeys?.[0] || 'membro'}</UserCardBadge>
+              <UserCardBadge>{getUserDisplayRole(user)}</UserCardBadge>
             </UserCardTitle>
             <UserCardMeta>{user.email}</UserCardMeta>
           </UserCard>
