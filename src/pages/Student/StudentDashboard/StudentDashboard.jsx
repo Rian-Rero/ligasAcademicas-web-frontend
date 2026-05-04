@@ -289,7 +289,10 @@ export default function StudentDashboard() {
                     <strong>{item.title}</strong>
                     <span>{item.location}</span>
                   </div>
-                  <AgendaAction $variant={item.variant}>
+                  <AgendaAction
+                    onClick={() => navigate('/student/events')}
+                    $variant={item.variant}
+                  >
                     {item.action}
                   </AgendaAction>
                 </AgendaItem>
