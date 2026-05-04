@@ -12,11 +12,11 @@ Documento de referência da estrutura do frontend, com foco em rotas, layouts, e
 
 ```mermaid
 flowchart TB
-  Router[RouterProvider / routes.jsx]
+  Router[Router]
   AppLayout[AppLayout]
-  PrivateRoutes[PrivateRoutes\nautenticação obrigatória]
-  AdminPrivateRoutes[AdminPrivateRoutes\nrole admin]
-  ManagerPrivateRoutes[ManagerPrivateRoutes\nrole manager ou membership de gestão]
+  PrivateRoutes[PrivateRoutes]
+  AdminPrivateRoutes[AdminPrivateRoutes]
+  ManagerPrivateRoutes[ManagerPrivateRoutes]
 
   Home[Home]
   Login[Login]
@@ -25,37 +25,40 @@ flowchart TB
   Confirm[EmailConfirmation]
   ChangePwd[ChangePassword]
 
-  AdminLayout[AdminSideBarLayout]
-  StudentLayout[StudentSideBarLayout]
-  ManagerLayout[ManagerSideBarLayout]
+  AdminLayout[AdminLayout]
+  StudentLayout[StudentLayout]
+  ManagerLayout[ManagerLayout]
+
+  AuthStore[stores/auth.js]
+  useGetLeagueMemberships[useGetLeagueMemberships]
 
   AdminDashboard[AdminDashboard]
   AdminUniversities[AdminUniversities]
-  AdminLeagues[AdminAcademicLeagues]
-  AdminCertificates[CertificateCreationPage]
+  AdminLeagues[AdminLeagues]
+  AdminCertificates[CertificateCreation]
   AdminEvents[AdminEvents]
   AdminSquads[AdminSquads]
   AdminUsers[AdminUsers]
   PermissionsAdmin[PermissionsAdmin]
-  AdminTasks[ManagerTasks]
-  AdminProfile[Profile]
+  AdminTasks[AdminTasks]
+  AdminProfile[AdminProfile]
 
   StudentDashboard[StudentDashboard]
   StudentEvents[StudentEvents]
   StudentCertificates[StudentCertificates]
   StudentTeam[StudentTeam]
   StudentTasks[StudentTasks]
-  StudentProfile[Profile]
+  StudentProfile[StudentProfile]
 
   ManagerDashboard[ManagerDashboard]
-  ManagerCertificates[CertificateCreationPage]
+  ManagerCertificates[ManagerCertificates]
   ManagerEventsList[ManagerEventsList]
   ManagerEvents[ManagerEvents]
   ManagerMembers[ManagerMembers]
   ManagerSquads[ManagerSquads]
-  ManagerRegister[Register]
+  ManagerRegister[ManagerRegister]
   ManagerTasks[ManagerTasks]
-  ManagerProfile[Profile]
+  ManagerProfile[ManagerProfile]
 
   Router --> AppLayout
   AppLayout --> Home
@@ -100,21 +103,26 @@ flowchart TB
   ManagerLayout --> ManagerTasks
   ManagerLayout --> ManagerProfile
 
-  PrivateRoutes ..> AuthStore[zustand auth store]
+  PrivateRoutes ..> AuthStore
   AdminPrivateRoutes ..> AuthStore
   ManagerPrivateRoutes ..> AuthStore
-  ManagerPrivateRoutes ..> useGetLeagueMemberships[React Query hook]
+  ManagerPrivateRoutes ..> useGetLeagueMemberships
 ```
+
+Relações de suporte:
+
+- `AuthStore` representa a store de autenticação usada pelos guardas de rota.
+- `useGetLeagueMemberships` é consultado pelo `ManagerPrivateRoutes` para validar acesso de gestão.
 
 ## Fluxo de dados e dependências
 
 ```mermaid
 flowchart LR
-  Pages[Páginas / componentes de tela]
-  QueryHooks[hooks/query/*]
+  Pages[Páginas]
+  QueryHooks[hooks/query]
   ApiEndpoints[services/api/endpoints.js]
   AxiosApi[services/api/instance.js]
-  Backend[Backend /sgla-api]
+  Backend[Backend]
   AuthStore[stores/auth.js]
 
   Pages --> QueryHooks

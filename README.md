@@ -39,55 +39,55 @@ A plataforma automatiza processos burocráticos, permitindo o controle eficiente
 
 ```mermaid
 flowchart TB
-	Router[RouterProvider / routes.jsx]
-	AppLayout[AppLayout]
-	PrivateRoutes[PrivateRoutes\nautenticação obrigatória]
-	AdminPrivateRoutes[AdminPrivateRoutes\nrole admin]
-	ManagerPrivateRoutes[ManagerPrivateRoutes\nrole manager ou membership de gestão]
+  Router[Router]
+  AppLayout[AppLayout]
+  PrivateRoutes[PrivateRoutes]
+  AdminPrivateRoutes[AdminPrivateRoutes]
+  ManagerPrivateRoutes[ManagerPrivateRoutes]
 
-	Home[Home]
-	Login[Login]
-	Forgot[ForgotPassword]
-	Reset[RedefinePassword]
-	Confirm[EmailConfirmation]
-	ChangePwd[ChangePassword]
+  Home[Home]
+  Login[Login]
+  Forgot[ForgotPassword]
+  Reset[RedefinePassword]
+  Confirm[EmailConfirmation]
+  ChangePwd[ChangePassword]
 
-	AdminLayout[AdminSideBarLayout]
-	StudentLayout[StudentSideBarLayout]
-	ManagerLayout[ManagerSideBarLayout]
+  AdminLayout[AdminLayout]
+  StudentLayout[StudentLayout]
+  ManagerLayout[ManagerLayout]
 
-	Router --> AppLayout
-	AppLayout --> Home
-	AppLayout --> Login
-	AppLayout --> Forgot
-	AppLayout --> Reset
-	AppLayout --> Confirm
-	AppLayout --> PrivateRoutes
-	PrivateRoutes --> ChangePwd
-	PrivateRoutes --> AdminPrivateRoutes
-	PrivateRoutes --> StudentLayout
-	PrivateRoutes --> ManagerPrivateRoutes
-	AdminPrivateRoutes --> AdminLayout
-	ManagerPrivateRoutes --> ManagerLayout
+  Router --> AppLayout
+  AppLayout --> Home
+  AppLayout --> Login
+  AppLayout --> Forgot
+  AppLayout --> Reset
+  AppLayout --> Confirm
+  AppLayout --> PrivateRoutes
+  PrivateRoutes --> ChangePwd
+  PrivateRoutes --> AdminPrivateRoutes
+  PrivateRoutes --> StudentLayout
+  PrivateRoutes --> ManagerPrivateRoutes
+  AdminPrivateRoutes --> AdminLayout
+  ManagerPrivateRoutes --> ManagerLayout
 ```
 
 ### Fluxo de dados
 
 ```mermaid
 flowchart LR
-	Pages[Páginas]
-	QueryHooks[hooks/query/*]
-	ApiEndpoints[services/api/endpoints.js]
-	AxiosApi[services/api/instance.js]
-	Backend[Backend /sgla-api]
-	AuthStore[stores/auth.js]
+  Pages[Páginas]
+  QueryHooks[hooks/query]
+  ApiEndpoints[services/api/endpoints.js]
+  AxiosApi[services/api/instance.js]
+  Backend[Backend]
+  AuthStore[stores/auth.js]
 
-	Pages --> QueryHooks
-	QueryHooks --> ApiEndpoints
-	ApiEndpoints --> AxiosApi
-	AxiosApi --> Backend
-	AxiosApi ..> AuthStore
-	QueryHooks ..> AuthStore
+  Pages --> QueryHooks
+  QueryHooks --> ApiEndpoints
+  ApiEndpoints --> AxiosApi
+  AxiosApi --> Backend
+  AxiosApi ..> AuthStore
+  QueryHooks ..> AuthStore
 ```
 
 Relações de suporte:
