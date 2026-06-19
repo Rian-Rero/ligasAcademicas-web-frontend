@@ -29,7 +29,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <GlobalStyles />
         <Routes />
       </Theme>
-      <ReactQueryDevtools />
+      {import.meta.env.VITE_NODE_ENV === 'development' && (
+        <ReactQueryDevtools />
+      )}
     </QueryClientProvider>
   </StrictMode>,
 );
