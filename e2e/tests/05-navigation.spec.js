@@ -12,7 +12,7 @@ test.describe('App navigation', () => {
     page,
   }) => {
     await page.goto('/login');
-    await page.getByText(/esqueceu|forgot/i).click();
+    await page.getByRole('button', { name: 'Esqueci minha senha' }).click();
     await expect(page).toHaveURL(/forgot/i);
     await page.goBack();
     await expect(page).toHaveURL(/login/);

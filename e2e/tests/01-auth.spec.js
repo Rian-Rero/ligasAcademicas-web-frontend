@@ -9,11 +9,10 @@ test.describe('Authentication lifecycle', () => {
   test('shows validation error for empty login form', async ({ page }) => {
     await page.goto('/login');
     await page.getByRole('button', { name: /entrar/i }).click();
-    // Validation errors visible
-    const errors = page.locator(
-      '[data-testid="form-error"], .error, p[role="alert"]',
-    );
-    await expect(errors.first()).toBeVisible({ timeout: 5000 });
+    await expect(
+      page.getByText('Insira um email no formato email@email.com'),
+    ).toBeVisible();
+    await expect(page.getByText('Favor digitar uma senha')).toBeVisible();
   });
 
   test('shows error for invalid credentials', async ({ page }) => {
@@ -46,6 +45,8 @@ test.describe('Authentication lifecycle', () => {
 
   test('forgot password link is visible on login page', async ({ page }) => {
     await page.goto('/login');
-    await expect(page.getByText(/esqueceu|forgot/i)).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Esqueci minha senha' }),
+    ).toBeVisible();
   });
 });
