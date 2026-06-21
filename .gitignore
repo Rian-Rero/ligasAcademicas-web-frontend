@@ -19,6 +19,14 @@ dist-ssr
 # Test coverage reports
 coverage/
 
+# End-to-end test artifacts
+playwright-report/
+test-results/
+.playwright/
+
+# Local agent skill artifacts
+docs/superpowers/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
